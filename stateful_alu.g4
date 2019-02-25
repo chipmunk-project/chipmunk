@@ -9,14 +9,18 @@ ARITHOP: 'arith_op'; // +,-
 MUX3  : 'Mux3';   // 3-to-1 mux
 MUX2  : 'Mux2';   // 2-to-1 mux
 OPT   : 'Opt';    // Pick either the argument or 0
-CONSTANT : 'C()'; // Return a finite constant
+CONSTANT : 'C()';  // Return a finite constant
 TRUE  : 'True';   // Guard corresponding to "always update"
 IF    : 'if';
 ELSE  : 'else';
 ELIF  : 'elif';
 
+
 // Identifiers
 ID : ('a'..'z' | 'A'..'Z') ('a'..'z' | 'A'..'Z' | '_' | '0'..'9')*;
+
+NUM : ('0'..'9') | (('1'..'9')('0'..'9')+);
+
 
 // alias id to state_var and packet_field
 state_var    : ID;
@@ -46,6 +50,7 @@ expr   : state_var #StateVar
        | packet_field #PacketField
        | expr op=('+'|'-'|'*'|'/') expr #ExprWithOp
        | '(' expr ')' #ExprWithParen
+       | MUX3 '(' expr ',' expr ',' NUM ')' #Mux3WithNum
        | MUX3 '(' expr ',' expr ',' expr ')' #Mux3
        | MUX2 '(' expr ',' expr ')' #Mux2
        | OPT '(' expr ')' #Opt

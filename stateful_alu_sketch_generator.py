@@ -125,6 +125,17 @@ class StatefulAluSketchGenerator(stateful_aluVisitor):
         self.mux3Count += 1
 
     @overrides
+    def visitMux3WithNum(self, ctx):
+        self.mainFunction += self.stateful_alu_name + "_Mux3_" + str(
+            self.mux3Count) + "("
+        self.visit(ctx.getChild(0, stateful_aluParser.ExprContext))
+        self.mainFunction += ","
+        self.visit(ctx.getChild(1, stateful_aluParser.ExprContext))
+        self.mainFunction += "," + "Mux3_" + str(self.mux3Count) + ")"
+        self.generateMux3WithNum(ctx.getChild(6).getText())
+        self.mux3Count += 1
+
+    @overrides
     def visitOpt(self, ctx):
         self.mainFunction += self.stateful_alu_name + "_" + "Opt_" + str(
             self.optCount) + "("
@@ -195,6 +206,16 @@ class StatefulAluSketchGenerator(stateful_aluVisitor):
     else if (choice == 1) return op2;
     else return op3;
     } \n\n"""
+        self.add_hole("Mux3_" + str(self.mux3Count), 2)
+
+    def generateMux3WithNum(self, num):
+        self.helperFunctionStrings += "int " + self.stateful_alu_name + "_Mux3_" + \
+        str(self.mux3Count) + \
+"""(int op1, int op2, int choice) {
+    if (choice == 0) return op1;
+    else if (choice == 1) return op2;
+    else return """ + num + """;
+} \n\n"""
         self.add_hole("Mux3_" + str(self.mux3Count), 2)
 
     def generateRelOp(self):
