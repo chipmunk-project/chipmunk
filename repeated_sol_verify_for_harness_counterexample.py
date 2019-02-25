@@ -88,7 +88,7 @@ else:
       begin_pos = original_sketch_file_string.find('assert',begin_pos)
 
       #add function assert here
-      (ret_code_sketch_with_counter_example, output_with_counter_example) = subprocess.getstatusoutput("sketch -V 3 --debug-cex " + "/tmp/new_sketch.sk")
+      (ret_code_sketch_with_counter_example, output_with_counter_example) = subprocess.getstatusoutput("sketch -V 3 --debug-cex --bnd-inbits=10 " + sketch_name + "_codegen_with_hole_value.sk")
       input_values = re.findall('\((\d+)\)' , output_with_counter_example)
       hits_pkt = re.findall("pkt_\d+",output_with_counter_example)
       hits_state = re.findall("state_\d+",output_with_counter_example)
