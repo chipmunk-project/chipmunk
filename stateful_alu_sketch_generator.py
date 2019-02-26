@@ -3,7 +3,8 @@ from stateful_aluVisitor import stateful_aluVisitor
 from overrides import overrides
 
 
-# Visitor class to generate Sketch code from a stateful_alu specification in a .stateful_alu file
+# Visitor class to generate Sketch code from a stateful_alu specification in a
+# .stateful_alu file
 class StatefulAluSketchGenerator(stateful_aluVisitor):
     def __init__(self, stateful_alu_file, stateful_alu_name):
         self.stateful_alu_name = stateful_alu_name
@@ -33,7 +34,8 @@ class StatefulAluSketchGenerator(stateful_aluVisitor):
         self.visit(ctx.getChild(0, stateful_aluParser.State_varsContext))
         self.mainFunction += ", "
         self.visit(ctx.getChild(0, stateful_aluParser.Packet_fieldsContext))
-        self.mainFunction += ", %s) {\n int old_state = state_1;"  # The %s is for hole arguments, which are added below.
+        # The %s is for hole arguments, which are added below.
+        self.mainFunction += ", %s) {\n int old_state = state_1;"
         self.visit(ctx.getChild(0, stateful_aluParser.Alu_bodyContext))
         self.mainFunction += "\n; return old_state;\n}"
         argument_string = ",".join(
@@ -94,8 +96,10 @@ class StatefulAluSketchGenerator(stateful_aluVisitor):
                 self.mainFunction += "}"
 
             # if there is an else
-            if ((ctx.getChildCount() > 7 and ctx.getChild(7).getText() == "else") or \
-                (ctx.getChildCount() > 14 and ctx.getChild(14).getText() == "else")):
+            if ((ctx.getChildCount() > 7
+                 and ctx.getChild(7).getText() == "else")
+                    or (ctx.getChildCount() > 14
+                        and ctx.getChild(14).getText() == "else")):
                 self.mainFunction += "else {"
                 self.visit(ctx.else_body)
                 self.mainFunction += "}"
@@ -209,9 +213,9 @@ class StatefulAluSketchGenerator(stateful_aluVisitor):
         self.add_hole("Mux3_" + str(self.mux3Count), 2)
 
     def generateMux3WithNum(self, num):
-        self.helperFunctionStrings += "int " + self.stateful_alu_name + "_Mux3_" + \
-        str(self.mux3Count) + \
-"""(int op1, int op2, int choice) {
+        self.helperFunctionStrings += "int " + self.stateful_alu_name + \
+            "_Mux3_" + str(self.mux3Count) + \
+            """(int op1, int op2, int choice) {
     if (choice == 0) return op1;
     else if (choice == 1) return op2;
     else return """ + num + """;
