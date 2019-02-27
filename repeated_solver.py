@@ -56,11 +56,11 @@ if (ret_code !=0 ):
   sys.exit(1)
 else:
   #generate the result file
-  result_file = open( "/tmp/result.sk", "w")
+  result_file = open( "/tmp/result.holes", "w")
   result_file.write(output)
   result_file.close()
   #Step2:run sol_verify.py
-  (ret_code, output) = subprocess.getstatusoutput("python3 sol_verify.py " + sketch_name + "_codegen.sk" + " " + "/tmp/result.sk " )
+  (ret_code, output) = subprocess.getstatusoutput("python3 sol_verify.py " + sketch_name + "_codegen.sk" + " " + "/tmp/result.holes " )
   if (ret_code == 0):
     print("success")
     end = time.time()
@@ -75,8 +75,8 @@ else:
     while(1):
       print(count)
       if (version == "negationassert_version"):
-        hole_value_file_string         = open("/tmp/result.sk","r").read()
-        open("/tmp/result.sk","w").close()
+        hole_value_file_string         = open("/tmp/result.holes","r").read()
+        open("/tmp/result.holes","w").close()
         begin_pos = hole_value_file_string.find('int')
         end_pos = hole_value_file_string.rfind(';')
         hole_value_file_string = hole_value_file_string[begin_pos:end_pos+1]
@@ -121,7 +121,7 @@ else:
       hole_value_string = ""
 #Failed      print("Hello1")
       if (ret_code1 == 0):
-        hole_value_file = open("/tmp/result.sk","w")
+        hole_value_file = open("/tmp/result.holes","w")
         for hole_name in sketch_generator.hole_names_:
           hits = re.findall("(" + hole_name + ")__" + "\w+ = (\d+)", output)
           if (len(hits) != 1):
@@ -133,7 +133,7 @@ else:
             hole_value_string += "int "+ hits[0][0] + " = "+ hits[0][1] + ";"
         hole_value_file.write(hole_value_string)
         hole_value_file.close()
-        (ret_code, output) = subprocess.getstatusoutput("python3 sol_verify.py " + "/tmp/new_sketch.sk" + " " + "/tmp/result.sk " )
+        (ret_code, output) = subprocess.getstatusoutput("python3 sol_verify.py " + "/tmp/new_sketch.sk" + " " + "/tmp/result.holes " )
         if (ret_code == 0):
           print("finally succeed")
           end = time.time()
