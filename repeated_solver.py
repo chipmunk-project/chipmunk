@@ -115,7 +115,7 @@ else:
       new_sketch.write(original_sketch_file_string)
       new_sketch.close()
 #success      print("Hello")
-      (ret_code1, output) = subprocess.getstatusoutput("time sketch -V 12 --slv-seed=1 --slv-parallel --bnd-inbits=2 --bnd-int-range=50 " + new_sketch.name)
+      (ret_code1, output) = subprocess.getstatusoutput("sketch -V 3 --bnd-inbits=2 --bnd-int-range=50 " + new_sketch.name)
       print("Iteration #" + str(count))
       hole_value_string = ""
 #Failed      print("Hello1")
