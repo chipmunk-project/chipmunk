@@ -73,7 +73,6 @@ else:
     original_sketch_file_string    = open(sketch_name + "_codegen.sk","r").read()
     count = 0
     while(1):
-      print(count)
       if (version == "negationassert_version"):
         hole_value_file_string         = open("/tmp/result.holes","r").read()
         open("/tmp/result.holes","w").close()
@@ -117,7 +116,7 @@ else:
       new_sketch.close()
 #success      print("Hello")
       (ret_code1, output) = subprocess.getstatusoutput("time sketch -V 12 --slv-seed=1 --slv-parallel --bnd-inbits=2 --bnd-int-range=50 " + new_sketch.name)
-      print("Hello")
+      print("Iteration #" + str(count))
       hole_value_string = ""
 #Failed      print("Hello1")
       if (ret_code1 == 0):
