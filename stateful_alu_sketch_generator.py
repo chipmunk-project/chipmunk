@@ -225,7 +225,7 @@ class StatefulAluSketchGenerator(stateful_aluVisitor):
                 if (choice == 0) return op1;
                 else if (choice == 1) return op2;
                 else return {2};
-            }}\n\n
+            }}\n
         """
         self.helperFunctionStrings += dedent(
             function_str.format(self.stateful_alu_name, str(self.mux3Count),
