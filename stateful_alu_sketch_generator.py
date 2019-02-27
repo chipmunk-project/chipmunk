@@ -137,6 +137,11 @@ class StatefulAluSketchGenerator(stateful_aluVisitor):
         self.mainFunction += ","
         self.visit(ctx.getChild(1, stateful_aluParser.ExprContext))
         self.mainFunction += "," + "Mux3_" + str(self.mux3Count) + ")"
+        # Here it's the child with index 6. The grammar parse for this
+        # expression as whole is following, NUM '(' expr ',' expr ',' NUM ')'
+        # Where NUM is not considered as an expr. Consider parsing NUM as expr
+        # so we could simply do ctx.getChild(2, stateful_aluParser.ExprContext)
+        # below.
         self.generateMux3WithNum(ctx.getChild(6).getText())
         self.mux3Count += 1
 
