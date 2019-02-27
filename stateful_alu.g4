@@ -9,7 +9,7 @@ ARITHOP: 'arith_op'; // +,-
 MUX3  : 'Mux3';   // 3-to-1 mux
 MUX2  : 'Mux2';   // 2-to-1 mux
 OPT   : 'Opt';    // Pick either the argument or 0
-CONSTANT : 'C()';  // Return a finite constant
+CONSTANT : 'C()'; // Return a finite constant
 TRUE  : 'True';   // Guard corresponding to "always update"
 IF    : 'if';
 ELSE  : 'else';
@@ -33,7 +33,7 @@ state_vars : state_var
 
 // list of packet_field
 packet_field_with_comma : ',' packet_field;
-packet_fields : packet_field 
+packet_fields : packet_field
               | packet_field packet_field_with_comma+ ;
 
 // guard for if and elif statements
