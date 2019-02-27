@@ -1,6 +1,7 @@
 from stateful_aluParser import stateful_aluParser
 from stateful_aluVisitor import stateful_aluVisitor
 from overrides import overrides
+from textwrap import dedent
 
 
 # Visitor class to generate Sketch code from a stateful_alu specification in a
@@ -213,13 +214,19 @@ class StatefulAluSketchGenerator(stateful_aluVisitor):
         self.add_hole("Mux3_" + str(self.mux3Count), 2)
 
     def generateMux3WithNum(self, num):
-        self.helperFunctionStrings += "int " + self.stateful_alu_name + \
-            "_Mux3_" + str(self.mux3Count) + \
-            """(int op1, int op2, int choice) {
-    if (choice == 0) return op1;
-    else if (choice == 1) return op2;
-    else return """ + num + """;
-} \n\n"""
+        # NOTE: To escape curly brace, use double curly brace.
+        function_str = """\
+            int {0}_Mux3_{1}(int op1, int op2, int choice) {{
+                if (choice == 0) return op1;
+                else if (choice == 1) return op2;
+                else return {2};
+            }}\n\n
+        """
+        self.helperFunctionStrings += dedent(
+            function_str.format(self.stateful_alu_name, str(self.mux3Count),
+                                num))
+        # Add two bit width hole, to express 3 possible values for choice in the
+        # above code.
         self.add_hole("Mux3_" + str(self.mux3Count), 2)
 
     def generateRelOp(self):
