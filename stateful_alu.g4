@@ -15,12 +15,11 @@ IF    : 'if';
 ELSE  : 'else';
 ELIF  : 'elif';
 
-
 // Identifiers
 ID : ('a'..'z' | 'A'..'Z') ('a'..'z' | 'A'..'Z' | '_' | '0'..'9')*;
 
+// Numerical constant
 NUM : ('0'..'9') | (('1'..'9')('0'..'9')+);
-
 
 // alias id to state_var and packet_field
 state_var    : ID;
