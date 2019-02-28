@@ -16,7 +16,7 @@ def get_num_pkt_fields_and_state_vars(program):
 
 
 if (len(sys.argv) < 9):#This part may need change with the chipmunk.py file
-  print("Usage: python3 " + sys.argv[0] + " <program file> <alu file> <number of pipeline stages> <number of stateless/stateful ALUs per stage> <codegen/optverify> <sketch_name (w/o file extension)> <parallel/serial> <counterexample_version/negationassert_version>" )
+  print("Usage: python3 " + sys.argv[0] + " <program file> <alu file> <number of pipeline stages> <number of stateless/stateful ALUs per stage> <codegen/optverify> <sketch_name (w/o file extension)> <parallel/serial> <counter_example_mode/hole_eliminationt_mode>" )
   sys.exit(1)
 else:
   start = time.time()
@@ -32,7 +32,7 @@ else:
   sketch_name          = str(sys.argv[6])
   parallel_or_serial   = str(sys.argv[7])
   version = str(sys.argv[8])
-  assert((version == "counterexample_version") or (version == "negationassert_version"))
+  assert((version == "counter_example_mode") or (version == "hole_eliminationt_mode"))
 # Initialize jinja2 environment for templates
 env = Environment(loader = FileSystemLoader('./templates'), undefined = StrictUndefined)
 
@@ -56,11 +56,11 @@ if (ret_code !=0 ):
   sys.exit(1)
 else:
   #generate the result file
-  result_file = open( "/tmp/result.holes", "w")
+  result_file = open( "/tmp/"+ sketch_name +"_result.holes", "w")
   result_file.write(output)
   result_file.close()
   #Step2:run sol_verify.py
-  (ret_code, output) = subprocess.getstatusoutput("python3 sol_verify.py " + sketch_name + "_codegen.sk" + " " + "/tmp/result.holes " )
+  (ret_code, output) = subprocess.getstatusoutput("python3 sol_verify.py " + sketch_name + "_codegen.sk" + " " + "/tmp/"+ sketch_name +"_result.holes " )
   if (ret_code == 0):
     print("success")
     end = time.time()
@@ -74,8 +74,8 @@ else:
     count = 0
     while(1):
       if (version == "negationassert_version"):
-        hole_value_file_string         = open("/tmp/result.holes","r").read()
-        open("/tmp/result.holes","w").close()
+        hole_value_file_string         = open("/tmp/"+ sketch_name +"_result.holes","r").read()
+        open("/tmp/" + sketch_name + "_result.holes","w").close()
         begin_pos = hole_value_file_string.find('int')
         end_pos = hole_value_file_string.rfind(';')
         hole_value_file_string = hole_value_file_string[begin_pos:end_pos+1]
@@ -111,7 +111,7 @@ else:
         counter_example_assert = "assert pipeline(" + "x_" + str(count)  + ")" + " == " + "program(" + "x_" + str(count)  + ");\n"
         original_sketch_file_string = original_sketch_file_string[0:begin_pos] + counter_example_definition + counter_example_assert + original_sketch_file_string[begin_pos:]  
 
-      new_sketch = open("/tmp/new_sketch.sk","w")
+      new_sketch = open("/tmp/" + sketch_name + "_new_sketch.sk","w")
       new_sketch.write(original_sketch_file_string)
       new_sketch.close()
 #success      print("Hello")
@@ -120,7 +120,7 @@ else:
       hole_value_string = ""
 #Failed      print("Hello1")
       if (ret_code1 == 0):
-        hole_value_file = open("/tmp/result.holes","w")
+        hole_value_file = open("/tmp/"+ sketch_name + "_result.holes","w")
         for hole_name in sketch_generator.hole_names_:
           hits = re.findall("(" + hole_name + ")__" + "\w+ = (\d+)", output)
           if (len(hits) != 1):
@@ -132,7 +132,7 @@ else:
             hole_value_string += "int "+ hits[0][0] + " = "+ hits[0][1] + ";"
         hole_value_file.write(hole_value_string)
         hole_value_file.close()
-        (ret_code, output) = subprocess.getstatusoutput("python3 sol_verify.py " + "/tmp/new_sketch.sk" + " " + "/tmp/result.holes " )
+        (ret_code, output) = subprocess.getstatusoutput("python3 sol_verify.py " + "/tmp/" + sketch_name + "_new_sketch.sk" + " " + "/tmp/" + sketch_name + "_result.holes " )
         if (ret_code == 0):
           print("finally succeed")
           end = time.time()
