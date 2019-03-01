@@ -73,7 +73,7 @@ else:
     original_sketch_file_string    = open(sketch_name + "_codegen.sk","r").read()
     count = 0
     while(1):
-      if (version == "negationassert_version"):
+      if (version == "hole_elimination_mode"):
         hole_value_file_string         = open("/tmp/"+ sketch_name +"_result.holes","r").read()
         open("/tmp/" + sketch_name + "_result.holes","w").close()
         begin_pos = hole_value_file_string.find('int')
@@ -94,7 +94,10 @@ else:
         begin_pos = original_sketch_file_string.find('assert',begin_pos)
 
         #add function assert here
-        (ret_code_sketch_with_counter_example, output_with_counter_example) = subprocess.getstatusoutput("sketch -V 3 --debug-cex --bnd-inbits=10 " + sketch_name + "_codegen_with_hole_value.sk")
+        if (count == 0):
+          (ret_code_sketch_with_counter_example, output_with_counter_example) = subprocess.getstatusoutput("sketch -V 3 --debug-cex --bnd-inbits=10 " + sketch_name + "_codegen_with_hole_value.sk")
+        else:
+          (ret_code_sketch_with_counter_example, output_with_counter_example) = subprocess.getstatusoutput("sketch -V 3 --debug-cex --bnd-inbits=10 " + "/tmp/" + sketch_name + "_new_sketch_with_hole_value.sk")
         input_values = re.findall("has value \d+= " + '\((\d+)\)' , output_with_counter_example)
         hits_pkt = re.findall("pkt_\d+",output_with_counter_example)
         hits_state = re.findall("state_\d+",output_with_counter_example)
