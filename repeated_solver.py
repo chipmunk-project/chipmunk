@@ -16,7 +16,7 @@ def get_num_pkt_fields_and_state_vars(program):
 
 
 if (len(sys.argv) < 9):#This part may need change with the chipmunk.py file
-  print("Usage: python3 " + sys.argv[0] + " <program file> <alu file> <number of pipeline stages> <number of stateless/stateful ALUs per stage> <codegen/optverify> <sketch_name (w/o file extension)> <parallel/serial> <counter_example_mode/hole_eliminationt_mode>" )
+  print("Usage: python3 " + sys.argv[0] + " <program file> <alu file> <number of pipeline stages> <number of stateless/stateful ALUs per stage> <codegen/optverify> <sketch_name (w/o file extension)> <parallel/serial> <counter_example_mode/hole_elimination_mode>" )
   sys.exit(1)
 else:
   start = time.time()
@@ -32,7 +32,7 @@ else:
   sketch_name          = str(sys.argv[6])
   parallel_or_serial   = str(sys.argv[7])
   version = str(sys.argv[8])
-  assert((version == "counter_example_mode") or (version == "hole_eliminationt_mode"))
+  assert((version == "counter_example_mode") or (version == "hole_elimination_mode"))
 # Initialize jinja2 environment for templates
 env = Environment(loader = FileSystemLoader('./templates'), undefined = StrictUndefined)
 
