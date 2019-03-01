@@ -1,6 +1,4 @@
-"""
-Repeated Solver.
-"""
+"""Repeated Solver"""
 
 from pathlib import Path
 import re

@@ -1,6 +1,4 @@
-"""
-Chipmunk Compiler
-"""
+"""Chipmunk Compiler"""
 
 from pathlib import Path
 import pickle
