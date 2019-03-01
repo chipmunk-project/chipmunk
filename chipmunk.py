@@ -10,18 +10,7 @@ from jinja2 import Environment, FileSystemLoader, StrictUndefined
 
 from chipmunk_pickle import ChipmunkPickle
 from sketch_generator import SketchGenerator
-
-
-# Use a regex to scan the program and extract the largest packet field index
-# and largest state variable index
-def get_num_pkt_fields_and_state_vars(program):
-    pkt_fields = [
-        int(x) for x in re.findall("state_and_packet.pkt_(\d+)", program)
-    ]
-    state_vars = [
-        int(x) for x in re.findall("state_and_packet.state_(\d+)", program)
-    ]
-    return (max(pkt_fields) + 1, max(state_vars) + 1)
+from utils import get_num_pkt_fields_and_state_vars
 
 
 if (len(sys.argv) < 8):
