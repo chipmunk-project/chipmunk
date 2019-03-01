@@ -1,14 +1,21 @@
-from jinja2 import Template, Environment, FileSystemLoader, StrictUndefined
-import pickle
+"""
+Chipmunk Compiler
+"""
+
 from pathlib import Path
-import sys
-from sketch_generator import SketchGenerator
-from chipmunk_pickle import ChipmunkPickle
+import pickle
 import re
 import subprocess
+import sys
+
+from jinja2 import Environment, FileSystemLoader, StrictUndefined
+
+from chipmunk_pickle import ChipmunkPickle
+from sketch_generator import SketchGenerator
 
 
-# Use a regex to scan the program and extract the largest packet field index and largest state variable index
+# Use a regex to scan the program and extract the largest packet field index
+# and largest state variable index
 def get_num_pkt_fields_and_state_vars(program):
     pkt_fields = [
         int(x) for x in re.findall("state_and_packet.pkt_(\d+)", program)
@@ -56,16 +63,19 @@ sketch_generator = SketchGenerator(
     jinja2_env=env,
     alu_file=alu_file)
 
-# Create stateless and stateful ALUs, operand muxes for stateful ALUs, and output muxes.
+# Create stateless and stateful ALUs, operand muxes for stateful ALUs, and
+# output muxes.
 alu_definitions = sketch_generator.generate_alus()
 stateful_operand_mux_definitions = sketch_generator.generate_stateful_operand_muxes(
 )
 output_mux_definitions = sketch_generator.generate_output_muxes()
 
-# Create allocator to ensure each state var is assigned to exactly stateful ALU and vice versa.
+# Create allocator to ensure each state var is assigned to exactly stateful ALU
+# and vice versa.
 sketch_generator.generate_state_allocator()
 
-# Now fill the appropriate template holes using the components created using sketch_generator
+# Now fill the appropriate template holes using the components created using
+# sketch_generator
 if (mode == "codegen"):
     codegen_code = sketch_generator.generate_sketch(
         program_file=program_file,
@@ -125,7 +135,8 @@ else:
     sketch_file.close()
     print("Sketch file is ", sketch_file.name)
 
-    # Put the rest (holes, hole arguments, constraints, etc.) into a .pickle file.
+    # Put the rest (holes, hole arguments, constraints, etc.) into a .pickle
+    # file.
     pickle_file = open(sketch_name + ".pickle", "wb")
     pickle.dump(
         ChipmunkPickle(
