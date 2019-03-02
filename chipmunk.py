@@ -12,11 +12,12 @@ from chipmunk_pickle import ChipmunkPickle
 from sketch_generator import SketchGenerator
 from utils import get_num_pkt_fields_and_state_vars
 
-
 if (len(sys.argv) < 8):
     print(
         "Usage: python3 " + sys.argv[0] +
-        " <program file> <alu file> <number of pipeline stages> <number of stateless/stateful ALUs per stage> <codegen/optverify> <sketch_name (w/o file extension)> <parallel/serial>"
+        " <program file> <alu file> <number of pipeline stages> " + \
+        "<number of stateless/stateful ALUs per stage> <codegen/optverify> " + \
+        "<sketch_name (w/o file extension)> <parallel/serial>"
     )
     sys.exit(1)
 else:
@@ -27,13 +28,13 @@ else:
     num_pipeline_stages = int(sys.argv[3])
     num_alus_per_stage = int(sys.argv[4])
     num_phv_containers = num_alus_per_stage
-    assert (num_fields_in_prog <= num_phv_containers)
+    assert num_fields_in_prog <= num_phv_containers
     mode = str(sys.argv[5])
-    assert ((mode == "codegen") or (mode == "optverify"))
+    assert (mode == "codegen") or (mode == "optverify")
     sketch_name = str(sys.argv[6])
     parallel_or_serial = str(sys.argv[7])
-    assert ((parallel_or_serial == "parallel")
-            or (parallel_or_serial == "serial"))
+    assert (parallel_or_serial == "parallel") or (
+        parallel_or_serial == "serial")
 
 # Initialize jinja2 environment for templates
 env = Environment(
@@ -72,43 +73,42 @@ if (mode == "codegen"):
         output_mux_definitions=output_mux_definitions)
 
     # Create file and write sketch_harness into it.
-    sketch_file = open(sketch_name + "_codegen.sk", "w")
-    sketch_file.write(codegen_code)
-    sketch_file.close()
+    sketch_file_name = sketch_name + "_codegen.sk"
+    with open(sketch_file_name, "w") as f:
+        f.write(codegen_code)
 
     # Call sketch on it
     print("Total number of hole bits is", sketch_generator.total_hole_bits_)
-    print("Sketch file is ", sketch_file.name)
+    print("Sketch file is ", sketch_file_name)
     if (parallel_or_serial == "parallel"):
         (ret_code, output) = subprocess.getstatusoutput(
             "time sketch -V 12 --slv-seed=1 --slv-parallel --bnd-inbits=2 --bnd-int-range=50 "
-            + sketch_file.name)
+            + sketch_file_name)
     else:
         (ret_code, output) = subprocess.getstatusoutput(
             "time sketch -V 12 --slv-seed=1 --bnd-inbits=2 --bnd-int-range=50 "
-            + sketch_file.name)
+            + sketch_file_name)
+
     if (ret_code != 0):
-        errors_file = open(sketch_name + ".errors", "w")
-        errors_file.write(output)
-        errors_file.close()
-        print("Sketch failed. Output left in " + errors_file.name)
+        with open(sketch_name + ".errors", "w") as errors_file:
+            errors_file.write(output)
+            print("Sketch failed. Output left in " + errors_file.name)
         sys.exit(1)
     else:
-        success_file = open(sketch_name + ".success", "w")
         for hole_name in sketch_generator.hole_names_:
             hits = re.findall("(" + hole_name + ")__" + "\w+ = (\d+)", output)
-            assert (len(hits) == 1)
-            assert (len(hits[0]) == 2)
+            assert len(hits) == 1
+            assert len(hits[0]) == 2
             print("int ", hits[0][0], " = ", hits[0][1], ";")
-        success_file.write(output)
-        success_file.close()
-        print(
-            "Sketch succeeded. Generated configuration is given above. Output left in "
-            + success_file.name)
+        with open(sketch_name + ".success", "w") as success_file:
+            success_file.write(output)
+            print(
+                "Sketch succeeded. Generated configuration is given above. " + \
+                "Output left in " + success_file.name)
         sys.exit(0)
 
 else:
-    assert (mode == "optverify")
+    assert mode == "optverify"
     optverify_code = sketch_generator.generate_sketch(
         program_file=program_file,
         alu_definitions=alu_definitions,
@@ -117,22 +117,20 @@ else:
         output_mux_definitions=output_mux_definitions)
 
     # Create file and write sketch_function into it
-    sketch_file = open(sketch_name + "_optverify.sk", "w")
-    sketch_file.write(optverify_code)
-    sketch_file.close()
-    print("Sketch file is ", sketch_file.name)
+    with open(sketch_name + "_optverify.sk", "w") as sketch_file:
+        sketch_file.write(optverify_code)
+        print("Sketch file is ", sketch_file.name)
 
     # Put the rest (holes, hole arguments, constraints, etc.) into a .pickle
     # file.
-    pickle_file = open(sketch_name + ".pickle", "wb")
-    pickle.dump(
-        ChipmunkPickle(
-            holes=sketch_generator.holes_,
-            hole_arguments=sketch_generator.hole_arguments_,
-            constraints=sketch_generator.constraints_,
-            num_fields_in_prog=num_fields_in_prog,
-            num_state_vars=num_state_vars), pickle_file)
-    pickle_file.close()
-    print("Pickle file is ", pickle_file.name)
+    with open(sketch_name + ".pickle", "wb") as pickle_file:
+        pickle.dump(
+            ChipmunkPickle(
+                holes=sketch_generator.holes_,
+                hole_arguments=sketch_generator.hole_arguments_,
+                constraints=sketch_generator.constraints_,
+                num_fields_in_prog=num_fields_in_prog,
+                num_state_vars=num_state_vars), pickle_file)
+        print("Pickle file is ", pickle_file.name)
 
     print("Total number of hole bits is", sketch_generator.total_hole_bits_)
