@@ -18,10 +18,15 @@ class ChipmunkCodegenTest(unittest.TestCase):
         ]
 
         for alu in alus:
+            # TODO(taegyunkim): Instead of writing to the same success and
+            # failure files, use different files for each ALU.
             compiler = Compiler(
                 path.join(base_path, "../example_specs/simple.sk"),
                 path.join(alu_dir, alu), 2, 2, "simple", "serial")
             self.assertEqual(compiler.codegen(), 0, "Failed for " + alu)
+            # TODO(taegyunkim): When all tests pass, clean up intermediary files
+            # or at least have an option to keep intermediary files, with
+            # default deleting them.
 
 
 if __name__ == '__main__':
