@@ -13,7 +13,7 @@ from sketch_generator import SketchGenerator
 from utils import get_num_pkt_fields_and_state_vars
 
 
-class Chipmunk:
+class Compiler:
     def __init__(self, program_file, alu_file, num_pipeline_stages,
                  num_alus_per_stage, sketch_name, parallel_or_serial):
         self.program_file = program_file
@@ -153,7 +153,7 @@ def main(argv):
     parallel_or_serial = str(argv[7])
     assert parallel_or_serial in ["parallel", "serial"]
 
-    compiler = Chipmunk(program_file, alu_file, num_pipeline_stages,
+    compiler = Compiler(program_file, alu_file, num_pipeline_stages,
                         num_alus_per_stage, sketch_name, parallel_or_serial)
 
     # Now fill the appropriate template holes using the components created using

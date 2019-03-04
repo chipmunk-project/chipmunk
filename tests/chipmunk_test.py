@@ -1,20 +1,24 @@
+"""Simple unit tests for chipmunk."""
+
 import unittest
+import glob
+from os import path
 
-class TestStringMethods(unittest.TestCase):
+from chipmunk import Compiler
 
-    def test_upper(self):
-        self.assertEqual('foo'.upper(), 'FOO')
 
-    def test_isupper(self):
-        self.assertTrue('FOO'.isupper())
-        self.assertFalse('Foo'.isupper())
+class ChipmunkCodegenTest(unittest.TestCase):
+    """Tests codegen method from chipmunk.Compiler."""
 
-    def test_split(self):
-        s = 'hello world'
-        self.assertEqual(s.split(), ['hello', 'world'])
-        # check that s.split fails when the separator is not a string
-        with self.assertRaises(TypeError):
-            s.split(2)
+    def test_codegen_with_simple_sketch_for_all_alus(self):
+        cwd = path.abspath(path.dirname(__file__))
+        for alu in glob.glob(
+                path.join(cwd, "../example_alus/*alu")):
+            compiler = Compiler(
+                path.join(cwd, "../example_specs/simple.sk"), alu, 2, 2,
+                "simple", "serial")
+            self.assertEqual(compiler.codegen(), 0)
+
 
 if __name__ == '__main__':
     unittest.main()
