@@ -2,7 +2,7 @@
 
 import unittest
 import glob
-from os import path
+from os import path, listdir
 
 from chipmunk import Compiler
 
@@ -11,13 +11,17 @@ class ChipmunkCodegenTest(unittest.TestCase):
     """Tests codegen method from chipmunk.Compiler."""
 
     def test_codegen_with_simple_sketch_for_all_alus(self):
-        cwd = path.abspath(path.dirname(__file__))
-        for alu in glob.glob(
-                path.join(cwd, "../example_alus/*alu")):
+        base_path = path.abspath(path.dirname(__file__))
+        alu_dir = path.join(base_path, "../example_alus/")
+        alus = [
+            f for f in listdir(alu_dir) if path.isfile(path.join(alu_dir, f))
+        ]
+
+        for alu in alus:
             compiler = Compiler(
-                path.join(cwd, "../example_specs/simple.sk"), alu, 2, 2,
-                "simple", "serial")
-            self.assertEqual(compiler.codegen(), 0)
+                path.join(base_path, "../example_specs/simple.sk"),
+                path.join(alu_dir, alu), 2, 2, "simple", "serial")
+            self.assertEqual(compiler.codegen(), 0, "Failed for " + alu)
 
 
 if __name__ == '__main__':
