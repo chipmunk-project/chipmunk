@@ -26,5 +26,5 @@ python3 optverify.py sample1 sample2 example_transforms/very_simple.transform
 Simply run `nosetests`, after installing
 [nose](https://nose.readthedocs.io/en/latest/).
 
-If you want to add a test, add a new file in /tests directory or add test
-cases in existing _test.py.
+If you want to add a test, add a new file in [tests](tests/) directory or add
+test cases in existing `*_test.py` file.
