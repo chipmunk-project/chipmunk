@@ -21,6 +21,7 @@ class StatefulAluSketchGenerator(stateful_aluVisitor):
         self.stateful_alu_args = dict()
         self.mainFunction = ""
         self.num_packet_fields = 0
+        self.num_state_slots = 0
 
     def add_hole(self, hole_name, hole_width):
         prefixed_hole = self.stateful_alu_name + "_" + hole_name
@@ -54,9 +55,20 @@ class StatefulAluSketchGenerator(stateful_aluVisitor):
     @overrides
     def visitState_vars(self, ctx):
         self.mainFunction += "ref int "
-        self.visit(ctx.getChild(0, stateful_aluParser.State_varContext))
-        assert (ctx.getChildCount() == 1
-                ), "We currently only handle 1 state variable in an atom."
+        self.mainFunction += ctx.getChild(
+            0, stateful_aluParser.State_varContext).getText() + ","
+        self.num_state_slots = 1
+        if (ctx.getChildCount() > 1):
+            for i in range(1, ctx.getChildCount()):
+                self.visit(ctx.getChild(i))
+                self.num_state_slots += 1
+        self.mainFunction = self.mainFunction[:-1]  # Trim out the last comma
+
+    @overrides
+    def visitState_var_with_comma(self, ctx):
+        self.mainFunction += "ref int "
+        assert (ctx.getChild(0).getText() == ",")
+        self.mainFunction += ctx.getChild(1).getText() + ","
 
     @overrides
     def visitPacket_fields(self, ctx):
