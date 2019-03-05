@@ -100,18 +100,16 @@ else:
           (ret_code_sketch_with_counter_example, output_with_counter_example) = subprocess.getstatusoutput("sketch -V 3 --debug-cex --bnd-inbits=10 " + sketch_name + "_codegen_with_hole_value.sk")
         else:
           (ret_code_sketch_with_counter_example, output_with_counter_example) = subprocess.getstatusoutput("sketch -V 3 --debug-cex --bnd-inbits=10 " + "/tmp/" + sketch_name + "_new_sketch_with_hole_value.sk")
-        input_values = re.findall("has value \d+= " + '\((\d+)\)' , output_with_counter_example)
-        hits_pkt = re.findall("pkt_\d+",output_with_counter_example)
-        hits_state = re.findall("state_\d+",output_with_counter_example)
-        print(input_values)
-        print("pkt: ",hits_pkt)
-        print("state: ", hits_state)
+        pkt_group = re.findall("input (pkt_\d+)\w+ has value \d+= \((\d+)\)", output_with_counter_example)
+        state_group = re.findall("input (state_\d+)\w+ has value \d+= \((\d+)\)", output_with_counter_example)
+        print(pkt_group,"len= ", len(pkt_group))
+        print(state_group, "len= ", len(state_group))
         counter_example_definition = "|StateAndPacket| x_" + str(count) + " = |StateAndPacket|(\n"
-        for i in range(len(hits_pkt)):
-          counter_example_definition += hits_pkt[i] + " = " + input_values[i] + ','
-        for i in range(len(hits_state)-1):
-          counter_example_definition += hits_state[i] + " = " + input_values[len(hits_pkt)+i] + ','
-        counter_example_definition += hits_state[len(hits_state)-1] + " = " + input_values[len(input_values)-1] + ");\n"
+        for i in range(len(pkt_group)):
+          counter_example_definition += pkt_group[i][0] + " = " + pkt_group[i][1] + ','
+        for i in range(len(state_group)-1):
+          counter_example_definition += state_group[i][0] + " = " + state_group[i][1] + ','
+        counter_example_definition += state_group[i][0] + " = " + state_group[i][1] + ");\n"
 
         counter_example_assert = "assert pipeline(" + "x_" + str(count)  + ")" + " == " + "program(" + "x_" + str(count)  + ");\n"
         original_sketch_file_string = original_sketch_file_string[0:begin_pos] + counter_example_definition + counter_example_assert + original_sketch_file_string[begin_pos:]  
