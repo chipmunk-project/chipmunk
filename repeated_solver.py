@@ -8,6 +8,8 @@ from   chipmunk_pickle import ChipmunkPickle
 import re
 #record time
 import time
+from sol_verify import sol_verify
+
 
 def get_num_pkt_fields_and_state_vars(program):
   pkt_fields = [int(x) for x in re.findall("state_and_packet.pkt_(\d+)", program)]
@@ -60,7 +62,7 @@ else:
   result_file.write(output)
   result_file.close()
   #Step2:run sol_verify.py
-  (ret_code, output) = subprocess.getstatusoutput("python3 sol_verify.py " + sketch_name + "_codegen.sk" + " " + "/tmp/"+ sketch_name +"_result.holes " )
+  ret_code = sol_verify(sketch_name + "_codegen.sk" , "/tmp/"+ sketch_name +"_result.holes")
   if (ret_code == 0):
     print("success")
     end = time.time()
@@ -117,11 +119,9 @@ else:
       new_sketch = open("/tmp/" + sketch_name + "_new_sketch.sk","w")
       new_sketch.write(original_sketch_file_string)
       new_sketch.close()
-#success      print("Hello")
       (ret_code1, output) = subprocess.getstatusoutput("sketch -V 3 --bnd-inbits=2 --bnd-int-range=50 " + new_sketch.name)
       print("Iteration #" + str(count))
       hole_value_string = ""
-#Failed      print("Hello1")
       if (ret_code1 == 0):
         hole_value_file = open("/tmp/"+ sketch_name + "_result.holes","w")
         for hole_name in sketch_generator.hole_names_:
@@ -135,7 +135,7 @@ else:
             hole_value_string += "int "+ hits[0][0] + " = "+ hits[0][1] + ";"
         hole_value_file.write(hole_value_string)
         hole_value_file.close()
-        (ret_code, output) = subprocess.getstatusoutput("python3 sol_verify.py " + "/tmp/" + sketch_name + "_new_sketch.sk" + " " + "/tmp/" + sketch_name + "_result.holes " )
+        ret_code = sol_verify("/tmp/" + sketch_name + "_new_sketch.sk" , "/tmp/"+ sketch_name +"_result.holes")
         if (ret_code == 0):
           print("finally succeed")
           end = time.time()
