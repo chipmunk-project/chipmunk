@@ -9,19 +9,21 @@
 // Definitions of muxes and ALUs of the router
 {% include "muxes_and_alus.j2" %}
 
-// Data type for holding result from spec and implementation
 struct StateGroup {
-  {% for state_number in range(num_state_slots) %}
-    int state_{{state_number}};
+  {% for slot_number in range(num_state_slots) %}
+    int state_{{slot_number}};
   {% endfor %}
 }
 
+// Data type for holding result from spec and implementation
 struct StateAndPacket {
   {% for field_number in range(num_fields_in_prog) %}
     int pkt_{{field_number}};
   {% endfor %}
   {% for group_number in range(num_state_groups) %}
-    StateGroup state_group_{{group_number}};
+    {% for slot_number in range(num_state_slots) %}
+      int state_group_{{group_number}}_state_{{slot_number}};
+    {% endfor %}
   {% endfor %}
 }
 

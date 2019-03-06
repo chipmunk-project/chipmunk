@@ -72,9 +72,21 @@
   // Read stateful ALU slots from allocated state vars.
   {% for state_group_number in range(num_state_groups) %}
   {% if state_group_number == 0 %}
-  if ({{sketch_name}}_salu_config_{{stage_number}}_{{state_group_number}} == 1) { state_operand_salu_{{stage_number}}_{{state_group_number}} = state_and_packet.state_group_{{state_group_number}};}
+  if ({{sketch_name}}_salu_config_{{stage_number}}_{{state_group_number}} == 1) { state_operand_salu_{{stage_number}}_{{state_group_number}} = |StateGroup|({% for slot_number in range(num_state_slots) %}
+                           {% if slot_number < num_state_slots - 1 %}
+                             state_{{slot_number}} = state_and_packet.state_group_{{state_group_number}}_state_{{slot_number}},
+                           {% else %}
+                             state_{{slot_number}} = state_and_packet.state_group_{{state_group_number}}_state_{{slot_number}}
+                           {% endif %}
+                          {%endfor%});}
   {% else %}
-  else if ({{sketch_name}}_salu_config_{{stage_number}}_{{state_group_number}} == 1) { state_operand_salu_{{stage_number}}_{{state_group_number}} = state_and_packet.state_group_{{state_group_number}};}
+  else if ({{sketch_name}}_salu_config_{{stage_number}}_{{state_group_number}} == 1) { state_operand_salu_{{stage_number}}_{{state_group_number}} =  |StateGroup|({% for slot_number in range(num_state_slots) %}
+                           {% if slot_number < num_state_slots - 1 %}
+                             state_{{slot_number}} = state_and_packet.state_group_{{state_group_number}}_state_{{slot_number}},
+                           {% else %}
+                             state_{{slot_number}} = state_and_packet.state_group_{{state_group_number}}_state_{{slot_number}}
+                           {% endif %}
+                          {%endfor%});}
   {% endif %}
   {% endfor %}
 
@@ -104,9 +116,17 @@
   {% for state_group_number in range(num_state_groups) %}
   // Write state_{{state_group_number}}
   {% if state_group_number == 0 %}
-  if ({{sketch_name}}_salu_config_{{stage_number}}_{{state_group_number}} == 1) { state_and_packet.state_group_{{state_group_number}} = state_operand_salu_{{stage_number}}_{{state_group_number}};}
+  if ({{sketch_name}}_salu_config_{{stage_number}}_{{state_group_number}} == 1) {
+    {% for slot_number in range(num_state_slots) %}
+      state_and_packet.state_group_{{state_group_number}}_state_{{slot_number}} = state_operand_salu_{{stage_number}}_{{state_group_number}}.state_{{slot_number}};
+    {% endfor %}
+  }
   {% else %}
-  else if ({{sketch_name}}_salu_config_{{stage_number}}_{{state_group_number}} == 1) { state_and_packet.state_group_{{state_group_number}} = state_operand_salu_{{stage_number}}_{{state_group_number}};}
+  else if ({{sketch_name}}_salu_config_{{stage_number}}_{{state_group_number}} == 1) {
+    {% for slot_number in range(num_state_slots) %}
+      state_and_packet.state_group_{{state_group_number}}_state_{{slot_number}} = state_operand_salu_{{stage_number}}_{{state_group_number}}.state_{{slot_number}};
+    {% endfor %}
+  }
   {% endif %}
   {% endfor %}
 
@@ -126,26 +146,21 @@ harness void main(
   {{range(num_fields_in_prog)|map('add_prefix_suffix', "int pkt_", "")|join(',')}}
   {% for state_group_number in range(num_state_groups) %}
     {% for slot_number in range(num_state_slots) %}
-      , int state_group_{{state_group_number}}_{{slot_number}}
+      , int state_group_{{state_group_number}}_state_{{slot_number}}
     {% endfor %}
   {% endfor %}) {
 
-  {% for state_group_number in range(num_state_groups) %}
-    StateGroup state_group_{{state_group_number}} = new StateGroup();
-    {% for slot_number in range(num_state_slots) %}
-       state_group_{{state_group_number}}.state_{{slot_number}} = state_group_{{state_group_number}}_{{slot_number}};
-    {% endfor %}
-  {% endfor %}
-
-  StateAndPacket x = new StateAndPacket({% for field_number in range(num_fields_in_prog) %}
+  |StateAndPacket| x = |StateAndPacket|({% for field_number in range(num_fields_in_prog) %}
     pkt_{{field_number}} = pkt_{{field_number}},
   {% endfor %}
   {% for state_group_number in range(num_state_groups) %}
-    {% if state_group_number == num_state_groups - 1 %}
-    state_group_{{state_group_number}} = state_group_{{state_group_number}}
-    {% else %}
-    state_group_{{state_group_number}} = state_group_{{state_group_number}},
-    {% endif %}
+    {% for slot_number in range(num_state_slots) %}
+      {% if (state_group_number == num_state_groups - 1) and (slot_number == num_state_slots - 1) %}
+        state_group_{{state_group_number}}_state_{{slot_number}} = state_group_{{state_group_number}}_state_{{slot_number}}
+      {% else %}
+        state_group_{{state_group_number}}_state_{{slot_number}} = state_group_{{state_group_number}}_state_{{slot_number}},
+      {% endif %}
+    {% endfor %}
   {% endfor %});
 
 assert(pipeline(x) == program(x));
