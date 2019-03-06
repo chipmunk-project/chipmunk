@@ -34,7 +34,7 @@ class StatefulAluSketchGenerator(stateful_aluVisitor):
     def visitStateful_alu(self, ctx):
         self.mainFunction += "|StateGroup| " + self.stateful_alu_name + "("
         self.visit(ctx.getChild(0, stateful_aluParser.State_varsContext))
-        self.mainFunction += "|StateGroup| state_group, "
+        self.mainFunction += "ref |StateGroup| state_group, "
         self.visit(ctx.getChild(0, stateful_aluParser.Packet_fieldsContext))
 
         # The %s is for hole arguments, which are added below.
@@ -47,6 +47,8 @@ class StatefulAluSketchGenerator(stateful_aluVisitor):
 
         # Now get into alu body
         self.visit(ctx.getChild(0, stateful_aluParser.Alu_bodyContext))
+        for slot in range(self.num_state_slots):
+          self.mainFunction += "\nstate_group.state_" + str(slot) + " = state_" + str(slot) + ";"
         self.mainFunction += "\n; return old_state_group;\n}"
         argument_string = ",".join(
             ["int " + hole for hole in sorted(self.stateful_alu_args)])
