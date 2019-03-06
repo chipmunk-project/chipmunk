@@ -29,7 +29,7 @@ class Compiler:
 
         # Initialize jinja2 environment for templates
         self.jinja2_env = Environment(
-            loader=FileSystemLoader('./templates'), undefined=StrictUndefined)
+            loader=FileSystemLoader('./templates'), undefined=StrictUndefined, trim_blocks = True, lstrip_blocks = True)
         # Create an object for sketch generation
         self.sketch_generator = SketchGenerator(
             sketch_name=sketch_name,
