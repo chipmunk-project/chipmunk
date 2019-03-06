@@ -10,8 +10,10 @@ struct StateAndPacket {
   {% for field_number in range(num_fields_in_prog) %}
     int pkt_{{field_number}};
   {% endfor %}
-  {% for state_group_number in range(num_state_groups) %}
-    StateGroup state_group_{{state_group_number}};
+  {% for group_number in range(num_state_groups) %}
+    {% for slot_number in range(num_state_slots) %}
+      int state_group_{{group_number}}_state_{{slot_number}};
+    {% endfor %}
   {% endfor %}
 }
 
@@ -50,7 +52,7 @@ harness void main(
   {% endfor %}
   {% for state_group_number in range(num_state_groups) %}
     {% for slot_number in range(num_state_slots) %}
-    state_and_packet.state_group_{{state_group_number}}.state_{{slot_number}} = sanp_state_group_{{state_group_number}}_{{slot_number}};
+    state_and_packet.state_group_{{state_group_number}}_state_{{slot_number}} = sanp_state_group_{{state_group_number}}_{{slot_number}};
     {% endfor %}
   {% endfor %}
 
