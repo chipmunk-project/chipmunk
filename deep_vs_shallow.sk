@@ -1,0 +1,21 @@
+struct StateGroup { int state_0; }
+struct StateAndPacket {
+    StateGroup state_group_0;
+}
+
+|StateAndPacket| program (|StateAndPacket| state_and_packet) {
+  return state_and_packet;
+}
+|StateAndPacket| pipeline (|StateAndPacket| state_and_packet) {
+  state_and_packet.state_group_0.state_0 *= 5;
+  return state_and_packet;
+}
+harness void main(
+  int state_0) {
+  |StateAndPacket| x = |StateAndPacket|(
+    state_group_0 = new StateGroup(state_0 = state_0)
+  );
+  int r1 = (pipeline(x).state_group_0.state_0);
+  int r2 = (program(x).state_group_0.state_0);
+  assert(r1 == r2);
+}

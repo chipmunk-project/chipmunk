@@ -1,0 +1,18 @@
+struct StateAndPacket {
+    int state_0;
+    int state_1;
+}
+
+|StateAndPacket| program (|StateAndPacket| state_and_packet) {
+  return state_and_packet;
+}
+|StateAndPacket| pipeline (|StateAndPacket| state_and_packet) {
+  state_and_packet.state_0 += 0;
+  state_and_packet.state_1 += 0;
+  return state_and_packet;
+}
+harness void main(
+  int state_0, int state_1) {
+  |StateAndPacket| x = |StateAndPacket|(state_0 = state_0);
+  assert(pipeline(x) == program(x));
+}
