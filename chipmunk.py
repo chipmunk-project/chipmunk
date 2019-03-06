@@ -7,6 +7,7 @@ import re
 from compiler import Compiler
 from utils import get_num_pkt_fields_and_state_vars, get_hole_dicts
 
+
 def main(argv):
     """Main program."""
     if len(argv) < 8:
@@ -45,11 +46,9 @@ def main(argv):
                 print("Sketch failed. Output left in " + errors_file.name)
             return 1
 
-        for hole_name in compiler.sketch_generator.hole_names_:
-            hits = re.findall("(" + hole_name + ")__" + r"\w+ = (\d+)", output)
-            assert len(hits) == 1
-            assert len(hits[0]) == 2
-            print("int ", hits[0][0], " = ", hits[0][1], ";")
+        for hole, value in get_hole_dicts(output).items():
+            print("int ", hole, " = ", value, ";")
+
         with open(compiler.sketch_name + ".success", "w") as success_file:
             success_file.write(output)
             print("Sketch succeeded. Generated configuration is given " +
@@ -57,6 +56,7 @@ def main(argv):
         return 0
     else:
         compiler.optverify()
+
 
 if __name__ == "__main__":
     main(sys.argv)
