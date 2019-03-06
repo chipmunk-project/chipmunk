@@ -35,11 +35,11 @@ harness void main(
   // Preconditions:
 
   {% for hole in sketch1_holes %}
-  assume(({{hole.name}} >= 0) && ({{hole.name}} <= {{hole.max}}));
+    assume(({{hole.name}} >= 0) && ({{hole.name}} <= {{hole.max}}));
   {% endfor %}
 
   {% for predicate in sketch1_asserts %}
-  assume({{predicate}});
+    assume({{predicate}});
   {% endfor %}
 
   // Transformation from sketch 1's holes to sketch 2's holes
@@ -52,7 +52,7 @@ harness void main(
   {% endfor %}
   {% for state_group_number in range(num_state_groups) %}
     {% for slot_number in range(num_state_slots) %}
-    state_and_packet.state_group_{{state_group_number}}_state_{{slot_number}} = sanp_state_group_{{state_group_number}}_{{slot_number}};
+      state_and_packet.state_group_{{state_group_number}}_state_{{slot_number}} = sanp_state_group_{{state_group_number}}_{{slot_number}};
     {% endfor %}
   {% endfor %}
 
@@ -61,10 +61,10 @@ harness void main(
   // Postconditions:
 
   {% for hole in sketch2_holes %}
-  assert(({{hole.name}} >= 0) && ({{hole.name}} <= {{hole.max}}));
+    assert(({{hole.name}} >= 0) && ({{hole.name}} <= {{hole.max}}));
   {% endfor %}
 
   {% for predicate in sketch2_asserts %}
-  assert({{predicate}});
+    assert({{predicate}});
   {% endfor %}
 }
