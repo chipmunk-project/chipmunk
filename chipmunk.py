@@ -46,11 +46,10 @@ def main(argv):
             return 1
 
         for hole_name in compiler.sketch_generator.hole_names_:
-            print("(" + hole_name + ")__")
             hits = re.findall("(" + hole_name + ")__" + r"\w+ = (\d+)", output)
             assert len(hits) == 1
             assert len(hits[0]) == 2
-            print("int ", hole_name, hits[0][0], " = ", hits[0][1], ";")
+            print("int ", hits[0][0], " = ", hits[0][1], ";")
         with open(compiler.sketch_name + ".success", "w") as success_file:
             success_file.write(output)
             print("Sketch succeeded. Generated configuration is given " +
