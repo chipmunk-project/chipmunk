@@ -4,7 +4,7 @@ import sys
 import re
 
 from compiler import Compiler
-from utils import get_num_pkt_fields_and_state_vars
+from utils import get_num_pkt_fields_and_state_groups
 
 def main(argv):
     """Main program."""
@@ -17,7 +17,7 @@ def main(argv):
         exit(1)
 
     program_file = str(argv[1])
-    (num_fields_in_prog, num_state_vars) = get_num_pkt_fields_and_state_vars(
+    (num_fields_in_prog, num_state_groups) = get_num_pkt_fields_and_state_groups(
         Path(program_file).read_text())
     alu_file = str(argv[2])
     num_pipeline_stages = int(argv[3])

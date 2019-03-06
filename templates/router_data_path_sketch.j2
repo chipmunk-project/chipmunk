@@ -14,8 +14,8 @@
   // One variable for each stateful ALU's state operand
   // This will be allocated to a state variable from the program using indicator variables.
   {% for stage_number in range(num_pipeline_stages) %}
-   {% for state_var_number in range(num_state_vars) %}
-    int state_operand_salu_{{stage_number}}_{{state_var_number}};
+   {% for state_group_number in range(num_state_groups) %}
+    |StateGroup| state_operand_salu_{{stage_number}}_{{state_group_number}};
    {% endfor %}
   {% endfor %}
 
@@ -56,9 +56,9 @@
   {% endfor %}
 
   // Stateful operands
-  {% for state_number in range(num_state_vars) %}
+  {% for state_group_number in range(num_state_groups) %}
   {% for operand_number in range(num_operands_to_stateful_alu) %}
-  int packet_operand_salu{{stage_number}}_{{state_number}}_{{operand_number}} = {{sketch_name}}_stateful_operand_mux_{{stage_number}}_{{state_number}}_{{operand_number}}(
+  int packet_operand_salu{{stage_number}}_{{state_group_number}}_{{operand_number}} = {{sketch_name}}_stateful_operand_mux_{{stage_number}}_{{state_group_number}}_{{operand_number}}(
   {% for container_number in range(num_phv_containers) %}
   {% if container_number != num_phv_containers - 1 %}
   input_{{stage_number}}_{{container_number}},
@@ -66,46 +66,48 @@
   input_{{stage_number}}_{{container_number}}
   {% endif %}
   {% endfor %}
-  , {{sketch_name}}_stateful_operand_mux_{{stage_number}}_{{state_number}}_{{operand_number}}_ctrl);
+  , {{sketch_name}}_stateful_operand_mux_{{stage_number}}_{{state_group_number}}_{{operand_number}}_ctrl);
   {% endfor %}
   {% endfor %}
 
   // Read stateful ALU slots from allocated state vars.
-  {% for state_number in range(num_state_vars) %}
-  {% if state_number == 0 %}
-  if ({{sketch_name}}_salu_config_{{stage_number}}_{{state_number}} == 1) { state_operand_salu_{{stage_number}}_{{state_number}} = state_and_packet.state_{{state_number}};}
+  {% for state_group_number in range(num_state_groups) %}
+  {% if state_group_number == 0 %}
+  if ({{sketch_name}}_salu_config_{{stage_number}}_{{state_group_number}} == 1) { state_operand_salu_{{stage_number}}_{{state_group_number}} = state_and_packet.state_group_{{state_group_number}};}
   {% else %}
-  else if ({{sketch_name}}_salu_config_{{stage_number}}_{{state_number}} == 1) { state_operand_salu_{{stage_number}}_{{state_number}} = state_and_packet.state_{{state_number}};}
+  else if ({{sketch_name}}_salu_config_{{stage_number}}_{{state_group_number}} == 1) { state_operand_salu_{{stage_number}}_{{state_group_number}} = state_and_packet.state_group_{{state_group_number}};}
   {% endif %}
   {% endfor %}
 
   // Stateful ALUs
-  {% for state_number in range(num_state_vars) %}
-  int old_state_{{stage_number}}_{{state_number}} = {{sketch_name}}_stateful_alu_{{stage_number}}_{{state_number}}(state_operand_salu_{{stage_number}}_{{state_number}},
+  {% for state_group_number in range(num_state_groups) %}
+  |StateGroup| old_state_group_{{stage_number}}_{{state_group_number}} = {{sketch_name}}_stateful_alu_{{stage_number}}_{{state_group_number}}(state_operand_salu_{{stage_number}}_{{state_group_number}},
   {% for operand_number in range(num_operands_to_stateful_alu) %}
-  packet_operand_salu{{stage_number}}_{{state_number}}_{{operand_number}},
+  packet_operand_salu{{stage_number}}_{{state_group_number}}_{{operand_number}},
   {% endfor %}
-  {% set prefix_string = sketch_name + "_stateful_alu_" + (stage_number|string) + "_" + (state_number|string) + "_" %}
+  {% set prefix_string = sketch_name + "_stateful_alu_" + (stage_number|string) + "_" + (state_group_number|string) + "_" %}
   {{stateful_alu_hole_arguments|map('add_prefix_suffix', prefix_string, "_global")|join(',')}});
   {% endfor %}
 
   // Outputs
   {% for container_number in range(num_phv_containers) %}
   int output_{{stage_number}}_{{container_number}} = {{sketch_name}}_output_mux_phv_{{stage_number}}_{{container_number}}(
-  {% for state_number in range(num_state_vars) %}
-  old_state_{{stage_number}}_{{state_number}},
+  {% for state_group_number in range(num_state_groups) %}
+    {% for state_slot in range(num_state_slots) %}
+      old_state_group_{{stage_number}}_{{state_group_number}}.state_{{state_slot}},
+    {% endfor %}
   {% endfor %}
   destination_{{stage_number}}_{{container_number}},
   {{sketch_name}}_output_mux_phv_{{stage_number}}_{{container_number}}_ctrl
   );
   {% endfor %}
 
-  {% for state_number in range(num_state_vars) %}
-  // Write state_{{state_number}}
-  {% if state_number == 0 %}
-  if ({{sketch_name}}_salu_config_{{stage_number}}_{{state_number}} == 1) { state_and_packet.state_{{state_number}} = state_operand_salu_{{stage_number}}_{{state_number}};}
+  {% for state_group_number in range(num_state_groups) %}
+  // Write state_{{state_group_number}}
+  {% if state_group_number == 0 %}
+  if ({{sketch_name}}_salu_config_{{stage_number}}_{{state_group_number}} == 1) { state_and_packet.state_group_{{state_group_number}} = state_operand_salu_{{stage_number}}_{{state_group_number}};}
   {% else %}
-  else if ({{sketch_name}}_salu_config_{{stage_number}}_{{state_number}} == 1) { state_and_packet.state_{{state_number}} = state_operand_salu_{{stage_number}}_{{state_number}};}
+  else if ({{sketch_name}}_salu_config_{{stage_number}}_{{state_group_number}} == 1) { state_and_packet.state_group_{{state_group_number}} = state_operand_salu_{{stage_number}}_{{state_group_number}};}
   {% endif %}
   {% endfor %}
 
@@ -122,17 +124,28 @@
 
 {% if mode == "codegen" %}
 harness void main(
-  {{range(num_fields_in_prog)|map('add_prefix_suffix', "int pkt_", "")|join(',')}},
-  {{range(num_state_vars)|map('add_prefix_suffix', "int state_", "")|join(',')}}) {
+  {{range(num_fields_in_prog)|map('add_prefix_suffix', "int pkt_", "")|join(',')}}
+  {% for state_group_number in range(num_state_groups) %}
+    {% for slot_number in range(num_state_slots) %}
+      , int state_group_{{state_group_number}}_{{slot_number}}
+    {% endfor %}
+  {% endfor %}) {
 
-  |StateAndPacket| x = |StateAndPacket|({% for field_number in range(num_fields_in_prog) %}
+  {% for state_group_number in range(num_state_groups) %}
+    StateGroup state_group_{{state_group_number}} = new StateGroup();
+    {% for slot_number in range(num_state_slots) %}
+       state_group_{{state_group_number}}.state_{{slot_number}} = state_group_{{state_group_number}}_{{slot_number}};
+    {% endfor %}
+  {% endfor %}
+
+  StateAndPacket x = new StateAndPacket({% for field_number in range(num_fields_in_prog) %}
     pkt_{{field_number}} = pkt_{{field_number}},
   {% endfor %}
-  {% for state_number in range(num_state_vars) %}
-    {% if state_number == num_state_vars - 1 %}
-    state_{{state_number}} = state_{{state_number}}
+  {% for state_group_number in range(num_state_groups) %}
+    {% if state_group_number == num_state_groups - 1 %}
+    state_group_{{state_group_number}} = state_group_{{state_group_number}}
     {% else %}
-    state_{{state_number}} = state_{{state_number}},
+    state_group_{{state_group_number}} = state_group_{{state_group_number}},
     {% endif %}
   {% endfor %});
 

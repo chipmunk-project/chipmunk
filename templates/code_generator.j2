@@ -10,12 +10,18 @@
 {% include "muxes_and_alus.j2" %}
 
 // Data type for holding result from spec and implementation
+struct StateGroup {
+  {% for state_number in range(num_state_slots) %}
+    int state_{{state_number}};
+  {% endfor %}
+}
+
 struct StateAndPacket {
   {% for field_number in range(num_fields_in_prog) %}
     int pkt_{{field_number}};
   {% endfor %}
-  {% for state_number in range(num_state_vars) %}
-    int state_{{state_number}};
+  {% for group_number in range(num_state_groups) %}
+    StateGroup state_group_{{group_number}};
   {% endfor %}
 }
 
