@@ -1,10 +1,11 @@
 """Chipmunk Compiler"""
+
 from pathlib import Path
 import sys
 import re
 
 from compiler import Compiler
-from utils import get_num_pkt_fields_and_state_vars
+from utils import get_num_pkt_fields_and_state_vars, get_hole_dicts
 
 def main(argv):
     """Main program."""
@@ -45,10 +46,11 @@ def main(argv):
             return 1
 
         for hole_name in compiler.sketch_generator.hole_names_:
+            print("(" + hole_name + ")__")
             hits = re.findall("(" + hole_name + ")__" + r"\w+ = (\d+)", output)
             assert len(hits) == 1
             assert len(hits[0]) == 2
-            print("int ", hits[0][0], " = ", hits[0][1], ";")
+            print("int ", hole_name, hits[0][0], " = ", hits[0][1], ";")
         with open(compiler.sketch_name + ".success", "w") as success_file:
             success_file.write(output)
             print("Sketch succeeded. Generated configuration is given " +

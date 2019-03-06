@@ -1,0 +1,258 @@
+/* Collected from commit 80f68c */
+
+SKETCH version 1.7.5
+Benchmark = simple_raw_1_2_codegen.sk
+    [0;32m[1551879486.5960 - DEBUG] Running stage 'parse' -- Parse the program from a file[0m
+    [0;32m[1551879486.6890 - DEBUG] Running stage 'preproc' -- Preprocessing (used for all further transformations)[0m
+    [0;32m[1551879486.7300 - DEBUG] Running stage SpmdLowLevelCStage[0m
+    [0;32m[1551879486.7320 - DEBUG]    Running visitor FlattenStmtBlocks2[0m
+    [0;32m[1551879486.7321 - DEBUG]    Running visitor SplitAssignFromVarDef[0m
+    [0;32m[1551879486.7322 - DEBUG]    Running visitor EliminateComplexForLoops[0m
+    [0;32m[1551879486.7330 - DEBUG] Running stage 'lowering' -- Lower for SKETCH backend[0m
+    [0;32m[1551879486.7380 - DEBUG] Running stage 'sten' -- Stencil transformations[0m
+[SATBackend] ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+[SATBackend] MAX LOOP UNROLLING = 8
+[SATBackend] MAX FUNC INLINING  = 5
+estimated size of pipeline
+stmt cnt: 47
+callee simple_raw_1_2_stateless_alu_0_0 : 25
+callee simple_raw_1_2_stateless_alu_0_1 : 25
+callee simple_raw_1_2_stateful_operand_mux_0_0_0 : 7
+callee simple_raw_1_2_stateful_alu_0_0 : 10
+callee simple_raw_1_2_output_mux_phv_0_0 : 7
+callee simple_raw_1_2_output_mux_phv_0_1 : 7
+
+[SATBackend] After prog.accept(partialEval)
+[SATBackend] OFILE = null
+searching for file null
+searching for file /usr/local/sketch/sketch-frontend/cegis/src/SketchSolver/cegis
+searching for file /usr/local/sketch/sketch-frontend/cegis
+searching for file cegis/src/SketchSolver/cegis
+searching for file ../sketch-backend/src/SketchSolver/cegis
+searching for file ../sketch-backend/bindings/cegis
+searching for file /home/taegyunk/.sketch/cegis-1.7.5
+searching for file /home/taegyunk/.sketch/cegis
+searching for file /home/taegyunk/.jenv/shims/cegis
+searching for file /home/taegyunk/.jenv/shims/src/SketchSolver/cegis
+searching for file /home/taegyunk/.jenv/shims/../sketch-backend/src/SketchSolver/cegis
+searching for file /home/taegyunk/.jenv/shims/../sketch-backend/bindings/cegis
+searching for file /home/taegyunk/.local/bin/cegis
+searching for file /home/taegyunk/.local/bin/src/SketchSolver/cegis
+searching for file /home/taegyunk/.local/bin/../sketch-backend/src/SketchSolver/cegis
+searching for file /home/taegyunk/.local/bin/../sketch-backend/bindings/cegis
+searching for file /home/taegyunk/.jenv/bin/cegis
+searching for file /home/taegyunk/.jenv/bin/src/SketchSolver/cegis
+searching for file /home/taegyunk/.jenv/bin/../sketch-backend/src/SketchSolver/cegis
+searching for file /home/taegyunk/.jenv/bin/../sketch-backend/bindings/cegis
+searching for file /home/taegyunk/.cargo/bin/cegis
+searching for file /home/taegyunk/.cargo/bin/src/SketchSolver/cegis
+searching for file /home/taegyunk/.cargo/bin/../sketch-backend/src/SketchSolver/cegis
+searching for file /home/taegyunk/.cargo/bin/../sketch-backend/bindings/cegis
+searching for file /usr/local/sketch/sketch-frontend/cegis
+searching for file /usr/local/sketch/sketch-frontend/src/SketchSolver/cegis
+searching for file /usr/local/sketch/sketch-frontend/../sketch-backend/src/SketchSolver/cegis
+resolved cegis to path /usr/local/sketch/sketch-backend/src/SketchSolver/cegis
+    [0;32m[1551879486.7690 - DEBUG] executing /usr/local/sketch/sketch-backend/src/SketchSolver/cegis --bnd-inbits 2 --boundmode CALLNAME --verbosity 12 --print-version --seed 1 -simiters 4 --assumebcheck --bnd-inline-amnt 5 --bndwrand 50 -angelictupledepth 1 -srctupledepth 2 -sprandbias 1 -o /home/taegyunk/.sketch/tmp/simple_raw_1_2_codegen.sk/solution0-0 /home/taegyunk/.sketch/tmp/simple_raw_1_2_codegen.sk/input0.tmp[0m
+[SATBackend] Launching: /usr/local/sketch/sketch-backend/src/SketchSolver/cegis --bnd-inbits 2 --boundmode CALLNAME --verbosity 12 --print-version --seed 1 -simiters 4 --assumebcheck --bnd-inline-amnt 5 --bndwrand 50 -angelictupledepth 1 -srctupledepth 2 -sprandbias 1 -o /home/taegyunk/.sketch/tmp/simple_raw_1_2_codegen.sk/solution0-0 /home/taegyunk/.sketch/tmp/simple_raw_1_2_codegen.sk/input0.tmp
+starting command line: [/usr/local/sketch/sketch-backend/src/SketchSolver/cegis, --bnd-inbits, 2, --boundmode, CALLNAME, --verbosity, 12, --print-version, --seed, 1, -simiters, 4, --assumebcheck, --bnd-inline-amnt, 5, --bndwrand, 50, -angelictupledepth, 1, -srctupledepth, 2, -sprandbias, 1, -o, /home/taegyunk/.sketch/tmp/simple_raw_1_2_codegen.sk/solution0-0, /home/taegyunk/.sketch/tmp/simple_raw_1_2_codegen.sk/input0.tmp]
+Overriding inputs with 2
+boundmode = CALLNAME
+assuming  bounds checks
+BND W RAND = 50
+SOLVER RAND SEED = 1
+ optimization level = 6
+Reading SKETCH Program in File /home/taegyunk/.sketch/tmp/simple_raw_1_2_codegen.sk/input0.tmp
+CREATING pipeline
+size = 65
+after ba size = 65
+CREATING program
+size = 6
+after ba size = 6
+CREATING simple_raw_1_2_stateless_alu_0_0
+size = 74
+after ba size = 74
+CREATING simple_raw_1_2_stateless_alu_0_1
+size = 74
+after ba size = 74
+CREATING simple_raw_1_2_stateful_operand_mux_0_0_0
+size = 13
+after ba size = 13
+CREATING simple_raw_1_2_stateful_alu_0_0
+size = 15
+after ba size = 15
+CREATING simple_raw_1_2_output_mux_phv_0_0
+size = 13
+after ba size = 13
+CREATING simple_raw_1_2_output_mux_phv_0_1
+size = 13
+after ba size = 13
+CREATING simple_raw_1_2_stateless_alu_0_0_mux1
+size = 13
+after ba size = 13
+CREATING simple_raw_1_2_stateless_alu_0_0_mux2
+size = 13
+after ba size = 13
+CREATING simple_raw_1_2_stateless_alu_0_1_mux1
+size = 13
+after ba size = 13
+CREATING simple_raw_1_2_stateless_alu_0_1_mux2
+size = 13
+after ba size = 13
+CREATING simple_raw_1_2_stateful_alu_0_0_Opt_0
+size = 10
+after ba size = 10
+CREATING simple_raw_1_2_stateful_alu_0_0_C_0
+size = 3
+after ba size = 3
+CREATING simple_raw_1_2_stateful_alu_0_0_Mux2_0
+size = 13
+after ba size = 13
+* before  EVERYTHING: program::SPEC nodes = 6	 pipeline::SKETCH nodes = 65
+ INBITS = 2
+ CBITS  = 5
+ input_ints = 2 	 input_bits = 0
+ Inlining amount = 5
+ Inlining functions in the sketch.
+inlined 13 new size =105
+inlined 0 new size =105
+END OF STEP 0
+ Inlining functions in the spec.
+inlined 0 new size =6
+END OF STEP 0
+Bailing out
+after Creating Miter: Problem nodes = 109
+* Final Problem size: Problem nodes = 108
+  # OF CONTROLS:    15
+ control_ints = 6 	 control_bits = 9
+inputSize = 4	ctrlSize = 23
+Random seeds = 1
+!+ 00000001000000001011010
+!+ H__0:0
+H__1:0
+H__2:0
+H__4:0
+H__5:1
+H__6:0
+H__7:0
+H__9:0
+H__14:0
+H__16:0
+H__3:1
+H__10:1
+H__13:1
+H__12:2
+H__11:0
+
+BEG CHECK
+ * After optims it became = 4 was 108
+Assert at simple_..odegen.sk:217 (0)
+Simulation found a cex by random testing:  0 ms
+END CHECK
+********  0	ftime= 0	ctime= 0
+!% 0000
+!% state_and_packet_pkt_0_s64_13_29_0:0
+state_and_packet_state_0_s65_14_2a_0:0
+
+BEG FIND
+Level 1  intsize = 2
+ * After optims it became = 71 was 108
+ * After all optims it became = 71
+ finder  hits = 5	 bstoreObjs=66	 sstorePages=1
+hitcount 	0	62	0
+hitcount 	1	3	0
+hitcount 	2	1	0
+bucketsPerDepth 	0	62
+bucketsPerDepth 	1	2
+* TIME TO ADD INPUT :  0 ms
+DECISIONS START = 0
+f# %assign: 25 clauses: 152 learn: 1 restart: 1 decision: 27 propagated: 123
+END FIND
+!+ 00001000000000101100000
+!+ H__0:0
+H__1:0
+H__2:4
+H__4:0
+H__5:0
+H__6:0
+H__7:0
+H__9:0
+H__14:1
+H__16:0
+H__3:3
+H__10:0
+H__13:0
+H__12:0
+H__11:0
+
+BEG CHECK
+ * After optims it became = 8 was 108
+The spec and sketch can not be made to be equal. _p_out_program_ANONYMOUS
+Simulation found a cex by random testing:  0 ms
+END CHECK
+********  1	ftime= 0	ctime= 0
+!% 0010
+!% state_and_packet_pkt_0_s64_13_29_0:0
+state_and_packet_state_0_s65_14_2a_0:1
+
+BEG FIND
+Level 1  intsize = 2
+ * After optims it became = 75 was 108
+ * After all optims it became = 75
+  UNSATISFIABLE ASSERTION The spec and sketch can not be made to be equal. _p_out_program_ANONYMOUS
+  UNSATISFIABLE ASSERTION The spec and sketch can not be made to be equal. _p_out_program_ANONYMOUS
+Problem became UNSAT.64= ASSERT 63 : The spec and sketch can not be made to be equal. _p_out_program_ANONYMOUS
+ finder  hits = 57	 bstoreObjs=66	 sstorePages=1
+hitcount 	0	19	0
+hitcount 	1	43	0
+hitcount 	3	3	0
+hitcount 	5	1	0
+bucketsPerDepth 	0	62
+bucketsPerDepth 	1	2
+* TIME TO ADD INPUT :  0.001 ms
+f# %assign: 25 clauses: 152 learn: 1 restart: 1 decision: 27 propagated: 123
+  UNSATISFIABLE ASSERTION The spec and sketch can not be made to be equal. _p_out_program_ANONYMOUS
+END FIND
+******** FAILED ********
+* FIND TIME:  0.001 ms
+* CHECK TIME:  0 ms
+ *FAILED IN 2 iterations.
+ *FIND TIME 0.001 CHECK TIME 0 TOTAL TIME 0.001
+VALUES H__0: 0, H__1: 0, H__10: 0, H__11: 0, H__12: 0, H__13: 0, H__14: 1, H__16: 0, H__2: 4, H__3: 3, H__4: 0, H__5: 0, H__6: 0, H__7: 0, H__9: 0,
+RESULT = 1
+**ROUND 0 : 0 Round time:  0.002 ms
+RNDDEG = -1
+SUMMRY
+ charness = 0
+POST-SUMMRY
+TRAIL:
+NOTOK
+ALLRESET
+return 1
+  UNSATISFIABLE ASSERTION The spec and sketch can not be made to be equal. _p_out_program_ANONYMOUS
+
+*** Rejected
+[SATBackend] Stats for last run:
+      [solution stats]
+      successful? ---------------------> false
+      elapsed time (s) ----------------> 1.028
+      model building time (s) ---------> -0.001
+      solution time (s) ---------------> -0.001
+      max memory usage (MiB) ----------> -9.536743E-7
+      [SAT-specific solution stats]
+      initial number of nodes ---------> 65
+      number of nodes after opts ------> 108
+      number of controls --------------> 15
+      total number of control bits ----> 23
+
+[SATBackend] Solver exit value: 1
+[SATBackend] The sketch cannot be resolved.
+    [0;31m[1551879487.8030 - ERROR] [SKETCH] Sketch Not Resolved Error:   UNSATISFIABLE ASSERTION The spec and sketch can not be made to be equal. _p_out_program_ANONYMOUS
+
+*** Rejected
+The sketch could not be resolved.[0m
+    [0;32m[1551879487.8050 - DEBUG] [SKETCH] stack trace written to file: /home/taegyunk/.sketch/tmp/stacktrace.txt[0m
+    [0;32m[1551879487.8060 - DEBUG] Backend solver input file at /home/taegyunk/.sketch/tmp/simple_raw_1_2_codegen.sk/input0.tmp[0m
+Total time = 1249
+Command exited with non-zero status 1
+0.70user 0.10system 0:01.30elapsed 61%CPU (0avgtext+0avgdata 101188maxresident)k
+8inputs+136outputs (0major+10391minor)pagefaults 0swaps
