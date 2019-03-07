@@ -10,6 +10,7 @@ from chipmunk_pickle import ChipmunkPickle
 from sketch_generator import SketchGenerator
 from utils import get_num_pkt_fields_and_state_vars
 
+
 class Compiler:
     def __init__(self, program_file, alu_file, num_pipeline_stages,
                  num_alus_per_stage, sketch_name, parallel_or_serial):
