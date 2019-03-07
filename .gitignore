@@ -14,3 +14,6 @@ __pycache__
 *Parser.py
 *Visitor.py
 *Listener.py
+
+!tests/data/*.success
+!tests/data/*.errors
