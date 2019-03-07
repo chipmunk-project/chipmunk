@@ -22,12 +22,20 @@ int {{ alu_name }}({{arg_list|join(',')}}, int opcode_hole_local, int immediate_
     return (alu_mode == 0 ? ! (x != 0)
                           : ! (y != 0));
   } else if (opcode == 5) {
-    return x != y;
+    return (alu_mode == 0 ? x != y
+                          : (alu_mode == 1 ? x != immediate_operand
+                                           : immediate_operand != y));
   } else if (opcode == 6) {
-    return x == y;
+    return (alu_mode == 0 ? x == y;
+                          : (alu_mode == 1 ? x == immediate_operand
+                                           | immediate_operand == y));
   } else if (opcode == 7) {
-    return x >= y;
+    return (alu_mode == 0 ? x >= y;
+                          : (alu_mode == 1 ? x >= immediate_operand
+                                           | immediate_operand >= y));
   } else {
-    return x < y;
+    return (alu_mode == 0 ? x < y;
+                          : (alu_mode == 1 ? x < immediate_operand
+                                           | immediate_operand < y));
   }
 }
