@@ -54,9 +54,11 @@ class ChipmunkCodegenTest(unittest.TestCase):
 
         hole_assignments = get_hole_dicts(output)
 
+        print (hole_assignments)
+        print (expected_hole_assignments)
         # TODO(taegyunkim): This fails, and I can't figure it out why at this
         # point.
-        self.assertNotEqual(expected_hole_assignments, hole_assignments)
+        self.assertEqual(expected_hole_assignments, hole_assignments)
 
 
 if __name__ == '__main__':
