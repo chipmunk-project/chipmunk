@@ -41,8 +41,8 @@ class ChipmunkCodegenTest(unittest.TestCase):
 
         compiler = Compiler(
             path.join(self.spec_dir, spec_filename),
-            path.join(self.alu_dir, alu_filename), 2, 2,
-            "simple_raw_2_2", "serial")
+            path.join(self.alu_dir, alu_filename), 2, 2, "simple_raw_2_2",
+            "serial")
         (ret_code, output) = compiler.codegen()
         self.assertEqual(
             ret_code, 0,
@@ -57,6 +57,16 @@ class ChipmunkCodegenTest(unittest.TestCase):
         # TODO(taegyunkim): This fails, and I can't figure it out why at this
         # point.
         self.assertNotEqual(expected_hole_assignments, hole_assignments)
+
+    def test_raise_assertion_for_grid_size(self):
+        spec_filename = "simple.sk"
+        alu_filename = "raw.stateful_alu"
+
+        with self.assertRaises(AssertionError):
+            Compiler(
+                path.join(self.spec_dir, spec_filename),
+                path.join(self.alu_dir, alu_filename), 1, 0, "simple_raw_1_2",
+                "serial")
 
 
 if __name__ == '__main__':

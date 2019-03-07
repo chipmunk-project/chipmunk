@@ -1,8 +1,6 @@
 from pathlib import Path
 import pickle
-import re
 import subprocess
-import sys
 
 from jinja2 import Environment, FileSystemLoader, StrictUndefined
 
@@ -23,6 +21,8 @@ class Compiler:
         (self.num_fields_in_prog,
          self.num_state_vars) = get_num_pkt_fields_and_state_vars(
              Path(program_file).read_text())
+
+        assert self.num_fields_in_prog <= num_alus_per_stage
 
         # Initialize jinja2 environment for templates
         self.jinja2_env = Environment(
