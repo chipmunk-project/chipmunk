@@ -26,16 +26,16 @@ int {{ alu_name }}({{arg_list|join(',')}}, int opcode_hole_local, int immediate_
                           : (alu_mode == 1 ? x != immediate_operand
                                            : immediate_operand != y));
   } else if (opcode == 6) {
-    return (alu_mode == 0 ? x == y;
+    return (alu_mode == 0 ? x == y
                           : (alu_mode == 1 ? x == immediate_operand
-                                           | immediate_operand == y));
+                                           : immediate_operand == y));
   } else if (opcode == 7) {
-    return (alu_mode == 0 ? x >= y;
+    return (alu_mode == 0 ? x >= y
                           : (alu_mode == 1 ? x >= immediate_operand
-                                           | immediate_operand >= y));
+                                           : immediate_operand >= y));
   } else {
-    return (alu_mode == 0 ? x < y;
+    return (alu_mode == 0 ? x < y
                           : (alu_mode == 1 ? x < immediate_operand
-                                           | immediate_operand < y));
+                                           : immediate_operand < y));
   }
 }
