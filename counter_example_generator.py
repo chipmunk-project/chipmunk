@@ -2,7 +2,6 @@
 import subprocess
 from pathlib import Path
 import re
-import sys
 
 # This program is to return the counterexample within [bits_val,bits_val+1] bits
 def counter_example_generator(bits_val,filename, num_fields_in_prog, num_state_vars):
