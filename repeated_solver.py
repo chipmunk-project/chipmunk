@@ -133,6 +133,22 @@ else:
                 print(pkt_group,"len= ", len(pkt_group))
                 print(state_group, "len= ", len(state_group))
                 counter_example_definition = "|StateAndPacket| x_" + str(count) + " = |StateAndPacket|(\n"
+                # Check if all packet fields are included in pkt_group as part of the counterexample.
+                # If not, set those packet fields to a default (0) since they don't matter for the counterexample.
+                for i in range(int(num_fields_in_prog)):
+                  if ("pkt_" + str(i) in [regex_match[0] for regex_match in pkt_group]):
+                    continue
+                  else:
+                    pkt_group.append(("pkt_" + str(i), str(0)))
+
+                # Check if all state vars are included in state_group as part of the counterexample.
+                # If not, set those state vars to a default (0) since they don't matter for the counterexample.
+                for i in range(int(num_state_vars)):
+                  if ("state_" + str(i) in [regex_match[0] for regex_match in state_group]):
+                    continue
+                  else:
+                    state_group.append(("state_" + str(i), str(0)))
+
                 for i in range(len(pkt_group)):
                   counter_example_definition += pkt_group[i][0] + " = " + pkt_group[i][1] + ','
                 for i in range(len(state_group)):
