@@ -1,4 +1,5 @@
-"counter_example_generator"
+"""counter_example_generator"""
+
 import subprocess
 from pathlib import Path
 import re
