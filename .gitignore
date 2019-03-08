@@ -15,5 +15,4 @@ __pycache__
 *Visitor.py
 *Listener.py
 
-!tests/data/*.success
-!tests/data/*.errors
+!tests/data/*.sk
