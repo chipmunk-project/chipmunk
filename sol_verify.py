@@ -29,7 +29,7 @@ def sol_verify(original_sketch_file, hole_value_file):
     sketch_file.close()
 
     # Call sketch on it
-    (ret_code, output) = subprocess.getstatusoutput("sketch --bnd-inbits=10 " +
+    (ret_code, _) = subprocess.getstatusoutput("sketch --bnd-inbits=10 " +
                                                     sketch_file.name)
     if (ret_code != 0):
         #fail print 1
