@@ -1,10 +1,11 @@
 """Simple unit tests for chipmunk."""
 
-import unittest
-import glob
 from os import path, listdir
+from pathlib import Path
+import unittest
 
 from chipmunk import Compiler
+from utils import get_hole_dicts
 
 
 class ChipmunkCodegenTest(unittest.TestCase):
@@ -17,10 +18,9 @@ class ChipmunkCodegenTest(unittest.TestCase):
         self.spec_dir = path.join(self.base_path, "../example_specs/")
 
     def test_codegen_with_simple_sketch_for_all_alus(self):
-        base_path = path.abspath(path.dirname(__file__))
-        alu_dir = path.join(base_path, "../example_alus/")
         alus = [
-            f for f in listdir(alu_dir) if path.isfile(path.join(alu_dir, f))
+            f for f in listdir(self.alu_dir)
+            if path.isfile(path.join(self.alu_dir, f))
         ]
 
         for alu in alus:
@@ -44,6 +44,27 @@ class ChipmunkCodegenTest(unittest.TestCase):
                 path.join(self.spec_dir, spec_filename),
                 path.join(self.alu_dir, alu_filename), 1, 0, "simple_raw_1_2",
                 "serial")
+
+    def test_simple_raw_succeeds_with_two_two_grid(self):
+        spec_filename = "simple.sk"
+        alu_filename = "raw.stateful_alu"
+
+        compiler = Compiler(
+            path.join(self.spec_dir, spec_filename),
+            path.join(self.alu_dir, alu_filename), 2, 2,
+            "simple_raw_2_2", "serial")
+        (ret_code, output) = compiler.codegen()
+        self.assertEqual(
+            ret_code, 0,
+            "Compiling " + spec_filename + " failed for " + alu_filename)
+
+        expected_hole_assignments = get_hole_dicts(
+            Path(path.join(self.data_dir,
+                           "simple_raw_2_2.success")).read_text())
+
+        hole_assignments = get_hole_dicts(output)
+
+        self.assertEqual(expected_hole_assignments, hole_assignments)
 
 
 if __name__ == '__main__':
