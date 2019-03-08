@@ -29,8 +29,8 @@ class ChipmunkCodegenTest(unittest.TestCase):
             compiler = Compiler(
                 path.join(self.base_path, "../example_specs/simple.sk"),
                 path.join(self.alu_dir, alu), 2, 2, "simple", "serial")
-            self.assertEqual(compiler.codegen()[
-                             0], 0, "Compiling simple.sk failed for " + alu)
+            self.assertEqual(compiler.codegen()[0], 0,
+                             "Compiling simple.sk failed for " + alu)
             # TODO(taegyunkim): When all tests pass, clean up intermediary files
             # or at least have an option to keep intermediary files, with
             # default deleting them.
@@ -58,13 +58,15 @@ class ChipmunkCodegenTest(unittest.TestCase):
             ret_code, 0,
             "Compiling " + spec_filename + " failed for " + alu_filename)
 
-        expected_hole_assignments = get_hole_dicts(
+        expected_holes = get_hole_dicts(
             Path(path.join(self.data_dir,
-                           "simple_raw_2_2.success")).read_text())
+                           "simple_raw_2_2_codegen.sk")).read_text())
 
-        hole_assignments = get_hole_dicts(output)
+        output_holes = get_hole_dicts(
+            Path(path.join(self.base_path,
+                           "../simple_raw_2_2_codegen.sk")).read_text())
 
-        self.assertEqual(expected_hole_assignments, hole_assignments)
+        self.assertEquals(sorted(expected_holes), sorted(output_holes))
 
 
 if __name__ == '__main__':
