@@ -66,7 +66,7 @@ class ChipmunkCodegenTest(unittest.TestCase):
             Path(path.join(self.base_path,
                            "../simple_raw_2_2_codegen.sk")).read_text())
 
-        self.assertEquals(sorted(expected_holes), sorted(output_holes))
+        self.assertEqual(sorted(expected_holes), sorted(output_holes))
 
 
 if __name__ == '__main__':
