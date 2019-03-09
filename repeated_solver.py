@@ -125,7 +125,7 @@ else:
                 counter_example_assert = ""
                 counter_example_definition = ""
                 for bits in range(2,10):
-                    output_with_counter_example = counter_example_generator(bits,filename, num_fields_in_prog, num_state_vars)
+                    output_with_counter_example = counter_example_generator(bits,filename, num_fields_in_prog, num_state_groups)
                     if (output_with_counter_example == ""):
                         continue;
                     else:
@@ -145,7 +145,7 @@ else:
 
                         # Check if all state vars are included in state_group as part of the counterexample.
                         # If not, set those state vars to a default (0) since they don't matter for the counterexample.
-                        for i in range(int(num_state_vars)):
+                        for i in range(int(num_state_groups)):
                           if ("state_" + str(i) in [regex_match[0] for regex_match in state_group]):
                             continue
                         else:
@@ -155,12 +155,12 @@ else:
                             count) + " = |StateAndPacket|(\n"
                         for i in range(len(pkt_group)):
                             counter_example_definition += pkt_group[i][
-                                0] + " = " + str(int(pkt_group[0][1]) + 2**bits) + ','
+                                0] + " = " + pkt_group[i][0] + str(int(pkt_group[0][1]) + 2**bits) + ',\n'
                         for i in range(len(state_group) - 1):
                             if (i < len(state_group) - 1):
-                              counter_example_definition += state_group[i][0] + " = " + state_group[i][1] + ','
+                              counter_example_definition += state_group[i][0] + " = " + state_group[i][1] + str(int(pkt_group[0][1]) + 2**bits) + ',\n'
                             else:
-                              counter_example_definition += state_group[i][0] + " = " + state_group[i][1] + ");\n"
+                              counter_example_definition += state_group[i][0] + " = " + state_group[i][1] + str(int(pkt_group[0][1]) + 2**bits) + ");\n"
                         counter_example_assert += "assert pipeline(" + "x_" + str(
                             count) + "_" + str(bits) + ")" + " == " + "program(" + "x_" + str(
                                 count) + "_" + str(bits) + ");\n"
