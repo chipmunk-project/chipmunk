@@ -1,0 +1,3 @@
+Original benchmark: about 20 to 40 seconds (very variable).
+Reducing both opcode and salu config: 3 seconds on average.
+slv-parallel: 4 to 5 seconds, but can't go beyond a single machine.
