@@ -20,13 +20,13 @@ def counter_example_generator(bits_val,filename, num_fields_in_prog, num_state_v
 
   #run the sketch first
   (ret_code, output) = subprocess.getstatusoutput(
-                "sketch --bnd-inbits=" + str(bits_val) + " --bnd-int-range=50 " +
+                "sketch --bnd-inbits=" + str(bits_val) + " " +
                 result_file.name)
   #run the counterexample then
   if (ret_code == 0):
     return ""
   else:
     (ret_code, output) = subprocess.getstatusoutput(
-                "sketch -V 3 --debug-cex --bnd-inbits=" + str(bits_val) +" --bnd-int-range=50 " +
+                "sketch -V 3 --debug-cex --bnd-inbits=" + str(bits_val) + " " +
                 result_file.name)
     return output
