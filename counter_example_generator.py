@@ -13,7 +13,7 @@ def counter_example_generator(bits_val,filename, num_fields_in_prog, num_state_v
     to_be_replaced = 'pkt_' + str(i) + ' = ' + 'pkt_' + str(i)
     original_sketch_file_string = original_sketch_file_string.replace(to_be_replaced, to_be_replaced + " + " + str(2**bits_val) )
   for i in range(num_fields_in_prog):
-    to_be_replaced = 'state_' + str(i) + ' = ' + 'state_' + str(i)
+    to_be_replaced = 'state_group_0_state_' + str(i) + ' = ' + 'state_group_0_state_' + str(i)
     original_sketch_file_string = original_sketch_file_string.replace(to_be_replaced, to_be_replaced + " + " + str(2**bits_val))
   with open("/tmp/counter_example_"+str(bits_val), "w") as result_file:
         result_file.write(original_sketch_file_string)

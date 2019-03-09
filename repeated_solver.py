@@ -131,7 +131,7 @@ else:
                     else:
                         pkt_group = re.findall("input (pkt_\d+)\w+ has value \d+= \((\d+)\)", output_with_counter_example)
                         state_group = re.findall(
-                            "input (state_\d+)\w+ has value \d+= \((\d+)\)",
+                            "input (state_group_0_state_\d+)\w+ has value \d+= \((\d+)\)",
                             output_with_counter_example)
                         print(pkt_group, "len= ", len(pkt_group), "actual value", str(int(pkt_group[0][1]) + 2**bits))
                         print(state_group, "len= ", len(state_group), "actual value", int(state_group[0][1]) + 2**bits)
@@ -152,18 +152,18 @@ else:
                           state_group.append(("state_" + str(i), str(0)))
 
                         counter_example_definition += "|StateAndPacket| x_" + str(
-                            count) + " = |StateAndPacket|(\n"
+                            count) + "_" + str(bits) + " = |StateAndPacket|(\n"
                         for i in range(len(pkt_group)):
                             counter_example_definition += pkt_group[i][
-                                0] + " = " + pkt_group[i][0] + str(int(pkt_group[0][1]) + 2**bits) + ',\n'
+                                0] + " = " + str(int(pkt_group[0][1]) + 2**bits) + ',\n'
                         for i in range(len(state_group) - 1):
                             if (i < len(state_group) - 1):
-                              counter_example_definition += state_group[i][0] + " = " + state_group[i][1] + str(int(pkt_group[0][1]) + 2**bits) + ',\n'
+                              counter_example_definition += state_group[i][0] + " = " + str(int(pkt_group[0][1]) + 2**bits) + ',\n'
                             else:
-                              counter_example_definition += state_group[i][0] + " = " + state_group[i][1] + str(int(pkt_group[0][1]) + 2**bits) + ");\n"
-                        counter_example_assert += "assert pipeline(" + "x_" + str(
+                              counter_example_definition += state_group[i][0] + " = " + str(int(pkt_group[0][1]) + 2**bits) + ");\n"
+                        counter_example_assert += "assert (pipeline(" + "x_" + str(
                             count) + "_" + str(bits) + ")" + " == " + "program(" + "x_" + str(
-                                count) + "_" + str(bits) + ");\n"
+                                count) + "_" + str(bits) + "));\n"
                 original_sketch_file_string = original_sketch_file_string[
                     0:
                     begin_pos] + counter_example_definition + counter_example_assert + original_sketch_file_string[
