@@ -1,3 +1,10 @@
-Original benchmark: about 20 to 40 seconds (very variable).
-Reducing both opcode and salu config: 3 seconds on average.
-slv-parallel: 4 to 5 seconds, but can't go beyond a single machine.
+Original benchmark: about 20 to 40 seconds (very variable). (serial)
+Reducing both opcode and salu config: 3 seconds on average. (serial)
+slv-parallel: 4 to 5 seconds, but can't go beyond a single machine. (parallel)
+
+Benchmark2:
+Original (with slv-parallel): Killed after no result in 6.5 minutes. (parallel)
+Reducing both opcode and salu config: 13 seconds or so (parallel)
+
+Overall, domain-specific concretization of holes seems to help quite a bit. I
+think this might be a good way to speed up synthesis.
