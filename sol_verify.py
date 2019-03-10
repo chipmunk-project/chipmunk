@@ -1,11 +1,9 @@
 """Solution Verifier"""
 
-import sys
 import subprocess
 
 
 def sol_verify(original_sketch_file, hole_value_file):
-
     original_sketch_file_string = open(str(original_sketch_file), "r").read()
     hole_value_file_string = open(str(hole_value_file), "r").read()
 
@@ -30,10 +28,6 @@ def sol_verify(original_sketch_file, hole_value_file):
     sketch_file.close()
 
     # Call sketch on it
-    (ret_code, output) = subprocess.getstatusoutput("sketch --bnd-inbits=10 " +
-                                                    sketch_file.name)
-    if (ret_code != 0):
-        #fail print 1
-        return 1
-    else:
-        return 0
+    (ret_code, _) = subprocess.getstatusoutput("sketch --bnd-inbits=10 " +
+                                               sketch_file.name)
+    return ret_code
