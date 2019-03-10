@@ -1,9 +1,11 @@
-from jinja2 import Template, Environment, FileSystemLoader, StrictUndefined
 from pathlib import Path
-from chipmunk_pickle import ChipmunkPickle
-import sys
 import pickle
 import subprocess
+import sys
+
+from jinja2 import Template, Environment, FileSystemLoader, StrictUndefined
+
+from chipmunk_pickle import ChipmunkPickle
 
 
 # Read contents of file_name into a string
@@ -72,3 +74,5 @@ else:
         success_file.close()
         print("Verification succeeded. Output left in " + success_file.name)
         sys.exit(0)
+
+
