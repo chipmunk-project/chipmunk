@@ -200,7 +200,8 @@ class StatefulAluSketchGenerator(stateful_aluVisitor):
     def visitUpdate(self, ctx):
         
         #Make sure every update ends with a semicolon
-        assert(ctx.getChild(ctx.getChildCount() - 1).getText() == ";")
+        assert ctx.getChild(ctx.getChildCount() - 1).getText() == ";", \
+                   "Every update must end with a semicolon."
 
         self.visit(ctx.getChild(0, stateful_aluParser.State_varContext))
         self.mainFunction += " = "
