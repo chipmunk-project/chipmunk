@@ -53,7 +53,7 @@ class ChipmunkCodegenTest(unittest.TestCase):
             path.join(self.spec_dir, spec_filename),
             path.join(self.alu_dir, alu_filename), 2, 2, "simple_raw_2_2",
             "serial")
-        (ret_code, output) = compiler.codegen()
+        (ret_code, _) = compiler.codegen()
         self.assertEqual(
             ret_code, 0,
             "Compiling " + spec_filename + " failed for " + alu_filename)
@@ -67,6 +67,19 @@ class ChipmunkCodegenTest(unittest.TestCase):
                            "../simple_raw_2_2_codegen.sk")).read_text())
 
         self.assertEqual(sorted(expected_holes), sorted(output_holes))
+
+    def test_simple_raw_fails_with_one_two_grid(self):
+        spec_filename = "simple.sk"
+        alu_filename = "raw.stateful_alu"
+
+        compiler = Compiler(
+            path.join(self.spec_dir, spec_filename),
+            path.join(self.alu_dir, alu_filename), 1, 2, "simple_raw_1_2",
+            "serial")
+        (ret_code, _) = compiler.codegen()
+        self.assertEqual(
+            1, ret_code, "Compiling " + spec_filename + " used to fail for " +
+            alu_filename + ", but not it succeeds.")
 
 
 if __name__ == '__main__':
