@@ -1,9 +1,11 @@
 from jinja2 import Template, Environment, FileSystemLoader, StrictUndefined
 from pathlib import Path
-from chipmunk_pickle import ChipmunkPickle
+from chipmunk.chipmunk_pickle import ChipmunkPickle
 import sys
 import pickle
 import subprocess
+
+from chipmunk.utils import load_jinja2_templates
 
 
 # Read contents of file_name into a string
@@ -19,8 +21,7 @@ else:
     sketch1_name = str(sys.argv[1])
     sketch2_name = str(sys.argv[2])
     transform_file = str(sys.argv[3])
-    env = Environment(
-        loader=FileSystemLoader('../templates'), undefined=StrictUndefined)
+    env = load_jinja2_templates()
     assert (pickle.load(open(
         sketch1_name + ".pickle", "rb")).num_fields_in_prog_ == pickle.load(
             open(sketch2_name + ".pickle", "rb")).num_fields_in_prog_)

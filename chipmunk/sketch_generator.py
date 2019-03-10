@@ -3,9 +3,9 @@ from jinja2 import Template
 import math
 import sys
 from pathlib import Path
-from stateful_aluLexer import stateful_aluLexer
-from stateful_aluParser import stateful_aluParser
-from stateful_alu_sketch_generator import StatefulAluSketchGenerator
+from chipmunk.stateful_aluLexer import stateful_aluLexer
+from chipmunk.stateful_aluParser import stateful_aluParser
+from chipmunk.stateful_alu_sketch_generator import StatefulAluSketchGenerator
 from antlr4 import *
 
 

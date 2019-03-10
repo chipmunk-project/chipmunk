@@ -3,7 +3,7 @@ from pathlib import Path
 import sys
 import re
 
-from compiler import Compiler
+from chipmunk.compiler import Compiler
 
 def main(argv):
     """Main program."""

@@ -4,11 +4,9 @@ import re
 import subprocess
 import sys
 
-from jinja2 import Environment, FileSystemLoader, StrictUndefined
-
-from chipmunk_pickle import ChipmunkPickle
-from sketch_generator import SketchGenerator
-from utils import get_num_pkt_fields_and_state_groups
+from chipmunk.chipmunk_pickle import ChipmunkPickle
+from chipmunk.sketch_generator import SketchGenerator
+from chipmunk.utils import get_num_pkt_fields_and_state_groups, load_jinja2_templates
 
 
 class Compiler:
@@ -28,11 +26,7 @@ class Compiler:
         assert self.num_fields_in_prog <= num_alus_per_stage
 
         # Initialize jinja2 environment for templates
-        self.jinja2_env = Environment(
-            loader=FileSystemLoader('./templates'),
-            undefined=StrictUndefined,
-            trim_blocks=True,
-            lstrip_blocks=True)
+        self.jinja2_env = load_jinja2_templates()
         # Create an object for sketch generation
         self.sketch_generator = SketchGenerator(
             sketch_name=sketch_name,
