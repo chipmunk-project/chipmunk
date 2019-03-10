@@ -23,13 +23,14 @@ def add_prefix_suffix(text, prefix_string, suffix_string):
 class SketchGenerator:
     def __init__(self, sketch_name, num_phv_containers, num_state_groups,
                  num_alus_per_stage, num_pipeline_stages, num_fields_in_prog,
-                 jinja2_env, alu_file):
+                 jinja2_env, alu_file, additional_constraints):
         self.sketch_name_ = sketch_name
         self.total_hole_bits_ = 0
         self.hole_names_ = []
         self.hole_preamble_ = ""
         self.hole_arguments_ = []
         self.holes_ = []
+        self.additional_constraints_ = additional_constraints;
         self.asserts_ = ""
         self.constraints_ = []
         self.num_phv_containers_ = num_phv_containers
@@ -214,4 +215,5 @@ class SketchGenerator:
             hole_arguments=self.hole_arguments_,
             stateful_alu_hole_arguments=self.stateful_alu_hole_arguments_,
             num_operands_to_stateful_alu=self.num_operands_to_stateful_alu_,
-            num_state_slots = self.num_state_slots_)
+            num_state_slots = self.num_state_slots_,
+            additional_constraints = "\n".join([str(x) for x in self.additional_constraints_]))
