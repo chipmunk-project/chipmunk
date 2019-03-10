@@ -864,9 +864,9 @@ int sample1_salu_config_0_1= 0;
 int sample1_salu_config_1_0= 1;
 int sample1_salu_config_1_1= 0;
 int sample1_salu_config_2_0= 0;
-int sample1_salu_config_2_1= 1;
+int sample1_salu_config_2_1= 0;
 int sample1_salu_config_3_0= 0;
-int sample1_salu_config_3_1= 0;
+int sample1_salu_config_3_1= 1;
 int sample1_salu_config_4_0= 0;
 int sample1_salu_config_4_1= 0;
 
