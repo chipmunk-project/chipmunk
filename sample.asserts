@@ -1,0 +1,7 @@
+assert(sample1_salu_config_0_0 == 1);
+assert(sample1_salu_config_1_0 == 0);
+assert(sample1_salu_config_2_0 == 0);
+assert(sample1_salu_config_3_0 == 0);
+assert(sample1_salu_config_4_0 == 0);
+
+# TODO: Figure out how to fill this in.
