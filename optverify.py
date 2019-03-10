@@ -32,9 +32,9 @@ else:
     num_fields_in_prog = pickle.load(open(sketch1_name + ".pickle",
                                           "rb")).num_fields_in_prog_
     num_state_groups = pickle.load(open(sketch1_name + ".pickle",
-                                      "rb")).num_state_groups_
+                                        "rb")).num_state_groups_
     num_state_slots = pickle.load(open(sketch1_name + ".pickle",
-                                      "rb")).num_state_slots_
+                                       "rb")).num_state_slots_
     opt_verify_template = env.get_template("opt_verify.j2")
     opt_verifier = opt_verify_template.render(
         sketch1_name=sketch1_name,
@@ -77,5 +77,3 @@ else:
         success_file.close()
         print("Verification succeeded. Output left in " + success_file.name)
         sys.exit(0)
-
-
