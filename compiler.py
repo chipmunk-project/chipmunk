@@ -13,7 +13,7 @@ from utils import get_num_pkt_fields_and_state_groups
 
 class Compiler:
     def __init__(self, program_file, alu_file, num_pipeline_stages,
-                 num_alus_per_stage, sketch_name, parallel_or_serial, additional_constraints = []):
+                 num_alus_per_stage, sketch_name, parallel_or_serial):
         self.program_file = program_file
         self.alu_file = alu_file
         self.num_pipeline_stages = num_pipeline_stages
@@ -39,7 +39,7 @@ class Compiler:
             num_state_groups=self.num_state_groups,
             num_fields_in_prog=self.num_fields_in_prog,
             jinja2_env=self.jinja2_env,
-            alu_file=alu_file, additional_constraints = additional_constraints)
+            alu_file=alu_file)
 
         # Create stateless and stateful ALUs, operand muxes for stateful ALUs,
         # and output muxes.
@@ -56,7 +56,7 @@ class Compiler:
         # Get number of state slots in stateful ALU from sketch_generator
         self.num_state_slots = self.sketch_generator.num_state_slots_
 
-    def codegen(self):
+    def codegen(self, additional_constraints = []):
         """Codegeneration"""
         codegen_code = self.sketch_generator.generate_sketch(
             program_file=self.program_file,
@@ -64,7 +64,8 @@ class Compiler:
             stateful_operand_mux_definitions=self.
             stateful_operand_mux_definitions,
             mode="codegen",
-            output_mux_definitions=self.output_mux_definitions)
+            output_mux_definitions=self.output_mux_definitions,
+            additional_constraints = additional_constraints)
 
         # Create file and write sketch_harness into it.
         sketch_file_name = self.sketch_name + "_codegen.sk"
