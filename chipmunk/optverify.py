@@ -20,7 +20,7 @@ else:
     sketch2_name = str(sys.argv[2])
     transform_file = str(sys.argv[3])
     env = Environment(
-        loader=FileSystemLoader('./templates'), undefined=StrictUndefined)
+        loader=FileSystemLoader('../templates'), undefined=StrictUndefined)
     assert (pickle.load(open(
         sketch1_name + ".pickle", "rb")).num_fields_in_prog_ == pickle.load(
             open(sketch2_name + ".pickle", "rb")).num_fields_in_prog_)
