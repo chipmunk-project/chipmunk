@@ -14,8 +14,8 @@ class ChipmunkCodegenTest(unittest.TestCase):
     def setUp(self):
         self.base_path = path.abspath(path.dirname(__file__))
         self.data_dir = path.join(self.base_path, "data/")
-        self.alu_dir = path.join(self.base_path, "../example_alus/")
-        self.spec_dir = path.join(self.base_path, "../example_specs/")
+        self.alu_dir = path.join(self.base_path, "../../example_alus/")
+        self.spec_dir = path.join(self.base_path, "../../example_specs/")
 
     def test_codegen_with_simple_sketch_for_all_alus(self):
         alus = [
@@ -27,7 +27,7 @@ class ChipmunkCodegenTest(unittest.TestCase):
             # TODO(taegyunkim): Instead of writing to the same success and
             # failure files, use different files for each ALU.
             compiler = Compiler(
-                path.join(self.base_path, "../example_specs/simple.sk"),
+                path.join(self.spec_dir, "simple.sk"),
                 path.join(self.alu_dir, alu), 2, 2, "simple", "serial")
             self.assertEqual(compiler.codegen()[0], 0,
                              "Compiling simple.sk failed for " + alu)
