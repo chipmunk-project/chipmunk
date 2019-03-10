@@ -53,9 +53,6 @@ class Compiler:
         # stateful ALU and vice versa.
         self.sketch_generator.generate_state_allocator()
 
-        # Get number of state slots in stateful ALU from sketch_generator
-        self.num_state_slots = self.sketch_generator.num_state_slots_
-
     def codegen(self, additional_constraints = []):
         """Codegeneration"""
         codegen_code = self.sketch_generator.generate_sketch(
@@ -112,7 +109,7 @@ class Compiler:
                     constraints=self.sketch_generator.constraints_,
                     num_fields_in_prog=self.num_fields_in_prog,
                     num_state_groups=self.num_state_groups,
-                    num_state_slots=self.num_state_slots), pickle_file)
+                    num_state_slots=self.sketch_generator.num_state_slots), pickle_file)
             print("Pickle file is ", pickle_file.name)
 
         print("Total number of hole bits is",
