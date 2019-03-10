@@ -1,5 +1,5 @@
-from stateful_aluParser import stateful_aluParser
-from stateful_aluVisitor import stateful_aluVisitor
+from chipmunk.stateful_aluParser import stateful_aluParser
+from chipmunk.stateful_aluVisitor import stateful_aluVisitor
 from overrides import overrides
 from textwrap import dedent
 

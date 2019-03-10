@@ -4,8 +4,8 @@ from os import path, listdir
 from pathlib import Path
 import unittest
 
-from chipmunk import Compiler
-from utils import get_hole_dicts
+from chipmunk.compiler import Compiler
+from chipmunk.utils import get_hole_dicts
 
 
 class ChipmunkCodegenTest(unittest.TestCase):

@@ -8,9 +8,9 @@ import time
 
 from jinja2 import Environment, FileSystemLoader, StrictUndefined
 
-from sketch_generator import SketchGenerator
-from utils import get_num_pkt_fields_and_state_vars
-from sol_verify import sol_verify
+from chipmunk.sketch_generator import SketchGenerator
+from chipmunk.utils import get_num_pkt_fields_and_state_vars, load_jinja2_templates
+from chipmunk.sol_verify import sol_verify
 
 if (len(sys.argv) != 8):  # This part may need change with the chipmunk.py file
     print(
@@ -36,8 +36,7 @@ else:
     assert (mode == "cex_mode") or (mode == "hole_elimination_mode")
 
 # Initialize jinja2 environment for templates
-env = Environment(
-    loader=FileSystemLoader('./templates'), undefined=StrictUndefined)
+env = load_jinja2_templates()
 
 # Create an object for sketch generation
 sketch_generator = SketchGenerator(
