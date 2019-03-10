@@ -3,7 +3,8 @@
 ## Installation
 - Install [antlr](https://www.antlr.org/)
 - `pip3 install antlr4-python3-runtime jinja2 overrides nose`
-- Generate ALU parser: `antlr4 -Dlanguage=Python3 -visitor stateful_alu.g4`
+- Generate ALU parser: `antlr4 -Dlanguage=Python3 -visitor stateful_alu.g4
+  -package chipmunk`
 
 ## How to
 
