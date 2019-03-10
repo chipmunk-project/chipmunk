@@ -29,7 +29,8 @@ def main(argv):
     # For each state_group, pick a pipeline_stage exhaustively.
     # Note that some of these assignments might be infeasible, but that's OK. Sketch will reject these anyway.
     count = 0
-    compiler_results = []
+    compiler_outputs = []
+    compiler_inputs  = []
     for assignment in itertools.product(list(range(num_pipeline_stages)), repeat=num_state_groups):
         additional_asserts = []
         count = count + 1
@@ -38,27 +39,41 @@ def main(argv):
             assigned_stage = assignment[state_group]
             for stage in range(num_pipeline_stages):
                 if (stage == assigned_stage):
-                    additional_asserts += [sketch_name + "_salu_config_" + str(stage) + "_" + str(state_group) + " == 1"]
+                    additional_asserts += [sketch_name + "_" + str(count) + "_salu_config_" + str(stage) + "_" + str(state_group) + " == 1"]
                 else:
-                    additional_asserts += [sketch_name + "_salu_config_" + str(stage) + "_" + str(state_group) + " == 0"]
-        compiler = Compiler(program_file, alu_file, num_pipeline_stages,
-                            num_alus_per_stage, sketch_name + "_" + str(count), "serial")
-        compiler_results += [compiler.codegen(additional_asserts)]
+                    additional_asserts += [sketch_name + "_" + str(count) + "_salu_config_" + str(stage) + "_" + str(state_group) + " == 0"]
+        compiler_inputs += [(Compiler(program_file, alu_file, num_pipeline_stages,
+                            num_alus_per_stage, sketch_name + "_" + str(count), "serial"),
+                            additional_asserts)]
 
-    if all([x[0] != 0 for x in compiler_results]):
-        with open(compiler.sketch_name + ".errors", "w") as errors_file:
-            errors_file.write(compiler_results[count - 1][1])
+    def single_compiler_run(compiler_input):
+        return compiler_input[0].codegen(compiler_input[1])
+
+    for x in compiler_inputs:
+        compiler_outputs += [single_compiler_run(x)]
+
+    # Now process all compiler outputs.
+    # If all runs failed
+    if all([x[0] != 0 for x in compiler_outputs]):
+        with open(sketch_name + ".errors", "w") as errors_file:
+            errors_file.write(compiler_outputs[count - 1][1])
             print("Sketch failed. Output left in " + errors_file.name)
         sys.exit(1)
 
-    assert(not all([x[0] != 0 for x in compiler_results]))
-    output =  next(x for x in compiler_results if x[0] == 0)[1]
-    for hole_name in compiler.sketch_generator.hole_names_:
+    # If at least one run succeeded, pick the first successful run.
+    assert(not all([x[0] != 0 for x in compiler_outputs]))
+    output_index = -1
+    for i in range(count):
+        if (compiler_outputs[i][0] == 0):
+            output_index = i
+    assert(output_index != -1)
+    output =  compiler_outputs[output_index][1]
+    for hole_name in compiler_inputs[output_index][0].sketch_generator.hole_names_:
         hits = re.findall("(" + hole_name + ")__" + r"\w+ = (\d+)", output)
         assert len(hits) == 1
         assert len(hits[0]) == 2
         print("int ", hits[0][0], " = ", hits[0][1], ";")
-    with open(compiler.sketch_name + ".success", "w") as success_file:
+    with open(sketch_name + ".success", "w") as success_file:
         success_file.write(output)
         print("Sketch succeeded. Generated configuration is given " +
               "above. Output left in " + success_file.name)
