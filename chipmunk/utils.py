@@ -6,7 +6,7 @@ from jinja2 import Environment, FileSystemLoader, StrictUndefined
 
 
 def get_num_pkt_fields_and_state_groups(program):
-    """Returns number of packet fields and state groups.
+    """Returns number of packet fields and state variables.
     Use a regex to scan the program and extract the largest packet field index
     and largest state variable index
 
@@ -19,10 +19,10 @@ def get_num_pkt_fields_and_state_groups(program):
     pkt_fields = [
         int(x) for x in findall(r'state_and_packet.pkt_(\d+)', program)
     ]
-    state_groups = [
-        int(x) for x in findall(r'state_and_packet.state_group_(\d+)', program)
+    state_vars = [
+        int(x) for x in findall(r'state_and_packet.state_(\d+)', program)
     ]
-    return (max(pkt_fields) + 1, max(state_groups) + 1)
+    return (max(pkt_fields) + 1, max(state_vars) + 1)
 
 
 def get_hole_dicts(sketch_file):
@@ -41,4 +41,4 @@ def load_jinja2_templates():
     # Initialize jinja2 environment for templates
     return Environment(
         loader=FileSystemLoader(path.join(here, '../templates')),
-        undefined=StrictUndefined, trim_blocks=True, lstrip_blocks=True)
+        undefined=StrictUndefined)
