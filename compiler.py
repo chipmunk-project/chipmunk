@@ -41,27 +41,11 @@ class Compiler:
             jinja2_env=self.jinja2_env,
             alu_file=alu_file)
 
-        # Create stateless and stateful ALUs, operand muxes for stateful ALUs,
-        # and output muxes.
-        self.alu_definitions = self.sketch_generator.generate_alus()
-        self.stateful_operand_mux_definitions = (
-            self.sketch_generator.generate_stateful_operand_muxes())
-        self.output_mux_definitions = (
-            self.sketch_generator.generate_output_muxes())
-
-        # Create allocator to ensure each state var is assigned to exactly
-        # stateful ALU and vice versa.
-        self.sketch_generator.generate_state_allocator()
-
     def codegen(self, additional_constraints = []):
         """Codegeneration"""
         codegen_code = self.sketch_generator.generate_sketch(
             program_file=self.program_file,
-            alu_definitions=self.alu_definitions,
-            stateful_operand_mux_definitions=self.
-            stateful_operand_mux_definitions,
             mode="codegen",
-            output_mux_definitions=self.output_mux_definitions,
             additional_constraints = additional_constraints)
 
         # Create file and write sketch_harness into it.
@@ -88,11 +72,7 @@ class Compiler:
         """Opt Verify"""
         optverify_code = self.sketch_generator.generate_sketch(
             program_file=self.program_file,
-            alu_definitions=self.alu_definitions,
-            stateful_operand_mux_definitions=self.
-            stateful_operand_mux_definitions,
-            mode="optverify",
-            output_mux_definitions=self.output_mux_definitions)
+            mode="optverify")
 
         # Create file and write sketch_function into it
         with open(self.sketch_name + "_optverify.sk", "w") as sketch_file:
