@@ -859,16 +859,16 @@ int sample1_output_mux_phv_4_1_ctrl= ??(3);
 int sample1_output_mux_phv_4_2_ctrl= ??(3);
 int sample1_output_mux_phv_4_3_ctrl= ??(3);
 int sample1_output_mux_phv_4_4_ctrl= ??(3);
-int sample1_salu_config_0_0= 0;
-int sample1_salu_config_0_1= 0;
-int sample1_salu_config_1_0= 1;
-int sample1_salu_config_1_1= 0;
-int sample1_salu_config_2_0= 0;
-int sample1_salu_config_2_1= 0;
-int sample1_salu_config_3_0= 0;
-int sample1_salu_config_3_1= 1;
-int sample1_salu_config_4_0= 0;
-int sample1_salu_config_4_1= 0;
+int sample1_salu_config_0_0= ??(1);
+int sample1_salu_config_0_1= ??(1);
+int sample1_salu_config_1_0= ??(1);
+int sample1_salu_config_1_1= ??(1);
+int sample1_salu_config_2_0= ??(1);
+int sample1_salu_config_2_1= ??(1);
+int sample1_salu_config_3_0= ??(1);
+int sample1_salu_config_3_1= ??(1);
+int sample1_salu_config_4_0= ??(1);
+int sample1_salu_config_4_1= ??(1);
 
 
 // Definitions of muxes and ALUs of the router
@@ -8441,6 +8441,17 @@ struct StateAndPacket {
 
 // Implementation
   |StateAndPacket| pipeline (|StateAndPacket| state_and_packet) {
+  assert(sample1_salu_config_0_0 == 0);
+  assert(sample1_salu_config_0_1 == 0);
+  assert(sample1_salu_config_1_0 == 1);
+  assert(sample1_salu_config_1_1 == 0);
+  assert(sample1_salu_config_2_0 == 0);
+  assert(sample1_salu_config_2_1 == 0);
+  assert(sample1_salu_config_3_0 == 0);
+  assert(sample1_salu_config_3_1 == 1);
+  assert(sample1_salu_config_4_0 == 0);
+  assert(sample1_salu_config_4_1 == 0);
+
   // Consolidate all constraints on holes here.
   assert((sample1_stateless_alu_0_0_opcode == 1)|| (sample1_stateless_alu_0_0_mux1_ctrl <= sample1_stateless_alu_0_0_mux2_ctrl));
 assert((sample1_stateless_alu_0_1_opcode == 1)|| (sample1_stateless_alu_0_1_mux1_ctrl <= sample1_stateless_alu_0_1_mux2_ctrl));
