@@ -124,6 +124,7 @@ else:
                     filename = "/tmp/" + sketch_name + "_new_sketch_with_hole_value.sk"
                 counter_example_assert = ""
                 counter_example_definition = ""
+                #Add multiple counterexample range from 2 bits to 10 bits
                 for bits in range(2,10):
                     output_with_counter_example = counter_example_generator(bits,filename, num_fields_in_prog, num_state_groups)
                     print(bits)
@@ -175,11 +176,12 @@ else:
             new_sketch.write(original_sketch_file_string)
             new_sketch.close()
             (ret_code1, output) = subprocess.getstatusoutput(
-                "sketch -V 3 --bnd-inbits=2 --bnd-int-range=50 " +
+                "sketch -V 3 --bnd-inbits=2 " +
                 new_sketch.name)
             print("Iteration #" + str(count))
             hole_value_string = ""
             #Failed      print("Hello1")
+            print("ret_code1: ", ret_code1)
             if (ret_code1 == 0):
                 hole_value_file = open("/tmp/" + sketch_name + "_result.holes",
                                        "w")
