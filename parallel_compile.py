@@ -3,6 +3,7 @@ from pathlib import Path
 import sys
 import re
 import itertools
+import concurrent.futures
 
 from compiler import Compiler
 from utils import get_num_pkt_fields_and_state_groups
@@ -49,8 +50,8 @@ def main(argv):
                             num_alus_per_stage, sketch_name + "_" + str(count), "serial"),
                             additional_asserts)]
 
-    for x in compiler_inputs:
-        compiler_outputs += [single_compiler_run(x)]
+    with concurrent.futures.ProcessPoolExecutor() as executor:
+        compiler_outputs = list(executor.map(single_compiler_run, compiler_inputs, timeout = 60))
 
     # Now process all compiler outputs.
     # If all runs failed
@@ -68,7 +69,7 @@ def main(argv):
             output_index = i
     assert(output_index != -1)
     output =  compiler_outputs[output_index][1]
-    for hole_name in compiler_inputs[output_index][0].sketch_generator.hole_names_:
+    for hole_name in compiler_outputs[output_index][2]:
         hits = re.findall("(" + hole_name + ")__" + r"\w+ = (\d+)", output)
         assert len(hits) == 1
         assert len(hits[0]) == 2

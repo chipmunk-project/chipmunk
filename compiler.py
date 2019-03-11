@@ -66,7 +66,7 @@ class Compiler:
                 "time sketch -V 12 --slv-seed=1 --bnd-inbits=2 " +
                 "--bnd-int-range=50 " + sketch_file_name)
 
-        return (ret_code, output)
+        return (ret_code, output, self.sketch_generator.hole_names_)
 
     def optverify(self):
         """Opt Verify"""
