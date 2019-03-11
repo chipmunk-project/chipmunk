@@ -53,7 +53,7 @@ class ChipmunkCodegenTest(unittest.TestCase):
             path.join(self.spec_dir, spec_filename),
             path.join(self.alu_dir, alu_filename), 2, 2, "simple_raw_2_2",
             "serial")
-        (ret_code, output) = compiler.codegen()
+        (ret_code, output, _) = compiler.codegen()
         self.assertEqual(
             ret_code, 0,
             "Compiling " + spec_filename + " failed for " + alu_filename)
