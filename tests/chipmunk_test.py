@@ -5,6 +5,7 @@ from pathlib import Path
 import unittest
 
 from chipmunk import Compiler
+from optverify import optverify
 from utils import get_hole_dicts
 
 BASE_PATH = path.abspath(path.dirname(__file__))
@@ -97,6 +98,36 @@ class ChipmunkCodegenTest(unittest.TestCase):
         self.assertEqual(
             ret_code, 0,
             "Compiling " + spec_filename + " failed for " + alu_filename)
+
+
+class OptverifyTest(unittest.TestCase):
+    def setUp(self):
+        self.base_path = path.abspath(path.dirname(__file__))
+        self.alu_dir = path.join(self.base_path, "../example_alus/")
+        self.spec_dir = path.join(self.base_path, "../example_specs/")
+        self.transform_dir = path.join(self.base_path,
+                                       "../example_transforms/")
+
+    def test_simple_sketch_same_config(self):
+        spec_filename = "simple.sk"
+        alu_filename = "raw.stateful_alu"
+
+        compiler = Compiler(
+            path.join(self.spec_dir, spec_filename),
+            path.join(self.alu_dir, alu_filename), 1, 1, "sample1", "serial")
+
+        compiler.optverify()
+
+        compiler = Compiler(
+            path.join(self.spec_dir, spec_filename),
+            path.join(self.alu_dir, alu_filename), 1, 1, "sample2", "serial")
+
+        compiler.optverify()
+
+        self.assertEqual(
+            0,
+            optverify("sample1", "sample2",
+                      path.join(self.transform_dir, "very_simple.transform")))
 
 
 if __name__ == '__main__':
