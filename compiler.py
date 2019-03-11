@@ -59,11 +59,11 @@ class Compiler:
         print("Sketch file is ", sketch_file_name)
         if self.parallel_or_serial == "parallel":
             (ret_code, output) = subprocess.getstatusoutput(
-                "time sketch -V 12 --slv-seed=1 --slv-parallel --fe-timeout=1 --slv-timeout=1" +
+                "time sketch -V 12 --slv-seed=1 --slv-parallel " +
                 "--bnd-inbits=2 --bnd-int-range=50 " + sketch_file_name)
         else:
             (ret_code, output) = subprocess.getstatusoutput(
-                "time sketch -V 12 --slv-seed=1 --bnd-inbits=2 --fe-timeout=1 --slv-timeout=1" +
+                "time sketch -V 12 --slv-seed=1 --bnd-inbits=2 " +
                 "--bnd-int-range=50 " + sketch_file_name)
 
         return (ret_code, output, self.sketch_generator.hole_names_)
