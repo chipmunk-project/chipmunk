@@ -4,9 +4,19 @@ import sys
 import re
 import itertools
 import concurrent.futures
+import signal, psutil, os
 
 from compiler import Compiler
 from utils import get_num_pkt_fields_and_state_groups
+
+def kill_child_processes(parent_pid, sig=signal.SIGTERM):
+    try:
+        parent = psutil.Process(parent_pid)
+    except psutil.NoSuchProcess:
+        return
+    children = parent.children(recursive=True)
+    for process in children:
+        process.send_signal(sig)
 
 def single_compiler_run(compiler_input):
     return compiler_input[0].codegen(compiler_input[1])
@@ -68,6 +78,9 @@ def main(argv):
                     success_file.write(compiler_output[1])
                     print("Sketch succeeded. Generated configuration is given " +
                           "above. Output left in " + success_file.name)
+                # TODO: Figure out the right way to do this in the future.
+                executor.shutdown(wait=False)
+                kill_child_processes(os.getpid())
                 sys.exit(0)
 
             else:
