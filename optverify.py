@@ -12,16 +12,7 @@ def read_file(filename):
     return Path(filename).read_text()
 
 
-def main(argv):
-    """Main routine for optimization verifier."""
-    if (len(argv) < 4):
-        print("Usage: " + argv[0] +
-              " sketch1_name sketch2_name transform_file")
-        sys.exit(1)
-
-    sketch1_name = str(argv[1])
-    sketch2_name = str(argv[2])
-    transform_file = str(argv[3])
+def optverify(sketch1_name, sketch2_name, transform_file):
     env = Environment(
         loader=FileSystemLoader('./templates'), undefined=StrictUndefined)
 
@@ -75,13 +66,27 @@ def main(argv):
         errors_file.write(output)
         errors_file.close()
         print("Verification failed. Output left in " + errors_file.name)
-        sys.exit(1)
+        return 1
     else:
         success_file = open(verifier_file + ".success", "w")
         success_file.write(output)
         success_file.close()
         print("Verification succeeded. Output left in " + success_file.name)
-        sys.exit(0)
+        return 0
+
+
+def main(argv):
+    """Main routine for optimization verifier."""
+    if (len(argv) < 4):
+        print("Usage: " + argv[0] +
+              " sketch1_name sketch2_name transform_file")
+        sys.exit(1)
+
+    sketch1_name = str(argv[1])
+    sketch2_name = str(argv[2])
+    transform_file = str(argv[3])
+
+    sys.exit(optverify(sketch1_name, sketch2_name, transform_file))
 
 
 if __name__ == "__main__":
