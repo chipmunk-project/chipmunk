@@ -3,9 +3,7 @@ import pickle
 import subprocess
 import sys
 
-from jinja2 import Template, Environment, FileSystemLoader, StrictUndefined
-
-from chipmunk_pickle import ChipmunkPickle
+from jinja2 import Environment, FileSystemLoader, StrictUndefined
 
 
 # Read contents of filename into a string
