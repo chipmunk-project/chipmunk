@@ -6,19 +6,20 @@ import sys
 from jinja2 import Environment, FileSystemLoader, StrictUndefined
 
 
-# Read contents of filename into a string
 def read_file(filename):
     return Path(filename).read_text()
 
 
-if (len(sys.argv) < 4):
-    print("Usage: " + sys.argv[0] +
-          " sketch1_name sketch2_name transform_file")
-    sys.exit(1)
-else:
-    sketch1_name = str(sys.argv[1])
-    sketch2_name = str(sys.argv[2])
-    transform_file = str(sys.argv[3])
+def main(argv):
+    """Main routine for optimization verifier."""
+    if (len(argv) < 4):
+        print("Usage: " + argv[0] +
+              " sketch1_name sketch2_name transform_file")
+        sys.exit(1)
+
+    sketch1_name = str(argv[1])
+    sketch2_name = str(argv[2])
+    transform_file = str(argv[3])
     env = Environment(
         loader=FileSystemLoader('./templates'), undefined=StrictUndefined)
     assert (pickle.load(open(
@@ -43,8 +44,10 @@ else:
                                          "rb")).hole_arguments_,
         hole2_arguments=pickle.load(open(sketch2_name + ".pickle",
                                          "rb")).hole_arguments_,
-        sketch1_holes=pickle.load(open(sketch1_name + ".pickle", "rb")).holes_,
-        sketch2_holes=pickle.load(open(sketch2_name + ".pickle", "rb")).holes_,
+        sketch1_holes=pickle.load(
+            open(sketch1_name + ".pickle", "rb")).holes_,
+        sketch2_holes=pickle.load(
+            open(sketch2_name + ".pickle", "rb")).holes_,
         sketch1_asserts=pickle.load(open(sketch1_name + ".pickle",
                                          "rb")).constraints_,
         sketch2_asserts=pickle.load(open(sketch2_name + ".pickle",
@@ -63,7 +66,7 @@ else:
     # Call sketch on it
     (ret_code,
      output) = subprocess.getstatusoutput("time sketch -V 12 " + verifier_file)
-    if (ret_code != 0):
+    if ret_code != 0:
         errors_file = open(verifier_file + ".errors", "w")
         errors_file.write(output)
         errors_file.close()
@@ -75,3 +78,7 @@ else:
         success_file.close()
         print("Verification succeeded. Output left in " + success_file.name)
         sys.exit(0)
+
+
+if __name__ == "__main__":
+    main(sys.argv)
