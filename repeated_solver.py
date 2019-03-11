@@ -8,7 +8,7 @@ import time
 from jinja2 import Environment, FileSystemLoader, StrictUndefined
 
 from sketch_generator import SketchGenerator
-from utils import get_num_pkt_fields_and_state_groups
+from utils import get_num_pkt_fields_and_state_groups, get_hole_value_assignments
 from sol_verify import sol_verify
 from counter_example_generator import counter_example_generator
 from compiler import Compiler
@@ -25,8 +25,9 @@ if (len(sys.argv) != 8):  # This part may need change with the chipmunk.py file
 else:
     start = time.time()
     program_file = str(sys.argv[1])
-    (num_fields_in_prog, num_state_groups) = get_num_pkt_fields_and_state_groups(
-        Path(program_file).read_text())
+    (num_fields_in_prog,
+     num_state_groups) = get_num_pkt_fields_and_state_groups(
+         Path(program_file).read_text())
     alu_file = str(sys.argv[2])
     num_pipeline_stages = int(sys.argv[3])
     num_alus_per_stage = int(sys.argv[4])
@@ -67,8 +68,8 @@ else:
         count = 0
         while (1):
             if (mode == "hole_elimination_mode"):
-                hole_value_file_string = Path(
-                    "/tmp/" + sketch_name + "_result.holes").read_text()
+                hole_value_file_string = Path("/tmp/" + sketch_name +
+                                              "_result.holes").read_text()
                 begin_pos = hole_value_file_string.find('int')
                 end_pos = hole_value_file_string.rfind(';')
                 hole_value_file_string = hole_value_file_string[begin_pos:
@@ -107,7 +108,7 @@ else:
                     output_with_counter_example = counter_example_generator(bits,filename, num_fields_in_prog, num_state_groups)
                     print(bits)
                     if (output_with_counter_example == ""):
-                        continue;
+                        continue
                     else:
                         #Grap the counterexample by using regular expression
                         pkt_group = re.findall("input (pkt_\d+)\w+ has value \d+= \((\d+)\)", output_with_counter_example)
@@ -137,12 +138,12 @@ else:
                             count) + "_" + str(bits) + " = |StateAndPacket|(\n"
                         for i in range(len(pkt_group)):
                             counter_example_definition += pkt_group[i][
-                                0] + " = " + str(int(pkt_group[0][1]) + 2**bits) + ',\n'
+                                0] + " = " + str(int(pkt_group[i][1]) + 2**bits) + ',\n'
                         for i in range(len(state_group)):
                             if (i < len(state_group) - 1):
-                              counter_example_definition += state_group[i][0] + " = " + str(int(state_group[0][1]) + 2**bits) + ',\n'
+                              counter_example_definition += state_group[i][0] + " = " + str(int(state_group[i][1]) + 2**bits) + ',\n'
                             else:
-                              counter_example_definition += state_group[i][0] + " = " + str(int(state_group[0][1]) + 2**bits) + ");\n"
+                              counter_example_definition += state_group[i][0] + " = " + str(int(state_group[i][1]) + 2**bits) + ");\n"
                         counter_example_assert += "assert (pipeline(" + "x_" + str(
                             count) + "_" + str(bits) + ")" + " == " + "program(" + "x_" + str(
                                 count) + "_" + str(bits) + "));\n"
