@@ -198,7 +198,8 @@ class SketchGenerator:
         # Create stateless and stateful ALUs, operand muxes for stateful ALUs,
         # and output muxes.
         alu_definitions = self.generate_alus()
-        stateful_operand_mux_definitions = self.generate_stateful_operand_muxes()
+        stateful_operand_mux_definitions = self.generate_stateful_operand_muxes(
+        )
         output_mux_definitions = self.generate_output_muxes()
 
         # Create allocator to ensure each state var is assigned to exactly
@@ -223,5 +224,6 @@ class SketchGenerator:
             hole_arguments=self.hole_arguments_,
             stateful_alu_hole_arguments=self.stateful_alu_hole_arguments_,
             num_operands_to_stateful_alu=self.num_operands_to_stateful_alu_,
-            num_state_slots = self.num_state_slots_,
-            additional_constraints = "\n".join(["assert(" + str(x) + ");" for x in additional_constraints]))
+            num_state_slots=self.num_state_slots_,
+            additional_constraints="\n".join(
+                ["assert(" + str(x) + ");" for x in additional_constraints]))
