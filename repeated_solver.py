@@ -39,7 +39,7 @@ else:
 
 compiler = Compiler(program_file, alu_file, num_pipeline_stages,
                     num_alus_per_stage, sketch_name, parallel_or_serial)
-(ret_code, output) = compiler.codegen()
+(ret_code, output, _) = compiler.codegen()
 
 if (ret_code != 0):
     print("failed")
@@ -180,7 +180,7 @@ else:
                 hole_value_file = open("/tmp/" + sketch_name + "_result.holes",
                                        "w")
                 holes_to_values = get_hole_value_assignments(
-                    sketch_generator.hole_names_, output)
+                    compiler.sketch_generator.hole_names_, output)
                 for hole, value in holes_to_values.items():
                     hole_value_string += "int " + hole + " = " + value + ";"
                 hole_value_file.write(hole_value_string)
