@@ -131,9 +131,10 @@ else:
                     if (output_with_counter_example == ""):
                         continue;
                     else:
+                        #Grap the counterexample by using regular expression
                         pkt_group = re.findall("input (pkt_\d+)\w+ has value \d+= \((\d+)\)", output_with_counter_example)
                         state_group = re.findall(
-                            "input (state_group_0_state_\d+)\w+ has value \d+= \((\d+)\)",
+                            "input (state_group_\d+_state_\d+)\w+ has value \d+= \((\d+)\)",
                             output_with_counter_example)
                         print(pkt_group,"  ",bits)
                         print(state_group," ",bits)
@@ -153,7 +154,7 @@ else:
                           if ("state_group_0_state_" + str(i) in [regex_match[0] for regex_match in state_group]):
                             continue
                           else:
-                            state_group.append(("state_" + str(i), str(0)))
+                            state_group.append(("state_group_0_state_" + str(i), str(0)))
                         counter_example_definition += "|StateAndPacket| x_" + str(
                             count) + "_" + str(bits) + " = |StateAndPacket|(\n"
                         for i in range(len(pkt_group)):
