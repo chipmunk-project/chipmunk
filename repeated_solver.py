@@ -8,7 +8,7 @@ import time
 from jinja2 import Environment, FileSystemLoader, StrictUndefined
 
 from sketch_generator import SketchGenerator
-from utils import get_num_pkt_fields_and_state_groups
+from utils import get_num_pkt_fields_and_state_groups, get_hole_value_assignments
 from sol_verify import sol_verify
 from counter_example_generator import counter_example_generator
 from compiler import Compiler
@@ -105,7 +105,7 @@ else:
                 for bits in range(2, 10):
                     output_with_counter_example = counter_example_generator(
                         bits, filename, num_fields_in_prog, num_state_groups)
-                    print(bits)
+                    print("Bit: %d" % bits)
                     if (output_with_counter_example == ""):
                         continue
                     else:
@@ -118,8 +118,8 @@ else:
                             output_with_counter_example)
                         print(pkt_group, "  ", bits)
                         print(state_group, " ", bits)
-                        #                        print(pkt_group, "len= ", len(pkt_group), "actual value", str(int(pkt_group[0][1]) + 2**bits))
-                        #                        print(state_group, "len= ", len(state_group), "actual value", int(state_group[0][1]) + 2**bits)
+                        # print(pkt_group, "len= ", len(pkt_group), "actual value", str(int(pkt_group[0][1]) + 2**bits))
+                        # print(state_group, "len= ", len(state_group), "actual value", int(state_group[0][1]) + 2**bits)
                         # Check if all packet fields are included in pkt_group as part of the counterexample.
                         # If not, set those packet fields to a default (0) since they don't matter for the counterexample.
                         for i in range(int(num_fields_in_prog)):

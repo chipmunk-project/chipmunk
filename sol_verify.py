@@ -1,11 +1,9 @@
 """Solution Verifier"""
 
-import sys
 import subprocess
 
 
 def sol_verify(original_sketch_file, hole_value_file):
-
     original_sketch_file_string = open(str(original_sketch_file), "r").read()
     hole_value_file_string = open(str(hole_value_file), "r").read()
 
