@@ -118,8 +118,8 @@ else:
                             output_with_counter_example)
                         print(pkt_group, "  ", bits)
                         print(state_group, " ", bits)
-                        #                        print(pkt_group, "len= ", len(pkt_group), "actual value", str(int(pkt_group[0][1]) + 2**bits))
-                        #                        print(state_group, "len= ", len(state_group), "actual value", int(state_group[0][1]) + 2**bits)
+                        # print(pkt_group, "len= ", len(pkt_group), "actual value", str(int(pkt_group[0][1]) + 2**bits))
+                        # print(state_group, "len= ", len(state_group), "actual value", int(state_group[0][1]) + 2**bits)
                         # Check if all packet fields are included in pkt_group as part of the counterexample.
                         # If not, set those packet fields to a default (0) since they don't matter for the counterexample.
                         for i in range(int(num_fields_in_prog)):
