@@ -66,7 +66,8 @@ class Compiler:
                 "--bnd-inbits=2 " + sketch_file_name)
         else:
             (ret_code, output) = subprocess.getstatusoutput(
-                "time sketch -V 12 --slv-seed=1 --bnd-inbits=2 " + sketch_file_name)
+                "time sketch -V 12 --slv-seed=1 --bnd-inbits=2 " +
+                sketch_file_name)
 
         return (ret_code, output, self.sketch_generator.hole_names_)
 

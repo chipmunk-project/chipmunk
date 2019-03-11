@@ -37,10 +37,8 @@ else:
     mode = str(sys.argv[7])
     assert (mode == "cex_mode") or (mode == "hole_elimination_mode")
 
-
-
 compiler = Compiler(program_file, alu_file, num_pipeline_stages,
-                        num_alus_per_stage, sketch_name, parallel_or_serial)
+                    num_alus_per_stage, sketch_name, parallel_or_serial)
 (ret_code, output) = compiler.codegen()
 
 if (ret_code != 0):
@@ -104,49 +102,66 @@ else:
                 counter_example_assert = ""
                 counter_example_definition = ""
                 #Add multiple counterexample range from 2 bits to 10 bits
-                for bits in range(2,10):
-                    output_with_counter_example = counter_example_generator(bits,filename, num_fields_in_prog, num_state_groups)
+                for bits in range(2, 10):
+                    output_with_counter_example = counter_example_generator(
+                        bits, filename, num_fields_in_prog, num_state_groups)
                     print(bits)
                     if (output_with_counter_example == ""):
                         continue
                     else:
                         #Grap the counterexample by using regular expression
-                        pkt_group = re.findall("input (pkt_\d+)\w+ has value \d+= \((\d+)\)", output_with_counter_example)
+                        pkt_group = re.findall(
+                            "input (pkt_\d+)\w+ has value \d+= \((\d+)\)",
+                            output_with_counter_example)
                         state_group = re.findall(
                             "input (state_group_\d+_state_\d+)\w+ has value \d+= \((\d+)\)",
                             output_with_counter_example)
-                        print(pkt_group,"  ",bits)
-                        print(state_group," ",bits)
-#                        print(pkt_group, "len= ", len(pkt_group), "actual value", str(int(pkt_group[0][1]) + 2**bits))
-#                        print(state_group, "len= ", len(state_group), "actual value", int(state_group[0][1]) + 2**bits)
+                        print(pkt_group, "  ", bits)
+                        print(state_group, " ", bits)
+                        #                        print(pkt_group, "len= ", len(pkt_group), "actual value", str(int(pkt_group[0][1]) + 2**bits))
+                        #                        print(state_group, "len= ", len(state_group), "actual value", int(state_group[0][1]) + 2**bits)
                         # Check if all packet fields are included in pkt_group as part of the counterexample.
                         # If not, set those packet fields to a default (0) since they don't matter for the counterexample.
                         for i in range(int(num_fields_in_prog)):
-                          if ("pkt_" + str(i) in [regex_match[0] for regex_match in pkt_group]):
-                            continue
-                          else:
-                            pkt_group.append(("pkt_" + str(i), str(0)))
+                            if ("pkt_" + str(i) in [
+                                    regex_match[0] for regex_match in pkt_group
+                            ]):
+                                continue
+                            else:
+                                pkt_group.append(("pkt_" + str(i), str(0)))
 
                         # Check if all state vars are included in state_group as part of the counterexample.
                         # If not, set those state vars to a default (0) since they don't matter for the counterexample.
                         for i in range(int(num_state_groups)):
-                          if ("state_group_0_state_" + str(i) in [regex_match[0] for regex_match in state_group]):
-                            continue
-                          else:
-                            state_group.append(("state_group_0_state_" + str(i), str(0)))
+                            if ("state_group_0_state_" + str(i) in [
+                                    regex_match[0]
+                                    for regex_match in state_group
+                            ]):
+                                continue
+                            else:
+                                state_group.append(
+                                    ("state_group_0_state_" + str(i), str(0)))
                         counter_example_definition += "|StateAndPacket| x_" + str(
                             count) + "_" + str(bits) + " = |StateAndPacket|(\n"
                         for i in range(len(pkt_group)):
                             counter_example_definition += pkt_group[i][
-                                0] + " = " + str(int(pkt_group[i][1]) + 2**bits) + ',\n'
+                                0] + " = " + str(
+                                    int(pkt_group[i][1]) + 2**bits) + ',\n'
                         for i in range(len(state_group)):
                             if (i < len(state_group) - 1):
-                              counter_example_definition += state_group[i][0] + " = " + str(int(state_group[i][1]) + 2**bits) + ',\n'
+                                counter_example_definition += state_group[i][
+                                    0] + " = " + str(
+                                        int(state_group[i][1]) +
+                                        2**bits) + ',\n'
                             else:
-                              counter_example_definition += state_group[i][0] + " = " + str(int(state_group[i][1]) + 2**bits) + ");\n"
+                                counter_example_definition += state_group[i][
+                                    0] + " = " + str(
+                                        int(state_group[i][1]) +
+                                        2**bits) + ");\n"
                         counter_example_assert += "assert (pipeline(" + "x_" + str(
-                            count) + "_" + str(bits) + ")" + " == " + "program(" + "x_" + str(
-                                count) + "_" + str(bits) + "));\n"
+                            count) + "_" + str(
+                                bits) + ")" + " == " + "program(" + "x_" + str(
+                                    count) + "_" + str(bits) + "));\n"
                 original_sketch_file_string = original_sketch_file_string[
                     0:
                     begin_pos] + counter_example_definition + counter_example_assert + original_sketch_file_string[
@@ -156,8 +171,7 @@ else:
             new_sketch.write(original_sketch_file_string)
             new_sketch.close()
             (ret_code1, output) = subprocess.getstatusoutput(
-                "sketch -V 3 --bnd-inbits=2 " +
-                new_sketch.name)
+                "sketch -V 3 --bnd-inbits=2 " + new_sketch.name)
             print("Iteration #" + str(count))
             hole_value_string = ""
             #Failed      print("Hello1")
