@@ -5,6 +5,8 @@ import sys
 
 from jinja2 import Environment, FileSystemLoader, StrictUndefined
 
+PICKLE_EXT = ".pickle"
+
 
 def read_file(filename):
     return Path(filename).read_text()
@@ -22,36 +24,38 @@ def main(argv):
     transform_file = str(argv[3])
     env = Environment(
         loader=FileSystemLoader('./templates'), undefined=StrictUndefined)
-    assert (pickle.load(open(
-        sketch1_name + ".pickle", "rb")).num_fields_in_prog_ == pickle.load(
-            open(sketch2_name + ".pickle", "rb")).num_fields_in_prog_)
-    assert (pickle.load(open(
-        sketch1_name + ".pickle", "rb")).num_state_groups_ == pickle.load(
-            open(sketch2_name + ".pickle", "rb")).num_state_groups_)
-    num_fields_in_prog = pickle.load(open(sketch1_name + ".pickle",
-                                          "rb")).num_fields_in_prog_
-    num_state_groups = pickle.load(open(sketch1_name + ".pickle",
-                                        "rb")).num_state_groups_
-    num_state_slots = pickle.load(open(sketch1_name + ".pickle",
-                                       "rb")).num_state_slots_
+
+    with open(sketch1_name + PICKLE_EXT, "rb") as pickle_file:
+        pickle1 = pickle.load(pickle_file)
+
+    with open(sketch2_name + PICKLE_EXT, "rb") as pickle_file:
+        pickle2 = pickle.load(pickle_file)
+
+    assert (
+        pickle1.num_fields_in_prog_ == pickle2.num_fields_in_prog_
+    ), "Two sketches have different number of packet fields, %d != %d" % (
+        pickle1.num_fields_in_prog_, pickle2.num_fields_in_prog_)
+    assert (
+        pickle1.num_state_groups_ == pickle2.num_state_groups_
+    ), "Two sketches have different number of state groups, %d != %d" % (
+        pickle1.num_state_groups_, pickle2.num_state_groups_)
+
+    num_fields_in_prog = pickle1.num_fields_in_prog_
+    num_state_groups = pickle1.num_state_groups_
+    num_state_slots = pickle1.num_state_slots_
+
     opt_verify_template = env.get_template("opt_verify.j2")
     opt_verifier = opt_verify_template.render(
         sketch1_name=sketch1_name,
         sketch2_name=sketch2_name,
         sketch1_file_name=sketch1_name + "_optverify.sk",
         sketch2_file_name=sketch2_name + "_optverify.sk",
-        hole1_arguments=pickle.load(open(sketch1_name + ".pickle",
-                                         "rb")).hole_arguments_,
-        hole2_arguments=pickle.load(open(sketch2_name + ".pickle",
-                                         "rb")).hole_arguments_,
-        sketch1_holes=pickle.load(
-            open(sketch1_name + ".pickle", "rb")).holes_,
-        sketch2_holes=pickle.load(
-            open(sketch2_name + ".pickle", "rb")).holes_,
-        sketch1_asserts=pickle.load(open(sketch1_name + ".pickle",
-                                         "rb")).constraints_,
-        sketch2_asserts=pickle.load(open(sketch2_name + ".pickle",
-                                         "rb")).constraints_,
+        hole1_arguments=pickle1.hole_arguments_,
+        hole2_arguments=pickle2.hole_arguments_,
+        sketch1_holes=pickle1.holes_,
+        sketch2_holes=pickle2.holes_,
+        sketch1_asserts=pickle1.constraints_,
+        sketch2_asserts=pickle2.constraints_,
         num_fields_in_prog=num_fields_in_prog,
         num_state_groups=num_state_groups,
         transform_function=read_file(transform_file),
