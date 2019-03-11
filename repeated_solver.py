@@ -179,15 +179,10 @@ else:
             if (ret_code1 == 0):
                 hole_value_file = open("/tmp/" + sketch_name + "_result.holes",
                                        "w")
-                for hole_name in compiler.sketch_generator.hole_names_:
-                    hits = re.findall("(" + hole_name + ")__" + "\w+ = (\d+)",
-                                      output)
-                    if (len(hits) != 1):
-                        print(hits)
-                        print(hole_name)
-                    else:
-                        hole_value_string += "int " + hits[0][
-                            0] + " = " + hits[0][1] + ";"
+                holes_to_values = get_hole_value_assignments(
+                    sketch_generator.hole_names_, output)
+                for hole, value in holes_to_values.items():
+                    hole_value_string += "int " + hole + " = " + value + ";"
                 hole_value_file.write(hole_value_string)
                 hole_value_file.close()
                 ret_code = sol_verify("/tmp/" + sketch_name + "_new_sketch.sk",
