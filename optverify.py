@@ -8,9 +8,9 @@ from jinja2 import Template, Environment, FileSystemLoader, StrictUndefined
 from chipmunk_pickle import ChipmunkPickle
 
 
-# Read contents of file_name into a string
-def file_to_str(file_name):
-    return Path(file_name).read_text()
+# Read contents of filename into a string
+def read_file(filename):
+    return Path(filename).read_text()
 
 
 if (len(sys.argv) < 4):
@@ -53,7 +53,7 @@ else:
                                          "rb")).constraints_,
         num_fields_in_prog=num_fields_in_prog,
         num_state_groups=num_state_groups,
-        transform_function=file_to_str(transform_file),
+        transform_function=read_file(transform_file),
         num_state_slots=num_state_slots)
     print("Verifier file is ",
           sketch1_name + "_" + sketch2_name + "_verifier.sk")
