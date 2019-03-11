@@ -51,7 +51,7 @@ def main(argv):
                             additional_asserts)]
 
     with concurrent.futures.ProcessPoolExecutor() as executor:
-        compiler_outputs = list(executor.map(single_compiler_run, compiler_inputs, timeout = 60))
+        compiler_outputs = list(executor.map(single_compiler_run, compiler_inputs))
 
     # Now process all compiler outputs.
     # If all runs failed
