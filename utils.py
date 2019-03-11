@@ -22,6 +22,7 @@ def get_num_pkt_fields_and_state_groups(program):
     ]
     return (max(pkt_fields) + 1, max(state_groups) + 1)
 
+
 def get_hole_dicts(sketch_file):
     """Returns a dictionary from hole names to hole bit sizes given a sketch
     file.

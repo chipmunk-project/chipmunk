@@ -214,4 +214,4 @@ class SketchGenerator:
             hole_arguments=self.hole_arguments_,
             stateful_alu_hole_arguments=self.stateful_alu_hole_arguments_,
             num_operands_to_stateful_alu=self.num_operands_to_stateful_alu_,
-            num_state_slots = self.num_state_slots_)
+            num_state_slots=self.num_state_slots_)
