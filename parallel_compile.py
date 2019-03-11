@@ -7,6 +7,9 @@ import itertools
 from compiler import Compiler
 from utils import get_num_pkt_fields_and_state_groups
 
+def single_compiler_run(compiler_input):
+    return compiler_input[0].codegen(compiler_input[1])
+
 def main(argv):
     """Main program."""
     if len(argv) != 6:
@@ -45,9 +48,6 @@ def main(argv):
         compiler_inputs += [(Compiler(program_file, alu_file, num_pipeline_stages,
                             num_alus_per_stage, sketch_name + "_" + str(count), "serial"),
                             additional_asserts)]
-
-    def single_compiler_run(compiler_input):
-        return compiler_input[0].codegen(compiler_input[1])
 
     for x in compiler_inputs:
         compiler_outputs += [single_compiler_run(x)]
