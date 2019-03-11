@@ -137,12 +137,12 @@ else:
                             count) + "_" + str(bits) + " = |StateAndPacket|(\n"
                         for i in range(len(pkt_group)):
                             counter_example_definition += pkt_group[i][
-                                0] + " = " + str(int(pkt_group[0][1]) + 2**bits) + ',\n'
+                                0] + " = " + str(int(pkt_group[i][1]) + 2**bits) + ',\n'
                         for i in range(len(state_group)):
                             if (i < len(state_group) - 1):
-                              counter_example_definition += state_group[i][0] + " = " + str(int(state_group[0][1]) + 2**bits) + ',\n'
+                              counter_example_definition += state_group[i][0] + " = " + str(int(state_group[i][1]) + 2**bits) + ',\n'
                             else:
-                              counter_example_definition += state_group[i][0] + " = " + str(int(state_group[0][1]) + 2**bits) + ");\n"
+                              counter_example_definition += state_group[i][0] + " = " + str(int(state_group[i][1]) + 2**bits) + ");\n"
                         counter_example_assert += "assert (pipeline(" + "x_" + str(
                             count) + "_" + str(bits) + ")" + " == " + "program(" + "x_" + str(
                                 count) + "_" + str(bits) + "));\n"
