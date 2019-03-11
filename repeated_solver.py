@@ -105,7 +105,7 @@ else:
                 for bits in range(2, 10):
                     output_with_counter_example = counter_example_generator(
                         bits, filename, num_fields_in_prog, num_state_groups)
-                    print(bits)
+                    print("Bit: %d" % bits)
                     if (output_with_counter_example == ""):
                         continue
                     else:
