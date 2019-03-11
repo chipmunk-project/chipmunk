@@ -11,6 +11,7 @@ from sketch_generator import SketchGenerator
 from utils import get_num_pkt_fields_and_state_groups
 from sol_verify import sol_verify
 from counter_example_generator import counter_example_generator
+from compiler import Compiler
 
 if (len(sys.argv) != 8):  # This part may need change with the chipmunk.py file
     print(
@@ -35,35 +36,12 @@ else:
     mode = str(sys.argv[7])
     assert (mode == "cex_mode") or (mode == "hole_elimination_mode")
 
-# Initialize jinja2 environment for templates
-env = Environment(
-    loader=FileSystemLoader('./templates'), undefined=StrictUndefined)
 
-# Create an object for sketch generation
-sketch_generator = SketchGenerator(
-    sketch_name=sketch_name,
-    num_pipeline_stages=num_pipeline_stages,
-    num_alus_per_stage=num_alus_per_stage,
-    num_phv_containers=num_phv_containers,
-    num_state_groups=num_state_groups,
-    num_fields_in_prog=num_fields_in_prog,
-    jinja2_env=env,
-    alu_file=alu_file)
 
-# Create stateless and stateful ALUs, operand muxes for stateful ALUs, and output muxes.
-alu_definitions = sketch_generator.generate_alus()
-stateful_operand_mux_definitions = sketch_generator.generate_stateful_operand_muxes(
-)
-output_mux_definitions = sketch_generator.generate_output_muxes()
+compiler = Compiler(program_file, alu_file, num_pipeline_stages,
+                        num_alus_per_stage, sketch_name, parallel_or_serial)
+(ret_code, output) = compiler.codegen()
 
-# Create allocator to ensure each state var is assigned to exactly stateful ALU and vice versa.
-sketch_generator.generate_state_allocator()
-
-#Step1: run chipmunk to get the codegen
-(ret_code, output) = subprocess.getstatusoutput(
-    "python3 chipmunk.py " + program_file + " " + alu_file + " " +
-    str(num_pipeline_stages) + " " + str(num_alus_per_stage) + " codegen " +
-    sketch_name + " " + parallel_or_serial)
 if (ret_code != 0):
     print("failed")
     end = time.time()
@@ -186,7 +164,7 @@ else:
             if (ret_code1 == 0):
                 hole_value_file = open("/tmp/" + sketch_name + "_result.holes",
                                        "w")
-                for hole_name in sketch_generator.hole_names_:
+                for hole_name in compiler.sketch_generator.hole_names_:
                     hits = re.findall("(" + hole_name + ")__" + "\w+ = (\d+)",
                                       output)
                     if (len(hits) != 1):
