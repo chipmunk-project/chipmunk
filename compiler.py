@@ -29,7 +29,10 @@ class Compiler:
 
         # Initialize jinja2 environment for templates
         self.jinja2_env = Environment(
-            loader=FileSystemLoader('./templates'), undefined=StrictUndefined, trim_blocks = True, lstrip_blocks = True)
+            loader=FileSystemLoader('./templates'),
+            undefined=StrictUndefined,
+            trim_blocks=True,
+            lstrip_blocks=True)
         # Create an object for sketch generation
         self.sketch_generator = SketchGenerator(
             sketch_name=sketch_name,
@@ -41,12 +44,12 @@ class Compiler:
             jinja2_env=self.jinja2_env,
             alu_file=alu_file)
 
-    def codegen(self, additional_constraints = []):
+    def codegen(self, additional_constraints=[]):
         """Codegeneration"""
         codegen_code = self.sketch_generator.generate_sketch(
             program_file=self.program_file,
             mode="codegen",
-            additional_constraints = additional_constraints)
+            additional_constraints=additional_constraints)
 
         # Create file and write sketch_harness into it.
         sketch_file_name = self.sketch_name + "_codegen.sk"
@@ -72,7 +75,8 @@ class Compiler:
         """Opt Verify"""
         optverify_code = self.sketch_generator.generate_sketch(
             program_file=self.program_file,
-            mode="optverify")
+            mode="optverify",
+            additional_constraints=[])
 
         # Create file and write sketch_function into it
         with open(self.sketch_name + "_optverify.sk", "w") as sketch_file:
@@ -89,7 +93,8 @@ class Compiler:
                     constraints=self.sketch_generator.constraints_,
                     num_fields_in_prog=self.num_fields_in_prog,
                     num_state_groups=self.num_state_groups,
-                    num_state_slots=self.sketch_generator.num_state_slots), pickle_file)
+                    num_state_slots=self.sketch_generator.num_state_slots_),
+                pickle_file)
             print("Pickle file is ", pickle_file.name)
 
         print("Total number of hole bits is",
