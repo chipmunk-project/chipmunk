@@ -2,7 +2,6 @@
 
 import subprocess
 from pathlib import Path
-import re
 
 
 # This program is to return the counterexample within [bits_val,bits_val+1] bits
@@ -26,7 +25,7 @@ def counter_example_generator(bits_val, filename, num_fields_in_prog,
     (ret_code, output) = subprocess.getstatusoutput(
         "sketch --bnd-inbits=" + str(bits_val) + " " + result_file.name)
     #run the counterexample then
-    if (ret_code == 0):
+    if ret_code == 0:
         return ""
     else:
         (ret_code, output) = subprocess.getstatusoutput(
