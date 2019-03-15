@@ -12,7 +12,7 @@ from sol_verify import sol_verify
 
 
 def main(argv):
-    if len(argv) != 8:  # This part may need change with the chipmunk.py file
+    if len(argv) != 8:
         print("Usage: python3 " + argv[0] +
               " <program file> <alu file> <number of pipeline stages> " +
               "<number of stateless/stateful ALUs per stage> " +
@@ -33,6 +33,7 @@ def main(argv):
     mode = str(argv[7])
     assert mode in ["cex_mode", "hole_elimination_mode"]
 
+    # First try to compile with default number (2) of bits.
     compiler = Compiler(program_file, alu_file, num_pipeline_stages,
                         num_alus_per_stage, sketch_name, parallel_or_serial)
     (ret_code, output, _) = compiler.codegen()
