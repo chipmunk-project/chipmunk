@@ -137,18 +137,16 @@ def main(argv):
                                             str(0)))
                 counter_example_definition += "|StateAndPacket| x_" + str(
                     count) + "_" + str(bits) + " = |StateAndPacket|(\n"
-                for i in range(len(pkt_group)):
-                    counter_example_definition += pkt_group[i][0] + " = " + str(
-                        int(pkt_group[i][1]) + 2**bits) + ',\n'
-                for i in range(len(state_group)):
+                for group in pkt_group:
+                    counter_example_definition += group[0] + " = " + str(
+                        int(group[1]) + 2**bits) + ',\n'
+                for i, group in enumerate(state_group):
+                    counter_example_definition += group[0] + " = " + str(
+                        int(group[1]) + 2**bits)
                     if i < len(state_group) - 1:
-                        counter_example_definition += state_group[i][
-                            0] + " = " + str(int(state_group[i][1]) +
-                                             2**bits) + ',\n'
+                        counter_example_definition += ',\n'
                     else:
-                        counter_example_definition += state_group[i][
-                            0] + " = " + str(int(state_group[i][1]) +
-                                             2**bits) + ");\n"
+                        counter_example_definition += ");\n"
                 counter_example_assert += "assert (pipeline(" + "x_" + str(
                     count) + "_" + str(
                         bits) + ")" + " == " + "program(" + "x_" + str(
