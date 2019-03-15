@@ -20,7 +20,7 @@ def main(argv):
               "<cex_mode/hole_elimination_mode>")
         sys.exit(1)
 
-    start = time.time()
+    start_time = time.time()
     program_file = str(argv[1])
     (num_fields_in_prog,
      num_state_groups) = get_num_pkt_fields_and_state_groups(
@@ -39,8 +39,8 @@ def main(argv):
 
     if ret_code != 0:
         print("failed")
-        end = time.time()
-        print("total time in seconds: ", end - start)
+        end_time = time.time()
+        print("total time in seconds: ", end_time - start_time)
         sys.exit(1)
 
     # Generate the result file
@@ -51,8 +51,8 @@ def main(argv):
                           "/tmp/" + sketch_name + "_result.holes")
     if ret_code == 0:
         print("success")
-        end = time.time()
-        print("total time in seconds: ", end - start)
+        end_time = time.time()
+        print("total time in seconds: ", end_time - start_time)
         sys.exit(0)
 
     print("failed for larger size and need repeated testing by sketch")
@@ -179,16 +179,16 @@ def main(argv):
                                   "/tmp/" + sketch_name + "_result.holes")
             if ret_code == 0:
                 print("finally succeed")
-                end = time.time()
-                print("total time in seconds: ", end - start)
+                end_time = time.time()
+                print("total time in seconds: ", end_time - start_time)
                 exit(0)
             else:
                 count = count + 1
                 continue
         else:
             print("finally failed")
-            end = time.time()
-            print("total time in seconds: ", end - start)
+            end_time = time.time()
+            print("total time in seconds: ", end_time - start_time)
             print("total while loop: ", count)
             sys.exit(1)
 
