@@ -21,7 +21,10 @@ def counter_example_generator(bits_val, filename, num_fields_in_prog,
     with open("/tmp/counter_example_" + str(bits_val), "w") as result_file:
         result_file.write(original_sketch_file_string)
 
-    #run the sketch first
+    # run the sketch first
+    # We need to run sketch twice in this way because of the way we parse
+    # counter example values in repeated_solver.py. It might be possible to
+    # run just --debug-cex mode and get counter examples.
     (ret_code, output) = subprocess.getstatusoutput(
         "sketch --bnd-inbits=" + str(bits_val) + " " + result_file.name)
     #run the counterexample then
