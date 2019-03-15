@@ -38,7 +38,7 @@ def main(argv):
     (ret_code, output, _) = compiler.codegen()
 
     if ret_code != 0:
-        print("failed")
+        print("failed to compile with 2 bits.")
         end_time = time.time()
         print("total time in seconds: ", end_time - start_time)
         sys.exit(1)
@@ -186,6 +186,7 @@ def main(argv):
                 count = count + 1
                 continue
         else:
+            # It succeeds to compile with 2 bits but not with 10 bits.
             print("finally failed")
             end_time = time.time()
             print("total time in seconds: ", end_time - start_time)
