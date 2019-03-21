@@ -10,8 +10,9 @@ from utils import get_hole_dicts
 
 BASE_PATH = path.abspath(path.dirname(__file__))
 DATA_DIR = path.join(BASE_PATH, "data/")
-ALU_DIR = path.join(BASE_PATH, "../example_alus/")
-SPEC_DIR = path.join(BASE_PATH, "../example_specs/")
+ALU_DIR = path.join(BASE_PATH, "../../example_alus/")
+SPEC_DIR = path.join(BASE_PATH, "../../example_specs/")
+TRANSFORM_DIR = path.join(BASE_PATH, "../../example_transforms/")
 
 
 class ChipmunkCodegenTest(unittest.TestCase):
@@ -26,7 +27,7 @@ class ChipmunkCodegenTest(unittest.TestCase):
             # TODO(taegyunkim): Instead of writing to the same success and
             # failure files, use different files for each ALU.
             compiler = Compiler(
-                path.join(BASE_PATH, "../example_specs/simple.sk"),
+                path.join(SPEC_DIR, "simple.sk"),
                 path.join(ALU_DIR, alu), 2, 2, "simple", "serial")
             self.assertEqual(compiler.codegen()[0], 0,
                              "Compiling simple.sk failed for " + alu)
@@ -101,33 +102,26 @@ class ChipmunkCodegenTest(unittest.TestCase):
 
 
 class OptverifyTest(unittest.TestCase):
-    def setUp(self):
-        self.base_path = path.abspath(path.dirname(__file__))
-        self.alu_dir = path.join(self.base_path, "../example_alus/")
-        self.spec_dir = path.join(self.base_path, "../example_specs/")
-        self.transform_dir = path.join(self.base_path,
-                                       "../example_transforms/")
-
     def test_simple_sketch_same_config(self):
         spec_filename = "simple.sk"
         alu_filename = "raw.stateful_alu"
 
         compiler = Compiler(
-            path.join(self.spec_dir, spec_filename),
-            path.join(self.alu_dir, alu_filename), 1, 1, "sample1", "serial")
+            path.join(SPEC_DIR, spec_filename),
+            path.join(ALU_DIR, alu_filename), 1, 1, "sample1", "serial")
 
         compiler.optverify()
 
         compiler = Compiler(
-            path.join(self.spec_dir, spec_filename),
-            path.join(self.alu_dir, alu_filename), 1, 1, "sample2", "serial")
+            path.join(SPEC_DIR, spec_filename),
+            path.join(ALU_DIR, alu_filename), 1, 1, "sample2", "serial")
 
         compiler.optverify()
 
         self.assertEqual(
             0,
             optverify("sample1", "sample2",
-                      path.join(self.transform_dir, "very_simple.transform")))
+                      path.join(TRANSFORM_DIR, "very_simple.transform")))
 
 
 if __name__ == '__main__':
