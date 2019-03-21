@@ -16,7 +16,7 @@ def read_file(filename):
 def optverify(sketch1_name, sketch2_name, transform_file):
     env = Environment(
         loader=FileSystemLoader(
-            path.join(path.dirname(__file__), './templates')),
+            path.join(path.dirname(__file__), '../templates')),
         undefined=StrictUndefined)
 
     with open(sketch1_name + PICKLE_EXT, "rb") as pickle_file:
