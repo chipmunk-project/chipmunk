@@ -1,21 +1,21 @@
 """Simple unit tests for chipmunk."""
 
-from os import path, listdir
+from os import path, listdir, getcwd
 from pathlib import Path
 import unittest
 
-from chipmunk import Compiler
-from optverify import optverify
-from utils import get_hole_dicts
+from chipmunk.chipmunk import Compiler
+from chipmunk.optverify import optverify
+from chipmunk.utils import get_hole_dicts
 
 BASE_PATH = path.abspath(path.dirname(__file__))
 DATA_DIR = path.join(BASE_PATH, "data/")
-ALU_DIR = path.join(BASE_PATH, "../../example_alus/")
-SPEC_DIR = path.join(BASE_PATH, "../../example_specs/")
-TRANSFORM_DIR = path.join(BASE_PATH, "../../example_transforms/")
+ALU_DIR = path.join(BASE_PATH, "../example_alus/")
+SPEC_DIR = path.join(BASE_PATH, "../example_specs/")
+TRANSFORM_DIR = path.join(BASE_PATH, "../example_transforms/")
 
 
-class ChipmunkCodegenTest(unittest.TestCase):
+class TestChipmunkCodegen(unittest.TestCase):
     """Tests codegen method from chipmunk.Compiler."""
 
     def test_codegen_with_simple_sketch_for_all_alus(self):
@@ -61,8 +61,8 @@ class ChipmunkCodegenTest(unittest.TestCase):
             Path(path.join(DATA_DIR, "simple_raw_2_2_codegen.sk")).read_text())
 
         output_holes = get_hole_dicts(
-            Path(path.join(BASE_PATH,
-                           "../simple_raw_2_2_codegen.sk")).read_text())
+            Path(path.join(getcwd(),
+                           "simple_raw_2_2_codegen.sk")).read_text())
 
         self.assertEqual(sorted(expected_holes), sorted(output_holes))
 
