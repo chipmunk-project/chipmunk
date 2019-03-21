@@ -1,12 +1,14 @@
 # Helper functions to generate sketch code for synthesis
-from jinja2 import Template
+from pathlib import Path
 import math
 import sys
-from pathlib import Path
-from stateful_aluLexer import stateful_aluLexer
-from stateful_aluParser import stateful_aluParser
-from stateful_alu_sketch_generator import StatefulAluSketchGenerator
+
 from antlr4 import *
+from jinja2 import Template
+
+from chipmunk.stateful_aluLexer import stateful_aluLexer
+from chipmunk.stateful_aluParser import stateful_aluParser
+from chipmunk.stateful_alu_sketch_generator import StatefulAluSketchGenerator
 
 
 class Hole:
