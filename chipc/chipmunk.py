@@ -3,8 +3,8 @@ from pathlib import Path
 import sys
 import re
 
-from chipmunk.compiler import Compiler
-from chipmunk.utils import get_hole_value_assignments
+from chipc.compiler import Compiler
+from chipc.utils import get_hole_value_assignments
 
 
 def main(argv):

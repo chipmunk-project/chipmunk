@@ -1,8 +1,8 @@
 from overrides import overrides
 from textwrap import dedent
 
-from chipmunk.stateful_aluParser import stateful_aluParser
-from chipmunk.stateful_aluVisitor import stateful_aluVisitor
+from chipc.stateful_aluParser import stateful_aluParser
+from chipc.stateful_aluVisitor import stateful_aluVisitor
 
 
 # Visitor class to generate Sketch code from a stateful_alu specification in a

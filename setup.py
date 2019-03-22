@@ -32,13 +32,13 @@ class BuildByWrapper(build_py):
 
         run_args = [
             cmd, alu_filepath, '-Dlanguage=Python3', '-visitor', '-package',
-            'chipmunk'
+            'chipc'
         ]
         subprocess.run(run_args, capture_output=True, check=True)
 
 
 setup(
-    name='chipmunk',
+    name='chipc',
     version='0.1',
     description='A switch code generator based on end-to-end program ' +
     'synthesis.',
