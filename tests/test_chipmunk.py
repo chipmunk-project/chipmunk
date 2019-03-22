@@ -4,9 +4,9 @@ from os import path, listdir, getcwd
 from pathlib import Path
 import unittest
 
-from chipmunk.chipmunk import Compiler
-from chipmunk.optverify import optverify
-from chipmunk.utils import get_hole_dicts
+from chipc.chipmunk import Compiler
+from chipc.optverify import optverify
+from chipc.utils import get_hole_dicts
 
 BASE_PATH = path.abspath(path.dirname(__file__))
 DATA_DIR = path.join(BASE_PATH, "data/")

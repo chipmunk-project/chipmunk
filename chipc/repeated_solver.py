@@ -5,10 +5,10 @@ import subprocess
 import sys
 import time
 
-from chipmunk.compiler import Compiler
-from chipmunk.counter_example_generator import counter_example_generator
-from chipmunk.utils import get_num_pkt_fields_and_state_groups, get_hole_value_assignments
-from chipmunk.sol_verify import sol_verify
+from chipc.compiler import Compiler
+from chipc.counter_example_generator import counter_example_generator
+from chipc.utils import get_num_pkt_fields_and_state_groups, get_hole_value_assignments
+from chipc.sol_verify import sol_verify
 
 
 def main(argv):

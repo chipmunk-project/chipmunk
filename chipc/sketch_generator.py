@@ -6,9 +6,9 @@ import sys
 from antlr4 import *
 from jinja2 import Template
 
-from chipmunk.stateful_aluLexer import stateful_aluLexer
-from chipmunk.stateful_aluParser import stateful_aluParser
-from chipmunk.stateful_alu_sketch_generator import StatefulAluSketchGenerator
+from chipc.stateful_aluLexer import stateful_aluLexer
+from chipc.stateful_aluParser import stateful_aluParser
+from chipc.stateful_alu_sketch_generator import StatefulAluSketchGenerator
 
 
 class Hole:

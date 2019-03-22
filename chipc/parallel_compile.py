@@ -6,8 +6,8 @@ import itertools
 import concurrent.futures
 import signal, psutil, os
 
-from chipmunk.compiler import Compiler
-from chipmunk.utils import get_num_pkt_fields_and_state_groups
+from chipc.compiler import Compiler
+from chipc.utils import get_num_pkt_fields_and_state_groups
 
 
 def kill_child_processes(parent_pid, sig=signal.SIGTERM):
