@@ -56,5 +56,8 @@ def main(argv):
         compiler.optverify()
 
 
+def run_main():
+    sys.exit(main(sys.argv))
+
 if __name__ == "__main__":
-    main(sys.argv)
+    run_main()
