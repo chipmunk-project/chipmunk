@@ -8,12 +8,17 @@ from setuptools import find_packages
 from setuptools.command.build_py import build_py
 
 
-class InstallWrapper(build_py):
+class BuildByWrapper(build_py):
+    """Provides a build_py wrapper to generate parser using chipmunk grammar
+    file."""
     def run(self):
         self._generate_parser()
         build_py.run(self)
 
     def _generate_parser(self):
+        """Generates chipmunk grammar parser using chipmunk/stateful_alu.g4
+        file. It first checks for existence for antlr (mac OS) or antlr4 (Linux
+        like) command."""
         cmd = 'antlr'
         if sys.platform.startswith('linux'):
             cmd += '4'
@@ -40,4 +45,4 @@ setup(
     author='Chipmunk Contributors',
     packages=find_packages(exclude=["tests*", "*.interp", "*.tokens"]),
     include_package_data=True,
-    cmdclass={'build_py': InstallWrapper})
+    cmdclass={'build_py': BuildByWrapper})
