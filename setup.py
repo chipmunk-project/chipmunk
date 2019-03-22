@@ -11,6 +11,7 @@ from setuptools.command.build_py import build_py
 class BuildByWrapper(build_py):
     """Provides a build_py wrapper to generate parser using chipmunk grammar
     file."""
+
     def run(self):
         self._generate_parser()
         build_py.run(self)
@@ -44,5 +45,9 @@ setup(
     url='https://github.com/anirudhSK/chipmunk',
     author='Chipmunk Contributors',
     packages=find_packages(exclude=["tests*", "*.interp", "*.tokens"]),
+    # This will let setuptools to copy ver what's listed in MANIFEST.in
     include_package_data=True,
-    cmdclass={'build_py': BuildByWrapper})
+    cmdclass={'build_py': BuildByWrapper},
+    entry_points={
+        'console_scripts': ['chipmunk=chipmunk.chipmunk:run_main']
+    })
