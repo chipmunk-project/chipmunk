@@ -5,12 +5,12 @@ import shutil
 
 from setuptools import setup
 from setuptools import find_packages
-from setuptools.command.install_lib import install_lib
+from setuptools.command.build_py import build_py
 
 
-class InstallWrapper(install_lib):
+class InstallWrapper(build_py):
     def run(self):
-        install_lib.run(self)
+        build_py.run(self)
         self._generate_parser()
 
     def _generate_parser(self):
@@ -20,7 +20,7 @@ class InstallWrapper(install_lib):
         assert shutil.which(
             cmd) is not None, ("Can't find %s executable." % cmd)
 
-        alu_filepath = os.path.join(self.install_dir, "chipmunk/stateful_alu.g4")
+        alu_filepath = os.path.join(self.build_lib, "chipmunk/stateful_alu.g4")
 
         assert os.access(alu_filepath, os.R_OK), "Can't find grammar file: %s" % alu_filepath
 
@@ -37,4 +37,4 @@ setup(
     author='Chipmunk Contributors',
     packages=find_packages(exclude=["tests*"]),
     include_package_data=True,
-    cmdclass={'install_lib': InstallWrapper})
+    cmdclass={'build_py': InstallWrapper})
