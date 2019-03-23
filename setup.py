@@ -26,7 +26,9 @@ class BuildByWrapper(build_py):
         assert shutil.which(cmd) is not None, (
             "Can't find %s executable." % cmd)
 
-        alu_filepath = "chipmunk/stateful_alu.g4"
+        # TODO: Instead of hardcoding chipc package name, get it
+        # programmatically.
+        alu_filepath = "chipc/stateful_alu.g4"
         assert os.access(alu_filepath,
                          os.R_OK), "Can't find grammar file: %s" % alu_filepath
 
