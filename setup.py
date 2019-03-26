@@ -26,8 +26,8 @@ class BuildByWrapper(build_py):
         grammar_name = "stateful_alu"
         antlr_ext = ".g4"
 
-        alu_filepath = Path(_PACKAGE_NAME, grammar_name + antlr_ext)
-        assert os.access(str(alu_filepath),
+        alu_filepath = _PACKAGE_NAME + "/" + grammar_name + antlr_ext
+        assert os.access(alu_filepath,
                          os.R_OK), "Can't find grammar file: %s" % alu_filepath
 
         antlr_jar = Path(_PACKAGE_NAME, "lib", "antlr-4.7.2-complete.jar")
