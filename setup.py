@@ -34,11 +34,12 @@ class BuildByWrapper(build_py):
         run_args = [
             "java", "-jar",
             str(antlr_jar), alu_filepath, "-Dlanguage=Python3", "-visitor",
-            "-package", "chipc"
+            "-package", _PACKAGE_NAME
         ]
 
         subprocess.run(run_args, check=True)
-        generated_files = glob.glob(_PACKAGE_NAME + "/" + _GRAMMAR_NAME + "*.py")
+        generated_files = glob.glob(_PACKAGE_NAME + "/" + _GRAMMAR_NAME +
+                                    "*.py")
         # Check whether Antlr actually generated any file.
         assert generated_files, "Antlr4 failed to generate Parser/Lexer."
         log.info("Antlr generated Python files: %s" % ", ".join(
@@ -56,4 +57,7 @@ setup(
     # This will let setuptools to copy ver what"s listed in MANIFEST.in
     include_package_data=True,
     cmdclass={"build_py": BuildByWrapper},
-    entry_points={"console_scripts": ["chipmunk=chipc.chipmunk:run_main"]})
+    entry_points={
+        "console_scripts":
+        ["chipmunk=" + _PACKAGE_NAME + ".chipmunk:run_main"]
+    })
