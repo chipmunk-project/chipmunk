@@ -51,5 +51,5 @@ setup(
     include_package_data=True,
     cmdclass={'build_py': BuildByWrapper},
     entry_points={
-        'console_scripts': ['chipmunk=chipmunk.chipmunk:run_main']
+        'console_scripts': ['chipmunk=chipc.chipmunk:run_main']
     })
