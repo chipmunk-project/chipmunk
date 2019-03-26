@@ -1,5 +1,6 @@
 from distutils import log
 from pathlib import Path
+import glob
 import os
 import subprocess
 
@@ -22,7 +23,10 @@ class BuildByWrapper(build_py):
         """Generates chipmunk grammar parser using chipmunk/stateful_alu.g4
         file. Assumes the user has java binary."""
 
-        alu_filepath = Path(_PACKAGE_NAME, "stateful_alu.g4")
+        _GRAMMAR_NAME = "stateful_alu"
+        _ANTLR_EXT = ".g4"
+
+        alu_filepath = Path(_PACKAGE_NAME, _GRAMMAR_NAME + _ANTLR_EXT)
         assert os.access(alu_filepath,
                          os.R_OK), "Can't find grammar file: %s" % alu_filepath
 
@@ -33,12 +37,11 @@ class BuildByWrapper(build_py):
             "-package", "chipc"
         ]
 
-        existing_files = set(os.listdir(_PACKAGE_NAME))
         subprocess.run(run_args, check=True)
-        generated_files = set(os.listdir(_PACKAGE_NAME)) - existing_files
+        generated_files = glob.glob(_PACKAGE_NAME + "/" + _GRAMMAR_NAME + "*.py")
         # Check whether Antlr actually generated any file.
         assert generated_files, "Antlr4 failed to generate Parser/Lexer."
-        log.info("Antlr generated files: %s" % ", ".join(
+        log.info("Antlr generated Python files: %s" % ", ".join(
             [str(f) for f in generated_files]))
 
 
