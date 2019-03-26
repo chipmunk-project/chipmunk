@@ -10,8 +10,8 @@ from chipc.utils import get_hole_value_assignments
 def main(argv):
     """Main program."""
     if len(argv) < 8:
-        print("Usage: python3 " + argv[0] +
-              " <program file> <alu file> <number of pipeline stages> " +
+        print("Usage: chipmunk <program file> <alu file> " +
+              "<number of pipeline stages> " +
               "<number of stateless/stateful ALUs per stage> " +
               "<codegen/optverify> <sketch_name (w/o file extension)> " +
               "<parallel/serial>")
@@ -58,6 +58,7 @@ def main(argv):
 
 def run_main():
     sys.exit(main(sys.argv))
+
 
 if __name__ == "__main__":
     run_main()
