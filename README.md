@@ -4,6 +4,7 @@
 - Install [antlr](https://www.antlr.org/)
 - Install [sketch](https://people.csail.mit.edu/asolar/sketch-1.7.5.tar.gz)
 - `pip3 install -r requirements.txt && pip3 install .`(from this directory)
+(Add sudo if you want to install system wide.)
 
 ## How to
 
