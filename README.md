@@ -23,10 +23,10 @@ python3 optverify.py sample1 sample2 example_transforms/very_simple.transform
 
 ### Test
 
-Simply run `nosetests`, after installing
-[nose](https://nose.readthedocs.io/en/latest/).
+Run:
 
-Can also run: `python3 -m unittest`
+`antlr4 chipc/stateful_alu.g4 -Dlanguage=Python3 -visitor -package chipc`
+`python3 -m unittest`
 
 If you want to add a test, add a new file in [tests](tests/) directory or add
 test cases in existing `test_*.py` file.
