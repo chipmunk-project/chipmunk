@@ -195,5 +195,9 @@ def main(argv):
             sys.exit(1)
 
 
+def run_main():
+    sys.exit(main(sys.argv))
+
+
 if __name__ == "__main__":
-    main(sys.argv)
+    run_main()
