@@ -13,7 +13,7 @@ from chipc.sol_verify import sol_verify
 
 def main(argv):
     if len(argv) != 8:
-        print("Usage: python3 " + argv[0] +
+        print("Usage: repeated_solver " +
               " <program file> <alu file> <number of pipeline stages> " +
               "<number of stateless/stateful ALUs per stage> " +
               "<sketch_name (w/o file extension)> <parallel/serial> " +
