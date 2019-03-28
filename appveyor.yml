@@ -85,3 +85,5 @@ build_script:
     chipmunk_parallel example_specs/simple.sk example_alus/raw.stateful_alu 2 2 codegen
 
     python3 -m unittest
+
+    echo "ALL DONE"
