@@ -8,6 +8,10 @@
 - `pip3 install -r requirements.txt && pip3 install .`(from this directory)
 (Add sudo if you want to install system wide.)
 
+When devloping, to avoid repeatedly installing and uninstalling this, you can
+install as a development egg, and your change will be immediately active.
+`pip3 install -r requirements.txt && pip3 install -e .`
+
 ## How to
 
 ### Codegen
