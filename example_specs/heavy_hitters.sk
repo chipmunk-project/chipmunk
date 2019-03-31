@@ -1,0 +1,58 @@
+/*
+// Original program:
+//#include "hashes.h"
+
+#define low_th 100
+#define hi_th  1000
+
+struct Packet {
+  int sport;
+  int dport;
+  int is_not_heavy_hitter;
+  int sketch1_idx;
+  int sketch2_idx;
+  int sketch3_idx;
+};
+
+#define NUM_ENTRIES 4096
+
+int sketch_cnt_1[NUM_ENTRIES] = {0};
+int sketch_cnt_2[NUM_ENTRIES] = {0};
+int sketch_cnt_3[NUM_ENTRIES] = {0};
+
+void func(struct Packet p) {
+//  p.sketch1_idx = hash2a(p.sport, p.dport) % NUM_ENTRIES;
+//  p.sketch2_idx = hash2b(p.sport, p.dport) % NUM_ENTRIES;
+//  p.sketch3_idx = hash2c(p.sport, p.dport) % NUM_ENTRIES;
+  p.sketch1_idx = p.sketch1_idx;
+  p.sketch2_idx = p.sketch2_idx;
+  p.sketch3_idx = p.sketch3_idx;
+  if (sketch_cnt_1[p.sketch1_idx] > low_th && sketch_cnt_1[p.sketch1_idx] < hi_th &&
+	    sketch_cnt_2[p.sketch2_idx] > low_th && sketch_cnt_2[p.sketch2_idx] < hi_th &&
+	    sketch_cnt_3[p.sketch3_idx] > low_th && sketch_cnt_3[p.sketch3_idx] < hi_th) {
+		p.is_not_heavy_hitter = 0;
+  }	else {
+		p.is_not_heavy_hitter = 1;
+  }
+	sketch_cnt_1[p.sketch1_idx]+= 1;
+	sketch_cnt_2[p.sketch2_idx]+= 1;
+	sketch_cnt_3[p.sketch3_idx]+= 1;
+}
+ */
+
+// Output the rename map:
+// stateless variable rename list:
+
+// state_and_packet.pkt_0 = p.sketch1_idx
+// state_and_packet.pkt_1 = p.sketch2_idx
+// state_and_packet.pkt_2 = p.sketch3_idx
+// state_and_packet.pkt_3 = p.is_not_heavy_hitter
+
+// stateful variable rename list:
+
+// state_and_packet.state_group_0_state_0 = sketch_cnt_1[p.sketch1_idx]
+// state_and_packet.state_group_1_state_group_0_state_0 = sketch_cnt_2[p.sketch2_idx]
+// state_and_packet.state_group_2_state_group_0_state_0 = sketch_cnt_3[p.sketch3_idx]
+
+|StateAndPacket| program (|StateAndPacket| state_and_packet) {state_and_packet.pkt_0=state_and_packet.pkt_0;state_and_packet.pkt_1=state_and_packet.pkt_1;state_and_packet.pkt_2=state_and_packet.pkt_2;if (state_and_packet.state_group_0_state_0>100&&state_and_packet.state_group_0_state_0<1000&&state_and_packet.state_group_1_state_group_0_state_0>100&&state_and_packet.state_group_1_state_group_0_state_0<1000&&state_and_packet.state_group_2_state_group_0_state_0>100&&state_and_packet.state_group_2_state_group_0_state_0<1000) {state_and_packet.pkt_3=0;; }else {state_and_packet.pkt_3=1;; };state_and_packet.state_group_0_state_0+=1;state_and_packet.state_group_1_state_group_0_state_0+=1;state_and_packet.state_group_2_state_group_0_state_0+=1; return state_and_packet;
+}
