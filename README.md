@@ -12,29 +12,24 @@
 
 ### Develop
 
-When you run `python3 chipc/chipmunk.py ...`, Python will complain like following.
+If you have installed it as above, first uninstall and re-install via following
+command.
+
 ```shell
-Traceback (most recent call last):
-  File "chipc/chipmunk.py", line 6, in <module>
-    from chipc.compiler import Compiler
-ModuleNotFoundError: No module named 'chipc'
+pip uninstall chipc && pip install -e .
 ```
-It's because how we import all the modules in this package: we're using absolute imports.
 
-You can simply iterate like following
-1. make changes to any module
-2. pip install .
-3. run `chipmunk` or other binaries to see your change is working or not
-4. Make more changes
-5. pip uninstall chipc
-6. pip install .
+Note that there is `-e` in install command. It will install this package in
+development mode, and simply link actual chipc directory to your Python's
+site-packages directory.
 
-and many more steps like this
+1. Make changes to python code
+2. Consider implementing tests and run tests `python -m unittest`
+3. Run your desired binary like `python chipc/chipmunk.py ...`
 
-Since this process will be prone to confusion, simply do following, when developing.
-1. `pip install -e .`
-2. Make changes to any module
-3. `python3 chipc/chipmunk.py ...`
+This way you don't have to keep installing and uninstalling whenever you make a
+change and test. However, still you have to run via `python chipc/chipmunk.py`
+instead of using the installed binary.
 
 
 ### Codegen
