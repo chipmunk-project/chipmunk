@@ -8,11 +8,34 @@
 - `pip3 install -r requirements.txt && pip3 install .`(from this directory)
 (Add sudo if you want to install system wide.)
 
-When devloping, to avoid repeatedly installing and uninstalling this, you can
-install as a development egg, and your change will be immediately active.
-`pip3 install -r requirements.txt && pip3 install -e .`
-
 ## How to
+
+### Develop
+
+When you run `python3 chipc/chipmunk.py ...`, Python will complain like following.
+```shell
+Traceback (most recent call last):
+  File "chipc/chipmunk.py", line 6, in <module>
+    from chipc.compiler import Compiler
+ModuleNotFoundError: No module named 'chipc'
+```
+It's because how we import all the modules in this package: we're using absolute imports.
+
+You can simply iterate like following
+1. make changes to any module
+2. pip install .
+3. run `chipmunk` or other binaries to see your change is working or not
+4. Make more changes
+5. pip uninstall chipc
+6. pip install .
+
+and many more steps like this
+
+Since this process will be prone to confusion, simply do following, when developing.
+1. `pip install -e .`
+2. Make changes to any module
+3. `python3 chipc/chipmunk.py ...`
+
 
 ### Codegen
 

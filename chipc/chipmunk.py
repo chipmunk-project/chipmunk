@@ -61,4 +61,5 @@ def run_main():
 
 
 if __name__ == "__main__":
+    print("test")
     run_main()
