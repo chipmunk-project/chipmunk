@@ -32,6 +32,7 @@ void func(struct Packet p) {
 
 // state_and_packet.pkt_0 = p.time
 // state_and_packet.pkt_1 = p.bytes
+// Only this matters
 // state_and_packet.pkt_2 = p.mark
 
 // stateful variable rename list:
@@ -39,6 +40,17 @@ void func(struct Packet p) {
 // state_and_packet.state_group_0_state_0 = counter
 // state_and_packet.state_group_1_state_0 = last_time
 
-|StateAndPacket| program (|StateAndPacket| state_and_packet) {state_and_packet.state_group_0_state_0=state_and_packet.state_group_0_state_0-(state_and_packet.pkt_0-state_and_packet.state_group_1_state_0);if (state_and_packet.state_group_0_state_0<0) {state_and_packet.state_group_0_state_0=0; };state_and_packet.state_group_0_state_0+=state_and_packet.pkt_1;if (state_and_packet.state_group_0_state_0>20) {state_and_packet.pkt_2=1; };state_and_packet.state_group_1_state_0=state_and_packet.pkt_0; return state_and_packet;
+| StateAndPacket | program(| StateAndPacket | state_and_packet) {
+  state_and_packet.state_group_0_state_0 =
+      state_and_packet.state_group_0_state_0 -
+      (state_and_packet.pkt_0 - state_and_packet.state_group_1_state_0);
+  if (state_and_packet.state_group_0_state_0 < 0) {
+    state_and_packet.state_group_0_state_0 = 0;
+  };
+  state_and_packet.state_group_0_state_0 += state_and_packet.pkt_1;
+  if (state_and_packet.state_group_0_state_0 > 20) {
+    state_and_packet.pkt_2 = 1;
+  };
+  state_and_packet.state_group_1_state_0 = state_and_packet.pkt_0;
+  return state_and_packet;
 }
-
