@@ -104,10 +104,10 @@ class Compiler:
             holes_to_values = dict()
         return (ret_code, output, holes_to_values)
 
-    def serial_codegen(self):
-        return self.single_compiler_run(([], self.sketch_name + "_codegen.sk"))
+    def serial_codegen(self, additional_constraints = []):
+        return self.single_compiler_run((additional_constraints, self.sketch_name + "_codegen.sk"))
 
-    def parallel_codegen(self):
+    def parallel_codegen(self, additional_constraints = []):
         # For each state_group, pick a pipeline_stage exhaustively.
         # Note that some of these assignments might be infeasible, but that's OK. Sketch will reject these anyway.
         count = 0
@@ -115,23 +115,23 @@ class Compiler:
         compiler_inputs = []
         for assignment in itertools.product(
                 list(range(self.num_pipeline_stages)), repeat=self.num_state_groups):
-            additional_asserts = []
+            constraint_list = additional_constraints.copy()
             count = count + 1
             print("Now in assignment # ", count, " assignment is ", assignment)
             for state_group in range(self.num_state_groups):
                 assigned_stage = assignment[state_group]
                 for stage in range(self.num_pipeline_stages):
                     if (stage == assigned_stage):
-                        additional_asserts += [
+                        constraint_list += [
                             self.sketch_name + "_salu_config_" +
                             str(stage) + "_" + str(state_group) + " == 1"
                         ]
                     else:
-                        additional_asserts += [
+                        constraint_list += [
                             self.sketch_name + "_salu_config_" +
                             str(stage) + "_" + str(state_group) + " == 0"
                         ]
-            compiler_inputs += [(additional_asserts, self.sketch_name + "_" + str(count) + "_codegen.sk")]
+            compiler_inputs += [(constraint_list, self.sketch_name + "_" + str(count) + "_codegen.sk")]
 
         with concurrent.futures.ProcessPoolExecutor(max_workers=count) as executor:
             futures = []
