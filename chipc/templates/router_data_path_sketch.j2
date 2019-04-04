@@ -151,7 +151,7 @@
 
 {% if mode == "codegen" %}
   harness void main(
-    {{range(num_fields_in_prog)|map('add_prefix_suffix', "int pkt_", "")|join(',')}}
+    {{pkt_fields_to_check|map('add_prefix_suffix', "int pkt_", "")|join(',')}}
     {% for state_group_number in range(num_state_groups) %}
       {% for slot_number in range(num_state_slots) %}
         , int state_group_{{state_group_number}}_state_{{slot_number}}
