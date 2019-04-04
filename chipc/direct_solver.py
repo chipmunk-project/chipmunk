@@ -28,7 +28,7 @@ def main(argv):
         nargs='+',
         help="Packet fields to check correctness")
     parser.add_argument(
-        "--mode",
+        "--parallel",
         action="store_const",
         const="parallel_codegen",
         default="serial_codegen",
@@ -44,7 +44,7 @@ def main(argv):
                         args.num_pipeline_stages, args.num_alus_per_stage,
                         args.sketch_name, args.parallel_sketch, args.pkt_fields)
 
-    if args.mode == "serial_codegen":
+    if args.parallel == "serial_codegen":
         (ret_code, output, hole_names) = compiler.serial_codegen()
     else:
         (ret_code, output, hole_names) = compiler.parallel_codegen()
