@@ -13,6 +13,7 @@ from jinja2 import Environment, FileSystemLoader, StrictUndefined
 from chipc.chipmunk_pickle import ChipmunkPickle
 from chipc.sketch_generator import SketchGenerator
 from chipc.utils import get_num_pkt_fields_and_state_groups
+from chipc.utils import get_hole_value_assignments
 
 def kill_child_processes(parent_pid, sig=signal.SIGTERM):
     try:
@@ -97,7 +98,11 @@ class Compiler:
             (ret_code, output) = subprocess.getstatusoutput(
                 "time sketch -V 12 --slv-seed=1 --bnd-inbits=2 " +
                 sketch_file_name)
-        return (ret_code, output, self.sketch_generator.hole_names_)
+        if (ret_code == 0):
+            holes_to_values = get_hole_value_assignments(self.sketch_generator.hole_names_, output)
+        else:
+            holes_to_values = dict()
+        return (ret_code, output, holes_to_values)
 
     def serial_codegen(self):
         return self.single_compiler_run(([], self.sketch_name + "_codegen.sk"))
