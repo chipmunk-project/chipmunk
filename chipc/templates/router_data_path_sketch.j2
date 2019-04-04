@@ -151,14 +151,14 @@
 
 {% if mode == "codegen" %}
   harness void main(
-    {{pkt_fields_to_check|map('add_prefix_suffix', "int pkt_", "")|join(',')}}
+    {{range(num_fields_in_prog)|map('add_prefix_suffix', "int pkt_", "")|join(',')}}
     {% for state_group_number in range(num_state_groups) %}
       {% for slot_number in range(num_state_slots) %}
         , int state_group_{{state_group_number}}_state_{{slot_number}}
       {% endfor %}
     {% endfor %}) {
 
-    |StateAndPacket| x = |StateAndPacket|({% for field_number in pkt_fields_to_check %}
+    |StateAndPacket| x = |StateAndPacket|({% for field_number in range(num_fields_in_prog) %}
       pkt_{{field_number}} = pkt_{{field_number}},
     {% endfor %}
     {% for state_group_number in range(num_state_groups) %}
@@ -171,6 +171,19 @@
       {% endfor %}
     {% endfor %});
 
-  assert(pipeline(x) == program(x));
+  |StateAndPacket| pipeline_result = pipeline(x);
+  |StateAndPacket| program_result = program(x);
+
+  {% for state_group_number in range(num_state_groups) %}
+    {% for slot_number in range(num_state_slots) %}
+      assert(pipeline_result.state_group_{{state_group_number}}_state_{{slot_number}}
+      == program_result.state_group_{{state_group_number}}_state_{{slot_number}});
+    {% endfor %}
+  {% endfor %}
+
+  {% for field_number in pkt_fields_to_check %}
+    assert(pipeline_result.pkt_{{field_number}} == program_result.pkt_{{field_number}});
+  {% endfor %}
+
   }
 {% endif %}
