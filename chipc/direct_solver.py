@@ -28,6 +28,7 @@ def main(argv):
         nargs='+',
         help="Packet fields to check correctness")
     parser.add_argument(
+        "-p",
         "--parallel",
         action="store_const",
         const="parallel_codegen",
