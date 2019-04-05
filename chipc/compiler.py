@@ -72,7 +72,7 @@ class Compiler:
             jinja2_env=self.jinja2_env,
             alu_file=alu_file)
 
-    def single_compiler_run(self, compiler_input):
+    def single_codegen_run(self, compiler_input):
         additional_constraints = compiler_input[0]
         sketch_file_name = compiler_input[1]
 
@@ -105,7 +105,7 @@ class Compiler:
         return (ret_code, output, holes_to_values)
 
     def serial_codegen(self, additional_constraints = []):
-        return self.single_compiler_run((additional_constraints, self.sketch_name + "_codegen.sk"))
+        return self.single_codegen_run((additional_constraints, self.sketch_name + "_codegen.sk"))
 
     def parallel_codegen(self, additional_constraints = []):
         # For each state_group, pick a pipeline_stage exhaustively.
@@ -137,7 +137,7 @@ class Compiler:
             futures = []
             for compiler_input in compiler_inputs:
                 futures.append(
-                    executor.submit(self.single_compiler_run, compiler_input))
+                    executor.submit(self.single_codegen_run, compiler_input))
 
             for f in concurrent.futures.as_completed(futures):
                 compiler_output = f.result()
