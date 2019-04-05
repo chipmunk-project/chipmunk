@@ -14,7 +14,7 @@ ALU_DIR = path.join(BASE_PATH, "../example_alus/")
 SPEC_DIR = path.join(BASE_PATH, "../example_specs/")
 TRANSFORM_DIR = path.join(BASE_PATH, "../example_transforms/")
 
-
+# TODO(Xiangyu): Add more test function for iterative_solver with hole_elimination_mode and cex_mode
 class TestChipmunkCodegen(unittest.TestCase):
     """Tests codegen method from chipmunk.Compiler."""
 
