@@ -74,13 +74,15 @@ class Compiler:
 
     def single_codegen_run(self, compiler_input):
         additional_constraints = compiler_input[0]
-        sketch_file_name = compiler_input[1]
+        additional_testcases = compiler_input[1]
+        sketch_file_name = compiler_input[2]
 
         """Codegeneration"""
         codegen_code = self.sketch_generator.generate_sketch(
             program_file=self.program_file,
             mode="codegen",
-            additional_constraints=additional_constraints)
+            additional_constraints=additional_constraints,
+            additional_testcases = additional_testcases)
 
         # Create file and write sketch_harness into it.
         with open(sketch_file_name, "w") as sketch_file:
@@ -104,10 +106,10 @@ class Compiler:
             holes_to_values = dict()
         return (ret_code, output, holes_to_values)
 
-    def serial_codegen(self, additional_constraints = []):
-        return self.single_codegen_run((additional_constraints, self.sketch_name + "_codegen.sk"))
+    def serial_codegen(self, additional_constraints = [], additional_testcases = ""):
+        return self.single_codegen_run((additional_constraints, additional_testcases, self.sketch_name + "_codegen.sk"))
 
-    def parallel_codegen(self, additional_constraints = []):
+    def parallel_codegen(self, additional_constraints = [], additional_testcases = ""):
         # For each state_group, pick a pipeline_stage exhaustively.
         # Note that some of these assignments might be infeasible, but that's OK. Sketch will reject these anyway.
         count = 0
@@ -131,7 +133,7 @@ class Compiler:
                             self.sketch_name + "_salu_config_" +
                             str(stage) + "_" + str(state_group) + " == 0"
                         ]
-            compiler_inputs += [(constraint_list, self.sketch_name + "_" + str(count) + "_codegen.sk")]
+            compiler_inputs += [(constraint_list, additional_testcases, self.sketch_name + "_" + str(count) + "_codegen.sk")]
 
         with concurrent.futures.ProcessPoolExecutor(max_workers=count) as executor:
             futures = []
@@ -179,3 +181,42 @@ class Compiler:
 
         print("Total number of hole bits is",
               self.sketch_generator.total_hole_bits_)
+
+    def sol_verify(self, hole_assignments, num_input_bits):
+        # Check that all holes are filled.
+        for hole in self.sketch_generator.hole_names_:
+            assert(hole in hole_assignments)
+
+        # Generate and run sketch that verifies these holes on a large input range (num_input_bits)
+        sol_verify_code = self.sketch_generator.generate_sketch(
+            program_file=self.program_file,
+            mode = "sol_verify",
+            hole_assignments=hole_assignments
+        )
+        with open(self.sketch_name + "_sol_verify.sk", "w") as sketch_file:
+            sketch_file.write(sol_verify_code)
+        (ret_code, output) = subprocess.getstatusoutput("sketch -V 12 --slv-seed=1 --bnd-inbits=" +
+                             str(num_input_bits) + " " + self.sketch_name + "_sol_verify.sk")
+        return ret_code
+
+    def counter_example_generator(self, bits_val, hole_assignments):
+        cex_code = self.sketch_generator.generate_sketch(
+            program_file=self.program_file,
+            mode="cexgen",
+            hole_assignments = hole_assignments,
+            input_offset = 2**bits_val)
+        with open(self.sketch_name + "_cexgen.sk", "w") as sketch_file:
+            sketch_file.write(cex_code)
+
+        # Use --debug-cex mode and get counter examples.
+        (ret_code, output) = subprocess.getstatusoutput(
+            "sketch -V 3 --debug-cex --bnd-inbits=" + str(bits_val) + " " + self.sketch_name + "_cexgen.sk")
+
+        # Extract counterexample using regular expression.
+        pkt_group = re.findall(
+            r"input (pkt_\d+)\w+ has value \d+= \((\d+)\)",
+            output)
+        state_group = re.findall(
+            r"input (state_group_\d+_state_\d+)\w+ has value \d+= \((\d+)\)",
+            output)
+        return (pkt_group, state_group)

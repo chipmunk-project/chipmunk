@@ -46,6 +46,15 @@ class SketchGenerator:
         self.num_operands_to_stateful_alu_ = 0
         self.num_state_slots_ = 0
 
+    def reset_holes_and_asserts(self):
+        self.total_hole_bits_ = 0
+        self.hole_names_ = []
+        self.hole_preamble_ = ""
+        self.hole_arguments_ = []
+        self.holes_ = []
+        self.asserts_ = ""
+        self.constraints_ = []
+
     # Write all holes to a single hole string for ease of debugging
     def add_hole(self, hole_name, hole_bit_width):
         assert (hole_bit_width >= 0)
@@ -193,10 +202,14 @@ class SketchGenerator:
                                                   "_" + str(l)) + "\n"
         return ret
 
-    def generate_sketch(self, program_file, mode, additional_constraints):
-        template = (self.jinja2_env_.get_template("code_generator.j2")
-                    if mode == "codegen" else
-                    self.jinja2_env_.get_template("sketch_functions.j2"))
+    def generate_sketch(self, program_file, mode, additional_constraints = [], hole_assignments = dict(),
+                        additional_testcases = "", input_offset = 0):
+        self.reset_holes_and_asserts()
+        if mode == "codegen" or mode == "sol_verify" or mode == "cexgen":
+            template = self.jinja2_env_.get_template("code_generator.j2")   # TODO: Need better name for j2 file.
+        else:
+            assert(mode == "optverify"), "Found mode " + mode 
+            template = self.jinja2_env_.get_template("sketch_functions.j2") # TODO: Need better name for j2 file.
 
         # Create stateless and stateful ALUs, operand muxes for stateful ALUs,
         # and output muxes.
@@ -230,4 +243,8 @@ class SketchGenerator:
             num_operands_to_stateful_alu=self.num_operands_to_stateful_alu_,
             num_state_slots=self.num_state_slots_,
             additional_constraints="\n".join(
-                ["assert(" + str(x) + ");" for x in additional_constraints]))
+                ["assert(" + str(x) + ");" for x in additional_constraints]),
+            hole_assignments="\n".join(
+                ["int " + str(hole) + " = " + str(value) + ";" for hole, value in hole_assignments.items()]),
+            additional_testcases=additional_testcases,
+            input_offset = input_offset)

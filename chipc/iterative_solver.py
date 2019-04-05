@@ -3,13 +3,9 @@ from pathlib import Path
 import re
 import subprocess
 import sys
-import time
 
 from chipc.compiler import Compiler
-from chipc.counter_example_generator import counter_example_generator
 from chipc.utils import get_num_pkt_fields_and_state_groups, get_hole_value_assignments
-from chipc.sol_verify import sol_verify
-
 
 def main(argv):
     if len(argv) != 8:
@@ -20,7 +16,6 @@ def main(argv):
               "<cex_mode/hole_elimination_mode>")
         return 1
 
-    start_time = time.time()
     program_file = str(argv[1])
     (num_fields_in_prog,
      num_state_groups) = get_num_pkt_fields_and_state_groups(
@@ -38,81 +33,37 @@ def main(argv):
                         num_alus_per_stage, sketch_name, parallel_or_serial)
 
     # Can swap this out for compiler.parallel_codegen() instead
-    # TODO: But we need to do this in all iterations below as well.
-    (ret_code, output, hole_names) = compiler.serial_codegen()
+    (ret_code, output, hole_assignments) = compiler.serial_codegen()
 
     if ret_code != 0:
         print("failed to compile with 2 bits.")
-        end_time = time.time()
-        print("total time in seconds: ", end_time - start_time)
         return 1
 
-    # Generate the result file
-    with open("/tmp/" + sketch_name + "_result.holes", "w") as result_file:
-        result_file.write(output)
     # Step2: run sol_verify.py
-    ret_code = sol_verify(sketch_name + "_codegen.sk",
-                          "/tmp/" + sketch_name + "_result.holes")
-    # ret_code = 0 means sol_verify success
+    ret_code = compiler.sol_verify(hole_assignments = hole_assignments, num_input_bits = 10)
     if ret_code == 0:
         print("success")
-        end_time = time.time()
-        print("total time in seconds: ", end_time - start_time)
         return 0
 
     print("failed for larger size and need repeated testing by sketch")
     # start to repeated run sketch until get the final result
-    original_sketch_file_string = Path(sketch_name + "_codegen.sk").read_text()
     count = 0
     while 1:
         if mode == "hole_elimination_mode":
-            # holes_to_values is in the format {'hole_name':'hole_value'} i.e{'sample1_stateless_alu_0_0_mux1_ctrl': '0'}
-            holes_to_values = get_hole_value_assignments(hole_names, output)
-            hole_value_file_string = ""
-            # hole_value_file_string has the format hole_1==1 && hole_2==2 && 1
-            for hole, value in holes_to_values.items():
-                hole_value_file_string += hole + " == " + value + " && "
-            hole_value_file_string += "1"
-            #find the position of harness
-            begin_pos = original_sketch_file_string.find('harness')
-            begin_pos = original_sketch_file_string.find('assert', begin_pos)
-            original_sketch_file_string = (
-                original_sketch_file_string[0:begin_pos] + "assert(!(" +
-                hole_value_file_string + "));\n" +
-                original_sketch_file_string[begin_pos:])
+            # hole_assignments is in the format {'hole_name':'hole_value'},
+            # i.e., {'sample1_stateless_alu_0_0_mux1_ctrl': '0'}
+            hole_elimination_assert = "!" # The ! is to ensure a certain hole combination isn't present.
+            for hole, value in hole_assignments.items():
+                hole_elimination_assert += "(" + hole + " == " + value + ") && "
+            hole_elimination_assert += "1"
+            (ret_code1, output, _) = compiler.serial_codegen(additional_constraints = [hole_elimination_assert])
         else:
-            # Find the position of harness
-            begin_pos = original_sketch_file_string.find('harness')
-            begin_pos = original_sketch_file_string.find('assert', begin_pos)
-
-            # Add function assert here
-            if count == 0:
-                filename = sketch_name + "_codegen_with_hole_value.sk"
-            else:
-                filename = "/tmp/" + sketch_name + "_new_sketch_with_hole_value.sk"
-            counter_example_assert = ""
+            #Add multiple counterexamples in the range from 2 bits to 10 bits
             counter_example_definition = ""
-            #Add multiple counterexample range from 2 bits to 10 bits
+            counter_example_assert = ""
             for bits in range(2, 10):
-                output_with_counter_example = counter_example_generator(
-                    bits, filename, num_fields_in_prog, num_state_groups)
-                print("Bit: %d" % bits)
-                if output_with_counter_example == "":
-                    continue
+                (pkt_group, state_group) = compiler.counter_example_generator(bits, hole_assignments)
 
-                #Grap the counterexample by using regular expression
-                pkt_group = re.findall(
-                    r"input (pkt_\d+)\w+ has value \d+= \((\d+)\)",
-                    output_with_counter_example)
-                state_group = re.findall(
-                    r"input (state_group_\d+_state_\d+)\w+ has value \d+= \((\d+)\)",
-                    output_with_counter_example)
-                print(pkt_group, "  ", bits)
-                print(state_group, " ", bits)
-                # print(pkt_group, "len= ", len(pkt_group),
-                #       "actual value", str(int(pkt_group[0][1]) + 2**bits))
-                # print(state_group, "len= ", len(state_group),
-                #       "actual value", int(state_group[0][1]) + 2**bits)
                 # Check if all packet fields are included in pkt_group as part
                 # of the counterexample.
                 # If not, set those packet fields to a default (0) since they
@@ -152,45 +103,22 @@ def main(argv):
                     count) + "_" + str(
                         bits) + ")" + " == " + "program(" + "x_" + str(
                             count) + "_" + str(bits) + "));\n"
-            original_sketch_file_string = (
-                original_sketch_file_string[0:begin_pos] +
-                counter_example_definition + counter_example_assert +
-                original_sketch_file_string[begin_pos:])
+            (ret_code1, output, hole_assignments) = \
+            compiler.serial_codegen(additional_testcases = counter_example_definition + counter_example_assert)
 
-        new_sketch = open("/tmp/" + sketch_name + "_new_sketch.sk", "w")
-        new_sketch.write(original_sketch_file_string)
-        new_sketch.close()
-        (ret_code1,
-         output) = subprocess.getstatusoutput("sketch -V 3 --bnd-inbits=2 " +
-                                              new_sketch.name)
         print("Iteration #" + str(count))
-        hole_value_string = ""
-        #Failed      print("Hello1")
         print("ret_code1: ", ret_code1)
         if ret_code1 == 0:
-            hole_value_file = open("/tmp/" + sketch_name + "_result.holes",
-                                   "w")
-            holes_to_values = get_hole_value_assignments(
-                compiler.sketch_generator.hole_names_, output)
-            for hole, value in holes_to_values.items():
-                hole_value_string += "int " + hole + " = " + value + ";"
-            hole_value_file.write(hole_value_string)
-            hole_value_file.close()
-            ret_code = sol_verify("/tmp/" + sketch_name + "_new_sketch.sk",
-                                  "/tmp/" + sketch_name + "_result.holes")
+            ret_code = compiler.sol_verify(hole_assignments, 10)
             if ret_code == 0:
                 print("finally succeed")
-                end_time = time.time()
-                print("total time in seconds: ", end_time - start_time)
                 return 0
             else:
                 count = count + 1
                 continue
         else:
-            # It succeeds to compile with 2 bits but not with 10 bits.
+            # Failed synthesis at 2 bits.
             print("finally failed")
-            end_time = time.time()
-            print("total time in seconds: ", end_time - start_time)
             print("total while loop: ", count)
             return 1
 

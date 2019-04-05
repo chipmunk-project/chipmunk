@@ -4,7 +4,11 @@
 // num_alus_per_stage = {{ num_alus_per_stage }}
 // num_phv_containers = {{ num_phv_containers }}
 
+{% if mode == "codegen" %}
 {{ hole_definitions }}
+{% elif mode == "sol_verify" or mode == "cexgen" %}
+{{ hole_assignments }}
+{% endif %}
 
 // Definitions of muxes and ALUs of the router
 {% include "muxes_and_alus.j2" %}
