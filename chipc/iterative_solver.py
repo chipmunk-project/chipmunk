@@ -18,7 +18,7 @@ def main(argv):
               "<number of stateless/stateful ALUs per stage> " +
               "<sketch_name (w/o file extension)> <parallel/serial> " +
               "<cex_mode/hole_elimination_mode>")
-        sys.exit(1)
+        return 1
 
     start_time = time.time()
     program_file = str(argv[1])
@@ -45,7 +45,7 @@ def main(argv):
         print("failed to compile with 2 bits.")
         end_time = time.time()
         print("total time in seconds: ", end_time - start_time)
-        sys.exit(1)
+        return 1
 
     # Generate the result file
     with open("/tmp/" + sketch_name + "_result.holes", "w") as result_file:
@@ -58,7 +58,7 @@ def main(argv):
         print("success")
         end_time = time.time()
         print("total time in seconds: ", end_time - start_time)
-        sys.exit(0)
+        return 0
 
     print("failed for larger size and need repeated testing by sketch")
     # start to repeated run sketch until get the final result
@@ -182,7 +182,7 @@ def main(argv):
                 print("finally succeed")
                 end_time = time.time()
                 print("total time in seconds: ", end_time - start_time)
-                exit(0)
+                return 0
             else:
                 count = count + 1
                 continue
@@ -192,7 +192,7 @@ def main(argv):
             end_time = time.time()
             print("total time in seconds: ", end_time - start_time)
             print("total while loop: ", count)
-            sys.exit(1)
+            return 1
 
 
 def run_main():

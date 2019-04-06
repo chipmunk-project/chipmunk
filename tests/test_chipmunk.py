@@ -7,6 +7,7 @@ import unittest
 from chipc.direct_solver import Compiler
 from chipc.optverify import optverify
 from chipc.utils import get_hole_dicts
+import chipc.iterative_solver
 
 BASE_PATH = path.abspath(path.dirname(__file__))
 DATA_DIR = path.join(BASE_PATH, "data/")
@@ -14,8 +15,7 @@ ALU_DIR = path.join(BASE_PATH, "../example_alus/")
 SPEC_DIR = path.join(BASE_PATH, "../example_specs/")
 TRANSFORM_DIR = path.join(BASE_PATH, "../example_transforms/")
 
-# TODO(Xiangyu): Add more test function for iterative_solver with hole_elimination_mode and cex_mode
-class TestChipmunkCodegen(unittest.TestCase):
+class TestDirectSolver(unittest.TestCase):
     """Tests codegen method from chipmunk.Compiler."""
 
     def test_codegen_with_simple_sketch_for_all_alus(self):
@@ -123,6 +123,12 @@ class OptverifyTest(unittest.TestCase):
             optverify("sample1", "sample2",
                       path.join(TRANSFORM_DIR, "very_simple.transform")))
 
+class IterativeSolverTest(unittest.TestCase):
+    def test_simple_sketch_2_2_raw(self):
+        self.assertEqual(
+            0,
+            chipc.iterative_solver.main(["iterative_solver", path.join(SPEC_DIR,"simple.sk"), path.join(ALU_DIR, "raw.stateful_alu"), 2, 2, "sample1", "serial", "cex_mode"]),
+            )
 
 if __name__ == '__main__':
     unittest.main()
