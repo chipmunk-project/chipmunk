@@ -4,16 +4,17 @@ from os import path, listdir, getcwd
 from pathlib import Path
 import unittest
 
-from chipc.direct_solver import Compiler
+from chipc import iterative_solver
+from chipc.compiler import Compiler
 from chipc.optverify import optverify
 from chipc.utils import get_hole_dicts
-import chipc.iterative_solver
 
 BASE_PATH = path.abspath(path.dirname(__file__))
 DATA_DIR = path.join(BASE_PATH, "data/")
 ALU_DIR = path.join(BASE_PATH, "../example_alus/")
 SPEC_DIR = path.join(BASE_PATH, "../example_specs/")
 TRANSFORM_DIR = path.join(BASE_PATH, "../example_transforms/")
+
 
 class TestDirectSolver(unittest.TestCase):
     """Tests codegen method from chipmunk.Compiler."""
@@ -27,8 +28,8 @@ class TestDirectSolver(unittest.TestCase):
             # TODO(taegyunkim): Instead of writing to the same success and
             # failure files, use different files for each ALU.
             compiler = Compiler(
-                path.join(SPEC_DIR, "simple.sk"),
-                path.join(ALU_DIR, alu), 2, 2, "simple", "serial")
+                path.join(SPEC_DIR, "simple.sk"), path.join(ALU_DIR, alu), 2,
+                2, "simple", "serial")
             self.assertEqual(compiler.serial_codegen()[0], 0,
                              "Compiling simple.sk failed for " + alu)
             # TODO(taegyunkim): When all tests pass, clean up intermediary files
@@ -61,8 +62,7 @@ class TestDirectSolver(unittest.TestCase):
             Path(path.join(DATA_DIR, "simple_raw_2_2_codegen.sk")).read_text())
 
         output_holes = get_hole_dicts(
-            Path(path.join(getcwd(),
-                           "simple_raw_2_2_codegen.sk")).read_text())
+            Path(path.join(getcwd(), "simple_raw_2_2_codegen.sk")).read_text())
 
         self.assertEqual(sorted(expected_holes), sorted(output_holes))
 
@@ -107,14 +107,14 @@ class OptverifyTest(unittest.TestCase):
         alu_filename = "raw.stateful_alu"
 
         compiler = Compiler(
-            path.join(SPEC_DIR, spec_filename),
-            path.join(ALU_DIR, alu_filename), 1, 1, "sample1", "serial")
+            path.join(SPEC_DIR, spec_filename), path.join(
+                ALU_DIR, alu_filename), 1, 1, "sample1", "serial")
 
         compiler.optverify()
 
         compiler = Compiler(
-            path.join(SPEC_DIR, spec_filename),
-            path.join(ALU_DIR, alu_filename), 1, 1, "sample2", "serial")
+            path.join(SPEC_DIR, spec_filename), path.join(
+                ALU_DIR, alu_filename), 1, 1, "sample2", "serial")
 
         compiler.optverify()
 
@@ -123,18 +123,30 @@ class OptverifyTest(unittest.TestCase):
             optverify("sample1", "sample2",
                       path.join(TRANSFORM_DIR, "very_simple.transform")))
 
+
 class IterativeSolverTest(unittest.TestCase):
     def test_simple_sketch_2_2_raw_cex_mode(self):
         self.assertEqual(
             0,
-            chipc.iterative_solver.main(["iterative_solver", path.join(SPEC_DIR,"simple.sk"), path.join(ALU_DIR, "raw.stateful_alu"), 2, 2, "sample1", "serial", "cex_mode"]),
-            )
+            iterative_solver.main([
+                "iterative_solver",
+                path.join(SPEC_DIR, "simple.sk"),
+                path.join(ALU_DIR, "raw.stateful_alu"), 2, 2, "sample1",
+                "serial", "cex_mode"
+            ]),
+        )
 
     def test_simple_sketch_2_2_raw_hole_elimination_mode(self):
         self.assertEqual(
             0,
-            chipc.iterative_solver.main(["iterative_solver", path.join(SPEC_DIR,"simple.sk"), path.join(ALU_DIR, "raw.stateful_alu"), 2, 2, "sample1", "serial", "hole_elimination_mode"]),
-            )
+            iterative_solver.main([
+                "iterative_solver",
+                path.join(SPEC_DIR, "simple.sk"),
+                path.join(ALU_DIR, "raw.stateful_alu"), 2, 2, "sample1",
+                "serial", "hole_elimination_mode"
+            ]),
+        )
+
 
 if __name__ == '__main__':
     unittest.main()

@@ -71,7 +71,7 @@ def main(argv):
             hole_value_file_string = ""
             # hole_value_file_string has the format hole_1==1 && hole_2==2 && 1
             for hole, value in holes_to_values.items():
-              hole_value_file_string += hole + " == " + value + " && "
+                hole_value_file_string += hole + " == " + value + " && "
             hole_value_file_string += "1"
             #find the position of harness
             begin_pos = original_sketch_file_string.find('harness')
