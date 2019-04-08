@@ -42,7 +42,7 @@ def main(argv):
     # Step2: run sol_verify.py
     ret_code = compiler.sol_verify(hole_assignments = hole_assignments, num_input_bits = 10)
     if ret_code == 0:
-        print("success")
+         print("Successfully verified hole value assignments from 2 bit inputs with 10 bit inputs.")
         return 0
 
     print("failed for larger size and need repeated testing by sketch")
