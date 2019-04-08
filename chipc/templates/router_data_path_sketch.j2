@@ -1,11 +1,11 @@
-{% if mode == "codegen" or mode == "sol_verify" or mode == "cexgen" %}
+{% if mode.is_CODEGEN() or mode.is_SOL_VERIFY() or mode.is_CEXGEN() %}
   |StateAndPacket| pipeline (|StateAndPacket| state_and_packet) {
   // Any additional constraints to speed up synthesis through parallel execution.
   {{additional_constraints}}
 
   // Consolidate all constraints on holes here.
   {{all_assertions}}
-{% elif mode == "optverify" %}
+{% elif mode.is_OPTVERIFY() %}
   |StateAndPacket| pipeline (|StateAndPacket| state_and_packet, {{hole_arguments|join(',')}}) {
 {% endif %}
 
@@ -149,7 +149,7 @@
   return state_and_packet;
 }
 
-{% if mode == "codegen" or mode == "cexgen" or  mode == "sol_verify" %}
+{% if mode.is_CODEGEN() or mode.is_CEXGEN() or  mode.is_SOL_VERIFY() %}
   harness void main(
     {{range(num_fields_in_prog)|map('add_prefix_suffix', "int pkt_", "")|join(',')}}
     {% for state_group_number in range(num_state_groups) %}

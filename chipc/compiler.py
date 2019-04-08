@@ -14,6 +14,8 @@ from chipc.chipmunk_pickle import ChipmunkPickle
 from chipc.sketch_generator import SketchGenerator
 from chipc.utils import get_num_pkt_fields_and_state_groups
 from chipc.utils import get_hole_value_assignments
+from chipc.mode import Mode
+
 
 def kill_child_processes(parent_pid, sig=signal.SIGTERM):
     try:
@@ -80,7 +82,7 @@ class Compiler:
         """Codegeneration"""
         codegen_code = self.sketch_generator.generate_sketch(
             program_file=self.program_file,
-            mode="codegen",
+            mode=Mode.CODEGEN,
             additional_constraints=additional_constraints,
             additional_testcases = additional_testcases)
 
@@ -157,7 +159,7 @@ class Compiler:
         """Opt Verify"""
         optverify_code = self.sketch_generator.generate_sketch(
             program_file=self.program_file,
-            mode="optverify",
+            mode=Mode.OPTVERIFY,
             additional_constraints=[])
 
         # Create file and write sketch_function into it
@@ -190,7 +192,7 @@ class Compiler:
         # Generate and run sketch that verifies these holes on a large input range (num_input_bits)
         sol_verify_code = self.sketch_generator.generate_sketch(
             program_file=self.program_file,
-            mode = "sol_verify",
+            mode = Mode.SOL_VERIFY,
             hole_assignments=hole_assignments
         )
         with open(self.sketch_name + "_sol_verify.sk", "w") as sketch_file:
@@ -202,7 +204,7 @@ class Compiler:
     def counter_example_generator(self, bits_val, hole_assignments):
         cex_code = self.sketch_generator.generate_sketch(
             program_file=self.program_file,
-            mode="cexgen",
+            mode=Mode.CEXGEN,
             hole_assignments = hole_assignments,
             input_offset = 2**bits_val)
         with open(self.sketch_name + "_cexgen.sk", "w") as sketch_file:

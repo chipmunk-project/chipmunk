@@ -4,9 +4,9 @@
 // num_alus_per_stage = {{ num_alus_per_stage }}
 // num_phv_containers = {{ num_phv_containers }}
 
-{% if mode == "codegen" %}
+{% if mode.is_CODEGEN() %}
 {{ hole_definitions }}
-{% elif mode == "sol_verify" or mode == "cexgen" %}
+{% elif mode.is_SOL_VERIFY() or mode.is_CEXGEN() %}
 {{ hole_assignments }}
 {% endif %}
 
