@@ -32,35 +32,32 @@ def main(argv):
     compiler = Compiler(program_file, alu_file, num_pipeline_stages,
                         num_alus_per_stage, sketch_name, parallel_or_serial)
 
-    # Can swap this out for compiler.parallel_codegen() instead
-    (ret_code, output, hole_assignments) = compiler.serial_codegen()
-
-    if ret_code != 0:
-        print("failed to compile with 2 bits.")
-        return 1
-
-    # Step2: run sol_verify.py
-    ret_code = compiler.sol_verify(hole_assignments = hole_assignments, num_input_bits = 10)
-    if ret_code == 0:
-        print("Successfully verified hole value assignments from 2 bit inputs with 10 bit inputs.")
-        return 0
-
-    print("failed for larger size and need repeated testing by sketch")
-    # start to repeated run sketch until get the final result
-    count = 0
+    # Repeatedly run synthesis at 2 bits and verification at 10 bits until either
+    # verification succeeds at 10 bits or synthesis fails at 2 bits. Synthesis is
+    # much faster at a smaller bit width, while verification needs to run at a larger
+    # bit width for soundness.
+    count = 1
+    hole_elimination_assert = []
+    counter_example_definition = ""
+    counter_example_assert = ""
     while 1:
         if mode == "hole_elimination_mode":
+            (synthesis_ret_code, output, hole_assignments) = compiler.serial_codegen(
+                additional_constraints = hole_elimination_assert)
+            # Create hole_elimination_assert for next iteration
             # hole_assignments is in the format {'hole_name':'hole_value'},
             # i.e., {'sample1_stateless_alu_0_0_mux1_ctrl': '0'}
-            hole_elimination_assert = "!" # The ! is to ensure a certain hole combination isn't present.
+            hole_elimination_string = "!" # The ! is to ensure a certain hole combination isn't present.
             for hole, value in hole_assignments.items():
-                hole_elimination_assert += "(" + hole + " == " + value + ") && "
-            hole_elimination_assert += "1"
-            (ret_code1, output, _) = compiler.serial_codegen(additional_constraints = [hole_elimination_assert])
+                hole_elimination_string += "(" + hole + " == " + value + ") && "
+            hole_elimination_string += "1"
+            hole_elimination_assert = [hole_elimination_string]
         else:
-            #Add multiple counterexamples in the range from 2 bits to 10 bits
+            (synthesis_ret_code, output, hole_assignments) = \
+            compiler.serial_codegen(additional_testcases = counter_example_definition + counter_example_assert)
             counter_example_definition = ""
             counter_example_assert = ""
+            # Add multiple counterexamples in the range from 2 bits to 10 bits for next iteration
             for bits in range(2, 10):
                 (pkt_group, state_group) = compiler.counter_example_generator(bits, hole_assignments)
 
@@ -103,23 +100,20 @@ def main(argv):
                     count) + "_" + str(
                         bits) + ")" + " == " + "program(" + "x_" + str(
                             count) + "_" + str(bits) + "));\n"
-            (ret_code1, output, hole_assignments) = \
-            compiler.serial_codegen(additional_testcases = counter_example_definition + counter_example_assert)
-
         print("Iteration #" + str(count))
-        print("ret_code1: ", ret_code1)
-        if ret_code1 == 0:
-            ret_code = compiler.sol_verify(hole_assignments, 10)
-            if ret_code == 0:
-                print("finally succeed")
+        if synthesis_ret_code == 0:
+            print("Synthesis succeeded with 2 bits, proceeding to 10-bit verification.")
+            verification_ret_code = compiler.sol_verify(hole_assignments, num_input_bits = 10)
+            if verification_ret_code == 0:
+                print("SUCCESS: Verification succeeded at 10 bits.")
                 return 0
             else:
+                print("Verification failed at 10 bits. Trying again.")
                 count = count + 1
                 continue
         else:
             # Failed synthesis at 2 bits.
-            print("finally failed")
-            print("total while loop: ", count)
+            print("FAILURE: Failed synthesis at 2 bits.")
             return 1
 
 
