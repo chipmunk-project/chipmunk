@@ -6,7 +6,7 @@ import sys
 import argparse
 
 from chipc.compiler import Compiler
-from chipc.utils import get_num_pkt_fields_and_state_groups, get_hole_value_assignments
+from chipc.utils import get_num_pkt_fields_and_state_groups, get_hole_value_assignments, get_info_of_state_groups
 
 # Create hole_elimination_assert from hole_assignments
 # hole_assignments is in the format {'hole_name':'hole_value'},
@@ -19,10 +19,11 @@ def generate_hole_elimination_assert(hole_assignments):
     return [hole_elimination_string]
 
 # Create multiple counterexamples in the range from 2 bits to 10 bits.
-def generate_additional_testcases(hole_assignments, compiler, num_fields_in_prog, num_state_groups, count):
+def generate_additional_testcases(hole_assignments, compiler, num_fields_in_prog, num_state_groups, state_group_info, count):
     counter_example_definition = ""
     counter_example_assert = ""
     for bits in range(2, 10):
+        print("Trying to generate counterexample of " + str(bits) + " bits ")
         (pkt_group, state_group) = compiler.counter_example_generator(bits, hole_assignments)
 
         # Check if all packet fields are included in pkt_group as part
@@ -39,9 +40,12 @@ def generate_additional_testcases(hole_assignments, compiler, num_fields_in_prog
 
         # Check if all state vars are included in state_group as part
         # of the counterexample. If not, set those state vars to
-        # default (0) since they don't matter for the counterexample.
-        for i in range(int(num_state_groups)):
-            if ("state_group_0_state_" + str(i) in [
+        # default (0) since they don't matter for the counterexample
+        
+        # temporate print sth for fun
+        print(len(state_group_info))
+        for i in range(len(state_group_info)):
+            if ("state_group_" + state_group_info[i][0] + "_state_" + state_group_info[i][1] in [
                     regex_match[0] for regex_match in state_group
             ]):
                 continue
@@ -104,6 +108,9 @@ def main(argv):
     (num_fields_in_prog, num_state_groups) = get_num_pkt_fields_and_state_groups(
         Path(args.program_file).read_text())
 
+    # Get the state vars information    
+    state_group_info = get_info_of_state_groups(Path(args.program_file).read_text())
+
     sketch_name = args.program_file.split('/')[-1].split('.')[0] + "_" + args.alu_file.split('/')[-1].split('.')[0] + \
                   "_" + str(args.num_pipeline_stages) + "_" + str(args.num_alus_per_stage)
     compiler = Compiler(args.program_file, args.alu_file,
@@ -132,7 +139,7 @@ def main(argv):
                 if args.parallel == "serial_codegen" else \
                 compiler.parallel_codegen(additional_testcases = additional_testcases)
             additional_testcases    = generate_additional_testcases(hole_assignments, compiler,
-                num_fields_in_prog, num_state_groups, count)
+                num_fields_in_prog, num_state_groups, state_group_info ,count)
 
         print("Iteration #" + str(count))
         if synthesis_ret_code == 0:
