@@ -3,6 +3,13 @@
 from re import findall
 
 
+def get_info_of_state_groups(program):
+    """Returns the information of all state vars
+    i.e state_and_packet.state_group_1_state_0 we will get the information (1,0)
+    """
+    state_group_info = findall(r'state_and_packet.state_group_(\d+)_state_(\d+)',program)
+    return state_group_info
+
 def get_num_pkt_fields_and_state_groups(program):
     """Returns number of packet fields and state groups.
     Use a regex to scan the program and extract the largest packet field index
