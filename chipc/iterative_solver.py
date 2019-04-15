@@ -48,7 +48,7 @@ def generate_additional_testcases(hole_assignments, compiler, num_fields_in_prog
             ]):
                 continue
             else:
-                state_group.append(("state_group_0_state_" + str(i),
+                state_group.append(("state_group_" + state_group_info[i][0] + "_state_" + state_group_info[i][1]  + str(i),
                                     str(0)))
         counter_example_definition += "|StateAndPacket| x_" + str(
             count) + "_" + str(bits) + " = |StateAndPacket|(\n"
