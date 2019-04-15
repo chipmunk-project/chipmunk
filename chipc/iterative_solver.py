@@ -103,11 +103,12 @@ def main(argv):
         help="Whether to iterate by eliminating holes or using counterexamples") 
 
     args = parser.parse_args(argv[1:])
-    (num_fields_in_prog, num_state_groups) = get_num_pkt_fields_and_state_groups(
-        Path(args.program_file).read_text())
+    # Use program_content to store the program file text rather than use it twice
+    program_content = Path(args.program_file).read_text()
+    (num_fields_in_prog, num_state_groups) = get_num_pkt_fields_and_state_groups(program_content)
 
     # Get the state vars information    
-    state_group_info = get_info_of_state_groups(Path(args.program_file).read_text())
+    state_group_info = get_info_of_state_groups(program_content)
 
     sketch_name = args.program_file.split('/')[-1].split('.')[0] + "_" + args.alu_file.split('/')[-1].split('.')[0] + \
                   "_" + str(args.num_pipeline_stages) + "_" + str(args.num_alus_per_stage)
