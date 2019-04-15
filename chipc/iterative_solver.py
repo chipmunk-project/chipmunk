@@ -42,8 +42,6 @@ def generate_additional_testcases(hole_assignments, compiler, num_fields_in_prog
         # of the counterexample. If not, set those state vars to
         # default (0) since they don't matter for the counterexample
         
-        # temporate print sth for fun
-        print(len(state_group_info))
         for i in range(len(state_group_info)):
             if ("state_group_" + state_group_info[i][0] + "_state_" + state_group_info[i][1] in [
                     regex_match[0] for regex_match in state_group
