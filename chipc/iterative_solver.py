@@ -24,7 +24,7 @@ def generate_additional_testcases(hole_assignments, compiler, num_fields_in_prog
     counter_example_assert = ""
     for bits in range(2, 10):
         print("Trying to generate counterexample of " + str(bits) + " bits ")
-        (pkt_group, state_group) = compiler.counter_example_generator(bits, hole_assignments)
+        (pkt_group, state_group) = compiler.counter_example_generator(bits, hole_assignments,count)
 
         # Check if all packet fields are included in pkt_group as part
         # of the counterexample.
@@ -134,7 +134,7 @@ def main(argv):
         else:
             assert(args.hole_elimination == "cex_mode")
             (synthesis_ret_code, output, hole_assignments) = \
-                compiler.serial_codegen(additional_testcases = additional_testcases) \
+                compiler.serial_codegen(count,additional_testcases = additional_testcases) \
                 if args.parallel == "serial_codegen" else \
                 compiler.parallel_codegen(additional_testcases = additional_testcases)
             additional_testcases    = generate_additional_testcases(hole_assignments, compiler,
@@ -143,7 +143,7 @@ def main(argv):
         print("Iteration #" + str(count))
         if synthesis_ret_code == 0:
             print("Synthesis succeeded with 2 bits, proceeding to 10-bit verification.")
-            verification_ret_code = compiler.sol_verify(hole_assignments, num_input_bits = 10)
+            verification_ret_code = compiler.sol_verify(count, hole_assignments, num_input_bits = 10)
             if verification_ret_code == 0:
                 print("SUCCESS: Verification succeeded at 10 bits.")
                 return 0
