@@ -115,12 +115,8 @@ class Compiler:
             holes_to_values = dict()
         return (ret_code, output, holes_to_values)
 
-    def serial_codegen(self,
-                       additional_constraints=[],
-                       additional_testcases=""):
-        return self.single_codegen_run(
-            (additional_constraints, additional_testcases,
-             self.sketch_name + "_codegen.sk"))
+    def serial_codegen(self, num_of_iteration, additional_constraints = [], additional_testcases = ""):
+        return self.single_codegen_run((additional_constraints, additional_testcases, self.sketch_name + "_codegen_iteration_" + str(num_of_iteration) + ".sk"))
 
     def parallel_codegen(self,
                          additional_constraints=[],
@@ -202,7 +198,7 @@ class Compiler:
         print("Total number of hole bits is",
               self.sketch_generator.total_hole_bits_)
 
-    def sol_verify(self, hole_assignments):
+    def sol_verify(self, num_of_iteration, hole_assignments):
         """Verify hole value assignments with z3"""
         # Check that all holes are filled.
         for hole in self.sketch_generator.hole_names_:
@@ -214,14 +210,14 @@ class Compiler:
             program_file=self.program_file,
             mode=Mode.SOL_VERIFY,
             hole_assignments=hole_assignments)
-        with open(self.sketch_name + "_sol_verify.sk", "w") as sketch_file:
+        with open(self.sketch_name + "_sol_verify_iteration_" + str(num_of_iteration) + ".sk", "w") as sketch_file:
             sketch_file.write(sol_verify_code)
         # Set --slv-timeout=0.001 to quit sketch immediately, we only want the
         # SMT file.
         (ret_code, output) = subprocess.getstatusoutput(
             "sketch -V 12 --slv-seed=1 --slv-timeout=0.001 " +
             "--beopt:writeSMT " + self.sketch_name + ".smt2 " +
-            self.sketch_name + "_sol_verify.sk")
+            self.sketch_name + "_sol_verify_iteration_" + str(num_of_iteration) +".sk")
 
         z3_slv = z3.Solver()
         # We expect there is only one assert from smt2 file.
@@ -242,19 +238,18 @@ class Compiler:
             return 0
         return -1
 
-    def counter_example_generator(self, bits_val, hole_assignments):
+    def counter_example_generator(self, bits_val, hole_assignments, num_of_iteration):
         cex_code = self.sketch_generator.generate_sketch(
             program_file=self.program_file,
             mode=Mode.CEXGEN,
-            hole_assignments=hole_assignments,
-            input_offset=2**bits_val)
-        with open(self.sketch_name + "_cexgen.sk", "w") as sketch_file:
+            hole_assignments = hole_assignments,
+            input_offset = 2**bits_val)
+        with open(self.sketch_name + "_cexgen_iteration_"+ str(num_of_iteration) + ".sk", "w") as sketch_file:
             sketch_file.write(cex_code)
 
         # Use --debug-cex mode and get counter examples.
         (ret_code, output) = subprocess.getstatusoutput(
-            "sketch -V 3 --slv-seed=1 --debug-cex --bnd-inbits=" +
-            str(bits_val) + " " + self.sketch_name + "_cexgen.sk")
+            "sketch -V 3 --debug-cex --bnd-inbits=" + str(bits_val) + " " + self.sketch_name + "_cexgen_iteration_" + str(num_of_iteration) +".sk")
 
         # Extract counterexample using regular expression.
         pkt_group = re.findall(
