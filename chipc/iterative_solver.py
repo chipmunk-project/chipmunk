@@ -53,9 +53,13 @@ def generate_additional_testcases(hole_assignments, compiler, num_fields_in_prog
         counter_example_definition += "|StateAndPacket| x_" + str(
             count) + "_" + str(bits) + " = |StateAndPacket|(\n"
         for group in pkt_group:
+            # Guarantee the conterexample values are within the range [0,1024]
+            assert((int(group[1]) + 2**bits >= 0) & (int(group[1]) + 2**bits <= 1024))
             counter_example_definition += group[0] + " = " + str(
                 int(group[1]) + 2**bits) + ',\n'
         for i, group in enumerate(state_group):
+            # Guarantee the conterexample values are within the range [0,1024]
+            assert((int(group[1]) + 2**bits >= 0) & (int(group[1]) + 2**bits <= 1024))
             counter_example_definition += group[0] + " = " + str(
                 int(group[1]) + 2**bits)
             if i < len(state_group) - 1:
