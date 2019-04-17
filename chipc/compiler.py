@@ -102,6 +102,9 @@ class Compiler:
             (ret_code, output) = subprocess.getstatusoutput(
                 "time sketch -V 12 --slv-seed=1 --bnd-inbits=2 " +
                 sketch_file_name)
+        # Store sketch output
+        with open(sketch_file_name[:sketch_file_name.find(".sk")] + "_output.txt",'w') as outputfile:
+          outputfile.write(output)
         if (ret_code == 0):
             holes_to_values = get_hole_value_assignments(self.sketch_generator.hole_names_, output)
         else:
@@ -199,6 +202,9 @@ class Compiler:
             sketch_file.write(sol_verify_code)
         (ret_code, output) = subprocess.getstatusoutput("sketch -V 12 --slv-seed=1 --bnd-inbits=" +
                              str(num_input_bits) + " " + self.sketch_name + "_sol_verify_iteration_" + str(num_of_iteration) +".sk")
+        # Store the output of running sketch
+        with open (self.sketch_name + "_sol_verify_iteration_" + str(num_of_iteration) + "_output.txt","w") as sketch_file:
+            sketch_file.write(output)
         return ret_code
 
     def counter_example_generator(self, bits_val, hole_assignments, num_of_iteration):
@@ -213,7 +219,9 @@ class Compiler:
         # Use --debug-cex mode and get counter examples.
         (ret_code, output) = subprocess.getstatusoutput(
             "sketch -V 3 --debug-cex --bnd-inbits=" + str(bits_val) + " " + self.sketch_name + "_cexgen_iteration_" + str(num_of_iteration) +".sk")
-
+        # Store the output of running sketch
+        with open (self.sketch_name + "_cexgen_iteration_" + str(num_of_iteration) + "_output.txt","w") as sketch_file:
+            sketch_file.write(output)        
         # Extract counterexample using regular expression.
         pkt_group = re.findall(
             r"input (pkt_\d+)\w+ has value \d+= \((\d+)\)",
