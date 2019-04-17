@@ -7,6 +7,7 @@ import subprocess
 from setuptools import setup
 from setuptools import find_packages
 from setuptools.command.build_py import build_py
+from setuptools_antlr.command import AntlrCommand
 
 _PACKAGE_NAME = "chipc"
 
@@ -56,11 +57,15 @@ setup(
     packages=find_packages(exclude=["tests*", "*.interp", "*.tokens"]),
     # This will let setuptools to copy ver what"s listed in MANIFEST.in
     include_package_data=True,
-    cmdclass={"build_py": BuildByWrapper},
+    setup_requires=['setuptools-antlr'],
+    install_requires=['antlr4-python3-runtime'],
+    # cmdclass={"build_py": BuildByWrapper},
     entry_points={
-        "console_scripts":
-        ["direct_solver=" + _PACKAGE_NAME + ".direct_solver:run_main",
-         "optverify=" + _PACKAGE_NAME + ".optverify:run_main",
-         "optverify_stub_generator=" + _PACKAGE_NAME + ".optverify_stub_generator:run_main",
-         "iterative_solver=" + _PACKAGE_NAME + ".iterative_solver:run_main"]
+        "console_scripts": [
+            "direct_solver=" + _PACKAGE_NAME + ".direct_solver:run_main",
+            "optverify=" + _PACKAGE_NAME + ".optverify:run_main",
+            "optverify_stub_generator=" + _PACKAGE_NAME +
+            ".optverify_stub_generator:run_main",
+            "iterative_solver=" + _PACKAGE_NAME + ".iterative_solver:run_main"
+        ]
     })
