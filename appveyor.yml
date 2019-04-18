@@ -1,7 +1,7 @@
 version: 1.0.{build}
 image: Ubuntu
 stack: jdk 8
-init:
+install:
 - sh: >-
     old_dir=`pwd`
 
