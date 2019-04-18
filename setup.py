@@ -64,6 +64,13 @@ setup(
         'antlr4-python3-runtime>=4.7.2', 'Jinja2>=2.10', 'overrides>=1.9',
         'psutil>=5.6.1'
     ],
+    extras_require={
+        'dev': [
+            'nose',
+            'yapf',
+            'pylint',
+        ],
+    },
     cmdclass={
         "build_py": BuildPyWrapper,
         "develop": DevelopWrapper
