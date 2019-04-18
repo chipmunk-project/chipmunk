@@ -8,11 +8,10 @@ import argparse
 from chipc.compiler import Compiler
 from chipc.utils import get_num_pkt_fields_and_state_groups, get_hole_value_assignments, get_info_of_state_groups
 
+
 # Create hole_elimination_assert from hole_assignments
 # hole_assignments is in the format {'hole_name':'hole_value'},
 # i.e., {'sample1_stateless_alu_0_0_mux1_ctrl': '0'}
-
-
 def generate_hole_elimination_assert(hole_assignments):
     # The ! is to ensure a hole combination isn't present.
     hole_elimination_string = "!"
@@ -23,8 +22,6 @@ def generate_hole_elimination_assert(hole_assignments):
 
 
 # Create multiple counterexamples in the range from 2 bits to 10 bits.
-
-
 def generate_additional_testcases(hole_assignments, compiler,
                                   num_fields_in_prog, num_state_groups,
                                   state_group_info, count):
