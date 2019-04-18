@@ -11,6 +11,8 @@ init:
 
     sudo apt-get install -y bison python3-pip flex
 
+    java -verion
+
     cd /usr/local/lib
 
     sudo wget https://www.antlr.org/download/antlr-4.7.2-complete.jar
