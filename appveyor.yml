@@ -8,7 +8,13 @@ init:
 
     sudo apt-get update
 
-    sudo apt-get install -y bison python3-pip flex openjdk-8-jdk
+    sudo apt-get install -y bison python3-pip flex
+
+    sudo apt-get remove -y default-jre
+
+    sudo apt-get remove -y openjdk-10-jre openjdk-9-jre
+
+    sudo apt-get install openjdk-8-jre
 
     cd /usr/local/lib
 
