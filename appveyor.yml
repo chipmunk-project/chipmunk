@@ -1,4 +1,8 @@
 version: 1.0.{build}
+environment:
+  matrix:
+    - APPVEYOR_BUILD_WORKER_IMAGE: Ubuntu1604
+      JAVA_HOME: "/usr/lib/jvm/java-8-openjdk-amd64"
 image: Ubuntu1604
 stack: jdk 8
 init:
