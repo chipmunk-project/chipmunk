@@ -1,11 +1,9 @@
 version: 1.0.{build}
-image: Ubuntu
+image: Ubuntu1604
 stack: jdk 8
 install:
 - sh: >-
     old_dir=`pwd`
-
-    java -version
 
     set -e
 
