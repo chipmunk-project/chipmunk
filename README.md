@@ -12,8 +12,7 @@
 
 ### Develop
 
-If you have installed it as above, first uninstall and re-install via following
-command.
+If you have installed it as above, first re-install via following command.
 
 ```shell
 pip3 install -e .
@@ -24,11 +23,11 @@ development mode, and simply link actual chipc directory to your Python's
 site-packages directory.
 
 1. Make changes to python code
-2. Consider implementing tests and run tests `python -m unittest`
+2. Consider implementing tests and run tests `python3 -m unittest`
 3. Run your desired binary like `python chipc/chipmunk.py ...`
 
 This way you don't have to keep installing and uninstalling whenever you make a
-change and test. However, still you have to run via `python chipc/chipmunk.py`
+change and test. However, still you have to run via `python3 chipc/chipmunk.py`
 instead of using the installed binary.
 
 Also consider using [venv](https://docs.python.org/3/library/venv.html),
