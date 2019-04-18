@@ -1,0 +1,6 @@
+-e .
+
+flake8
+nose
+pre-commit
+yapf
