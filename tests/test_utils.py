@@ -14,11 +14,16 @@ class GetHoleValueAssignmentsTest(unittest.TestCase):
 
         self.assertEqual(holes_to_values, {"a": "3", "b": "4", "c": "5"})
 
+
 class GetInfoOfStateGroupsTest(unittest.TestCase):
     def test_success(self):
-        state_group_info = get_info_of_state_groups("state_and_packet.state_group_0_state_0,state_and_packet.state_group_0_state_1,state_and_packet.state_group_1_state_0,state_and_packet.state_group_1_state_1")
+        state_group_info = get_info_of_state_groups(
+            "state_and_packet.state_group_0_state_0,state_and_packet.state_group_0_state_1,state_and_packet.state_group_1_state_0,state_and_packet.state_group_1_state_1"
+        )
 
-        self.assertEqual(state_group_info,[('0', '0'),('0', '1'),('1', '0'),('1', '1')])
+        self.assertEqual(state_group_info, [('0', '0'), ('0', '1'), ('1', '0'),
+                                            ('1', '1')])
+
 
 if __name__ == '__main__':
     unittest.main()
