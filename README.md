@@ -13,6 +13,7 @@
   cd build
   make
   make install
+  python -c 'import z3; print(z3.get_version_string())'
   ``
 - Install [antlr](https://www.antlr.org/)
 - Install [sketch](https://people.csail.mit.edu/asolar/sketch-1.7.5.tar.gz)
