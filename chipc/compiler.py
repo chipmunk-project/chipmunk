@@ -199,7 +199,7 @@ class Compiler:
         print("Total number of hole bits is",
               self.sketch_generator.total_hole_bits_)
 
-    def sol_verify(self, hole_assignments, num_input_bits):
+    def sol_verify(self, hole_assignments, num_input_bits=32):
         # Check that all holes are filled.
         for hole in self.sketch_generator.hole_names_:
             assert (hole in hole_assignments)
