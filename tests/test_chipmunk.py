@@ -44,43 +44,26 @@ class TestDirectSolver(unittest.TestCase):
         with self.assertRaises(AssertionError):
             Compiler(
                 path.join(SPEC_DIR, spec_filename),
-                path.join(ALU_DIR, alu_filename),
-                1,
-                0,
-                "simple_raw_1_2",
-                "serial",
-            )
+                path.join(ALU_DIR, alu_filename), 1, 0, "simple_raw_1_2",
+                "serial")
 
     def test_simple_raw_succeeds_with_two_two_grid(self):
         spec_filename = "simple.sk"
         alu_filename = "raw.stateful_alu"
 
         compiler = Compiler(
-            path.join(SPEC_DIR, spec_filename),
-            path.join(ALU_DIR, alu_filename),
-            2,
-            2,
-            "simple_raw_2_2",
-            "serial",
-        )
+            path.join(SPEC_DIR, spec_filename), path.join(
+                ALU_DIR, alu_filename), 2, 2, "simple_raw_2_2", "serial")
         (ret_code, _, _) = compiler.serial_codegen()
         self.assertEqual(
-            ret_code,
-            0,
-            "Compiling " + spec_filename + " failed for " + alu_filename,
-        )
+            ret_code, 0,
+            "Compiling " + spec_filename + " failed for " + alu_filename)
 
         expected_holes = get_hole_dicts(
-            Path(path.join(
-                DATA_DIR,
-                "simple_raw_2_2_codegen.sk",
-            ), ).read_text(), )
+            Path(path.join(DATA_DIR, "simple_raw_2_2_codegen.sk")).read_text())
 
         output_holes = get_hole_dicts(
-            Path(path.join(
-                getcwd(),
-                "simple_raw_2_2_codegen.sk",
-            ), ).read_text(), )
+            Path(path.join(getcwd(), "simple_raw_2_2_codegen.sk")).read_text())
 
         self.assertEqual(sorted(expected_holes), sorted(output_holes))
 
@@ -89,13 +72,8 @@ class TestDirectSolver(unittest.TestCase):
         alu_filename = "raw.stateful_alu"
 
         compiler = Compiler(
-            path.join(SPEC_DIR, spec_filename),
-            path.join(ALU_DIR, alu_filename),
-            1,
-            2,
-            "simple_raw_1_2",
-            "serial",
-        )
+            path.join(SPEC_DIR, spec_filename), path.join(
+                ALU_DIR, alu_filename), 1, 2, "simple_raw_1_2", "serial")
         (ret_code, _, _) = compiler.serial_codegen()
         self.assertEqual(
             1, ret_code, "Compiling " + spec_filename + " used to fail for " +
@@ -107,13 +85,8 @@ class TestDirectSolver(unittest.TestCase):
         alu_filename = "raw.stateful_alu"
         # Running in parallel mode to minimize test run time.
         compiler = Compiler(
-            path.join(SPEC_DIR, spec_filename),
-            path.join(ALU_DIR, alu_filename),
-            3,
-            3,
-            "test_raw_3_3",
-            "parallel",
-        )
+            path.join(SPEC_DIR, spec_filename), path.join(
+                ALU_DIR, alu_filename), 3, 3, "test_raw_3_3", "parallel")
         (ret_code, _, _) = compiler.serial_codegen()
         self.assertEqual(
             1, ret_code, "Compiling " + spec_filename + " used to fail for " +
@@ -121,19 +94,12 @@ class TestDirectSolver(unittest.TestCase):
             "this test accordingly if this is expected.")
 
         compiler = Compiler(
-            path.join(SPEC_DIR, spec_filename),
-            path.join(ALU_DIR, alu_filename),
-            4,
-            4,
-            "test_raw_4_4",
-            "parallel",
-        )
+            path.join(SPEC_DIR, spec_filename), path.join(
+                ALU_DIR, alu_filename), 4, 4, "test_raw_4_4", "parallel")
         (ret_code, _, _) = compiler.serial_codegen()
         self.assertEqual(
-            ret_code,
-            0,
-            "Compiling " + spec_filename + " failed for " + alu_filename,
-        )
+            ret_code, 0,
+            "Compiling " + spec_filename + " failed for " + alu_filename)
 
 
 class OptverifyTest(unittest.TestCase):
@@ -142,35 +108,21 @@ class OptverifyTest(unittest.TestCase):
         alu_filename = "raw.stateful_alu"
 
         compiler = Compiler(
-            path.join(SPEC_DIR, spec_filename),
-            path.join(ALU_DIR, alu_filename),
-            1,
-            1,
-            "sample1",
-            "serial",
-        )
+            path.join(SPEC_DIR, spec_filename), path.join(
+                ALU_DIR, alu_filename), 1, 1, "sample1", "serial")
 
         compiler.optverify()
 
         compiler = Compiler(
-            path.join(SPEC_DIR, spec_filename),
-            path.join(ALU_DIR, alu_filename),
-            1,
-            1,
-            "sample2",
-            "serial",
-        )
+            path.join(SPEC_DIR, spec_filename), path.join(
+                ALU_DIR, alu_filename), 1, 1, "sample2", "serial")
 
         compiler.optverify()
 
         self.assertEqual(
             0,
-            optverify(
-                "sample1",
-                "sample2",
-                path.join(TRANSFORM_DIR, "very_simple.transform"),
-            ),
-        )
+            optverify("sample1", "sample2",
+                      path.join(TRANSFORM_DIR, "very_simple.transform")))
 
 
 class IterativeSolverTest(unittest.TestCase):
@@ -180,10 +132,7 @@ class IterativeSolverTest(unittest.TestCase):
             iterative_solver.main([
                 "iterative_solver",
                 path.join(SPEC_DIR, "simple.sk"),
-                path.join(ALU_DIR, "raw.stateful_alu"),
-                "2",
-                "2",
-            ]),
+                path.join(ALU_DIR, "raw.stateful_alu"), "2", "2"]),
         )
 
     def test_simple_2_2_raw_hole_elimination_mode(self):
