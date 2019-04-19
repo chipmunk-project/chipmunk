@@ -219,7 +219,7 @@ class Compiler:
         with open(self.sketch_name + "_sol_verify.sk", "w") as sketch_file:
             sketch_file.write(sol_verify_code)
         (ret_code, output) = subprocess.getstatusoutput(
-            "sketch -V 12 --slv-seed=1 --slv-lightverif " +
+            "sketch -V 12 --slv-seed=1 --slv-timeout=0.001 " +
             "--beopt:writeSMT " + self.sketch_name + ".smt2 " +
             "--bnd-inbits=" + str(num_input_bits) + " " + self.sketch_name +
             "_sol_verify.sk")
