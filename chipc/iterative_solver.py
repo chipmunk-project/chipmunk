@@ -162,8 +162,7 @@ def main(argv):
         if synthesis_ret_code == 0:
             print("Synthesis succeeded with 2 bits, proceeding to 10-bit "
                   "verification.")
-            verification_ret_code = compiler.sol_verify(
-                hole_assignments, num_input_bits=10)
+            verification_ret_code = compiler.sol_verify(hole_assignments)
             if verification_ret_code == 0:
                 print("SUCCESS: Verification succeeded at 10 bits.")
                 return 0
