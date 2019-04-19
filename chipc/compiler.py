@@ -199,7 +199,14 @@ class Compiler:
         print("Total number of hole bits is",
               self.sketch_generator.total_hole_bits_)
 
-    def sol_verify(self, hole_assignments, num_input_bits=32):
+    def sol_verify(self, hole_assignments, num_input_bits=29):
+        """Verify hole value assignments with inputs upto 29 bits.
+
+        The reason it's 29 is that sketch has a bug. If I set it to 31 or 32,
+        the output .smt2 file will have a range like this
+        (AND (x >= 0) (x < -2^31)), which doesn't make sense. If I set it to 30
+        sketch complains that the integer bound was exceeded.
+        """
         # Check that all holes are filled.
         for hole in self.sketch_generator.hole_names_:
             assert (hole in hole_assignments)
