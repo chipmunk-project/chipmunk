@@ -38,13 +38,8 @@ def kill_child_processes(parent_pid, sig=signal.SIGTERM):
 
 
 class Compiler:
-    def __init__(self,
-                 program_file,
-                 alu_file,
-                 num_pipeline_stages,
-                 num_alus_per_stage,
-                 sketch_name,
-                 parallel_or_serial,
+    def __init__(self, program_file, alu_file, num_pipeline_stages,
+                 num_alus_per_stage, sketch_name, parallel_or_serial,
                  pkt_fields_to_check=[]):
         self.program_file = program_file
         self.alu_file = alu_file
@@ -59,12 +54,13 @@ class Compiler:
 
         assert self.num_fields_in_prog <= num_alus_per_stage, (
             "Number of fields in program %d is greater than number of "
-            "alus per stage %d. Try increasing number of alus per stage." %
-            (self.num_fields_in_prog, num_alus_per_stage))
+            "alus per stage %d. Try increasing number of alus per stage." % (
+                self.num_fields_in_prog, num_alus_per_stage))
 
         # Initialize jinja2 environment for templates
-        self.jinja2_env = Environment(loader=FileSystemLoader(
-            path.join(path.dirname(__file__), './templates')),
+        self.jinja2_env = Environment(
+            loader=FileSystemLoader(
+                path.join(path.dirname(__file__), './templates')),
             undefined=StrictUndefined,
             trim_blocks=True,
             lstrip_blocks=True)
@@ -88,6 +84,7 @@ class Compiler:
         additional_constraints = compiler_input[0]
         additional_testcases = compiler_input[1]
         sketch_file_name = compiler_input[2]
+
         """Codegeneration"""
         codegen_code = self.sketch_generator.generate_sketch(
             program_file=self.program_file,
@@ -143,13 +140,13 @@ class Compiler:
                 for stage in range(self.num_pipeline_stages):
                     if (stage == assigned_stage):
                         constraint_list += [
-                            self.sketch_name + "_salu_config_" + str(stage) +
-                            "_" + str(state_group) + " == 1"
+                            self.sketch_name + "_salu_config_" +
+                            str(stage) + "_" + str(state_group) + " == 1"
                         ]
                     else:
                         constraint_list += [
-                            self.sketch_name + "_salu_config_" + str(stage) +
-                            "_" + str(state_group) + " == 0"
+                            self.sketch_name + "_salu_config_" +
+                            str(stage) + "_" + str(state_group) + " == 0"
                         ]
             compiler_inputs += [(constraint_list, additional_testcases,
                                  self.sketch_name + "_" + str(count) +
@@ -244,8 +241,9 @@ class Compiler:
             str(bits_val) + " " + self.sketch_name + "_cexgen.sk")
 
         # Extract counterexample using regular expression.
-        pkt_group = re.findall(r"input (pkt_\d+)\w+ has value \d+= \((\d+)\)",
-                               output)
+        pkt_group = re.findall(
+            r"input (pkt_\d+)\w+ has value \d+= \((\d+)\)",
+            output)
         state_group = re.findall(
             r"input (state_group_\d+_state_\d+)\w+ has value \d+= \((\d+)\)",
             output)
