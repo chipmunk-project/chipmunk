@@ -118,15 +118,13 @@ class Compiler:
             holes_to_values = dict()
         return (ret_code, output, holes_to_values)
 
-    def serial_codegen(self,
-                       additional_constraints=[],
+    def serial_codegen(self, additional_constraints=[],
                        additional_testcases=""):
         return self.single_codegen_run(
             (additional_constraints, additional_testcases,
              self.sketch_name + "_codegen.sk"))
 
-    def parallel_codegen(self,
-                         additional_constraints=[],
+    def parallel_codegen(self, additional_constraints=[],
                          additional_testcases=""):
         # For each state_group, pick a pipeline_stage exhaustively.
         # Note that some of these assignments might be infeasible, but that's
@@ -134,8 +132,8 @@ class Compiler:
         count = 0
         compiler_output = None
         compiler_inputs = []
-        for assignment in itertools.product(list(
-            range(self.num_pipeline_stages)),
+        for assignment in itertools.product(
+                list(range(self.num_pipeline_stages)),
                 repeat=self.num_state_groups):
             constraint_list = additional_constraints.copy()
             count = count + 1
@@ -153,10 +151,9 @@ class Compiler:
                             self.sketch_name + "_salu_config_" + str(stage) +
                             "_" + str(state_group) + " == 0"
                         ]
-            compiler_inputs += [
-                (constraint_list, additional_testcases,
-                 self.sketch_name + "_" + str(count) + "_codegen.sk")
-            ]
+            compiler_inputs += [(constraint_list, additional_testcases,
+                                 self.sketch_name + "_" + str(count) +
+                                 "_codegen.sk")]
 
         with cf.ProcessPoolExecutor(max_workers=count) as executor:
             futures = []
