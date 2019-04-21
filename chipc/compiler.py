@@ -202,14 +202,8 @@ class Compiler:
         print("Total number of hole bits is",
               self.sketch_generator.total_hole_bits_)
 
-    def sol_verify(self, hole_assignments, num_input_bits=29):
-        """Verify hole value assignments with inputs upto 29 bits.
-
-        The reason it's 29 is that sketch has a bug. If I set it to 31 or 32,
-        the output .smt2 file will have a range like this
-        (AND (x >= 0) (x < -2^31)), which doesn't make sense. If I set it to 30
-        sketch complains that the integer bound was exceeded.
-        """
+    def sol_verify(self, hole_assignments):
+        """Verify hole value assignments with z3"""
         # Check that all holes are filled.
         for hole in self.sketch_generator.hole_names_:
             assert (hole in hole_assignments)
@@ -225,8 +219,7 @@ class Compiler:
         (ret_code, output) = subprocess.getstatusoutput(
             "sketch -V 12 --slv-seed=1 --slv-timeout=0.001 " +
             "--beopt:writeSMT " + self.sketch_name + ".smt2 " +
-            "--bnd-inbits=" + str(num_input_bits) + " " + self.sketch_name +
-            "_sol_verify.sk")
+            self.sketch_name + "_sol_verify.sk")
 
         z3_slv = z3.Solver()
         formular = z3.parse_smt2_file(self.sketch_name + ".smt2")
