@@ -3,6 +3,18 @@
 [![Build status](https://ci.appveyor.com/api/projects/status/060fwhaq3vfvt22n/branch/master?svg=true)](https://ci.appveyor.com/project/anirudhSK/chipmunk-hhg5f/branch/master)
 
 ## Installation
+- Install [z3](https://github.com/Z3Prover/z3) and its Python bindings.
+
+ If you use a virtual environment, make sure to activate it before installing
+ via following commands.
+
+  ``shell
+  python3 scripts/mk_make.py --python
+  cd build
+  make
+  make install
+  python -c 'import z3; print(z3.get_version_string())'
+  ``
 - Install [antlr](https://www.antlr.org/)
 - Install [sketch](https://people.csail.mit.edu/asolar/sketch-1.7.5.tar.gz)
 - `pip3 install -r requirements-dev.txt -e . && pre-commit install` (if you want to make changes to

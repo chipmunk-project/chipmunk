@@ -9,6 +9,7 @@ from os import path
 from pathlib import Path
 
 import psutil
+import z3
 from jinja2 import Environment
 from jinja2 import FileSystemLoader
 from jinja2 import StrictUndefined
@@ -114,13 +115,15 @@ class Compiler:
             holes_to_values = dict()
         return (ret_code, output, holes_to_values)
 
-    def serial_codegen(self, additional_constraints=[],
+    def serial_codegen(self,
+                       additional_constraints=[],
                        additional_testcases=""):
         return self.single_codegen_run(
             (additional_constraints, additional_testcases,
              self.sketch_name + "_codegen.sk"))
 
-    def parallel_codegen(self, additional_constraints=[],
+    def parallel_codegen(self,
+                         additional_constraints=[],
                          additional_testcases=""):
         # For each state_group, pick a pipeline_stage exhaustively.
         # Note that some of these assignments might be infeasible, but that's
@@ -128,8 +131,8 @@ class Compiler:
         count = 0
         compiler_output = None
         compiler_inputs = []
-        for assignment in itertools.product(
-                list(range(self.num_pipeline_stages)),
+        for assignment in itertools.product(list(
+            range(self.num_pipeline_stages)),
                 repeat=self.num_state_groups):
             constraint_list = additional_constraints.copy()
             count = count + 1
@@ -147,9 +150,10 @@ class Compiler:
                             self.sketch_name + "_salu_config_" +
                             str(stage) + "_" + str(state_group) + " == 0"
                         ]
-            compiler_inputs += [(constraint_list, additional_testcases,
-                                 self.sketch_name + "_" + str(count) +
-                                 "_codegen.sk")]
+            compiler_inputs += [
+                (constraint_list, additional_testcases,
+                 self.sketch_name + "_" + str(count) + "_codegen.sk")
+            ]
 
         with cf.ProcessPoolExecutor(max_workers=count) as executor:
             futures = []
@@ -198,25 +202,39 @@ class Compiler:
         print("Total number of hole bits is",
               self.sketch_generator.total_hole_bits_)
 
-    def sol_verify(self, hole_assignments, num_input_bits):
+    def sol_verify(self, hole_assignments, num_input_bits=29):
+        """Verify hole value assignments with inputs upto 29 bits.
+
+        The reason it's 29 is that sketch has a bug. If I set it to 31 or 32,
+        the output .smt2 file will have a range like this
+        (AND (x >= 0) (x < -2^31)), which doesn't make sense. If I set it to 30
+        sketch complains that the integer bound was exceeded.
+        """
         # Check that all holes are filled.
         for hole in self.sketch_generator.hole_names_:
-            assert(hole in hole_assignments)
+            assert (hole in hole_assignments)
 
         # Generate and run sketch that verifies these holes on a large input
         # range (num_input_bits)
         sol_verify_code = self.sketch_generator.generate_sketch(
             program_file=self.program_file,
             mode=Mode.SOL_VERIFY,
-            hole_assignments=hole_assignments
-        )
+            hole_assignments=hole_assignments)
         with open(self.sketch_name + "_sol_verify.sk", "w") as sketch_file:
             sketch_file.write(sol_verify_code)
         (ret_code, output) = subprocess.getstatusoutput(
-            "sketch -V 12 --slv-seed=1 --bnd-inbits=" +
-            str(num_input_bits) + " " + self.sketch_name +
+            "sketch -V 12 --slv-seed=1 --slv-timeout=0.001 " +
+            "--beopt:writeSMT " + self.sketch_name + ".smt2 " +
+            "--bnd-inbits=" + str(num_input_bits) + " " + self.sketch_name +
             "_sol_verify.sk")
-        return ret_code
+
+        z3_slv = z3.Solver()
+        formular = z3.parse_smt2_file(self.sketch_name + ".smt2")
+        z3_slv.add(formular[0])
+
+        if z3_slv.check() == z3.sat:
+            return 0
+        return -1
 
     def counter_example_generator(self, bits_val, hole_assignments):
         cex_code = self.sketch_generator.generate_sketch(
