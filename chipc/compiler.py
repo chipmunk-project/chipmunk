@@ -225,18 +225,18 @@ class Compiler:
 
         z3_slv = z3.Solver()
         # We expect there is only one assert from smt2 file.
-        formular = z3.parse_smt2_file(self.sketch_name + ".smt2")[0]
+        formula = z3.parse_smt2_file(self.sketch_name + ".smt2")[0]
 
-        variables = [z3.Int(formular.var_name(i))
-                     for i in range(0, formular.num_vars())]
-        # The original formular's body is comprised of
+        variables = [z3.Int(formula.var_name(i))
+                     for i in range(0, formula.num_vars())]
+        # The original formula's body is comprised of
         # Implies(A, B) where A is usually range of inputs and B is where a
         # condition that must hold for the program. We only want to get the B.
-        body = formular.body().children()[1]
+        body = formula.body().children()[1]
 
-        formular_without_bounds = z3.ForAll(variables, body)
+        formula_without_bounds = z3.ForAll(variables, body)
 
-        z3_slv.add(formular_without_bounds)
+        z3_slv.add(formula_without_bounds)
 
         if z3_slv.check() == z3.sat:
             return 0
