@@ -119,13 +119,13 @@ class Compiler:
             holes_to_values = dict()
         return (ret_code, output, holes_to_values)
 
-    def serial_codegen(self, num_of_iteration, additional_constraints=[],
+    def serial_codegen(self, iter_cnt=1, additional_constraints=[],
                        additional_testcases=""):
         return self.single_codegen_run((additional_constraints,
                                         additional_testcases,
                                         self.sketch_name +
                                         "_codegen_iteration_" +
-                                        str(num_of_iteration) + ".sk"))
+                                        str(iter_cnt) + ".sk"))
 
     def parallel_codegen(self,
                          additional_constraints=[],
@@ -207,7 +207,7 @@ class Compiler:
         print("Total number of hole bits is",
               self.sketch_generator.total_hole_bits_)
 
-    def sol_verify(self, num_of_iteration, hole_assignments):
+    def sol_verify(self, hole_assignments, iter_cnt=1):
         """Verify hole value assignments with z3"""
         # Check that all holes are filled.
         for hole in self.sketch_generator.hole_names_:
@@ -220,7 +220,7 @@ class Compiler:
             mode=Mode.SOL_VERIFY,
             hole_assignments=hole_assignments)
         with open(self.sketch_name + "_sol_verify_iteration_" +
-                  str(num_of_iteration) + ".sk", "w") as sketch_file:
+                  str(iter_cnt) + ".sk", "w") as sketch_file:
             sketch_file.write(sol_verify_code)
         # Set --slv-timeout=0.001 to quit sketch immediately, we only want the
         # SMT file.
@@ -228,11 +228,11 @@ class Compiler:
             "sketch -V 12 --slv-seed=1 --slv-timeout=0.001 " +
             "--beopt:writeSMT " + self.sketch_name + ".smt2 " +
             self.sketch_name + "_sol_verify_iteration_" +
-            str(num_of_iteration) + ".sk")
+            str(iter_cnt) + ".sk")
 
         # Store the output of running sketch
         with open(self.sketch_name + "_sol_verify_iteration_" +
-                  str(num_of_iteration) + "_output.txt", "w") as sketch_file:
+                  str(iter_cnt) + "_output.txt", "w") as sketch_file:
             sketch_file.write(output)
 
         z3_slv = z3.Solver()
@@ -254,25 +254,25 @@ class Compiler:
             return 0
         return -1
 
-    def counter_example_generator(self, bits_val, hole_assignments,
-                                  num_of_iteration):
+    def counter_example_generator(self, bits_val,
+                                  hole_assignments, iter_cnt=1):
         cex_code = self.sketch_generator.generate_sketch(
             program_file=self.program_file,
             mode=Mode.CEXGEN,
             hole_assignments=hole_assignments,
             input_offset=2**bits_val)
         with open(self.sketch_name + "_cexgen_iteration_" +
-                  str(num_of_iteration) + ".sk", "w") as sketch_file:
+                  str(iter_cnt) + ".sk", "w") as sketch_file:
             sketch_file.write(cex_code)
 
         # Use --debug-cex mode and get counter examples.
         (ret_code, output) = subprocess.getstatusoutput(
             "sketch -V 3 --debug-cex --bnd-inbits=" + str(bits_val) + " " +
             self.sketch_name + "_cexgen_iteration_" +
-            str(num_of_iteration) + ".sk")
+            str(iter_cnt) + ".sk")
         # Store the output of running sketch
         with open(self.sketch_name + "_cexgen_iteration_" +
-                  str(num_of_iteration) + "_output.txt", "w") as sketch_file:
+                  str(iter_cnt) + "_output.txt", "w") as sketch_file:
             sketch_file.write(output)
         # Extract counterexample using regular expression.
         pkt_group = re.findall(
