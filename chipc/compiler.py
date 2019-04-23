@@ -110,8 +110,8 @@ class Compiler:
                 sketch_file_name)
         # Store sketch output
         with open(sketch_file_name[:sketch_file_name.find(".sk")] +
-                  "_output.txt", 'w') as outputfile:
-            outputfile.write(output)
+                  "_output.txt", 'w') as output_file:
+            output_file.write(output)
         if (ret_code == 0):
             holes_to_values = get_hole_value_assignments(
                 self.sketch_generator.hole_names_, output)
