@@ -31,7 +31,7 @@ class TestDirectSolver(unittest.TestCase):
             compiler = Compiler(
                 path.join(SPEC_DIR, "simple.sk"), path.join(ALU_DIR, alu), 2,
                 2, "simple", "serial")
-            self.assertEqual(compiler.serial_codegen()[0], 0,
+            self.assertEqual(compiler.serial_codegen(0)[0], 0,
                              "Compiling simple.sk failed for " + alu)
             # TODO(taegyunkim): When all tests pass, clean up intermediary
             # files or at least have an option to keep intermediary files, with
@@ -54,7 +54,7 @@ class TestDirectSolver(unittest.TestCase):
         compiler = Compiler(
             path.join(SPEC_DIR, spec_filename), path.join(
                 ALU_DIR, alu_filename), 2, 2, "simple_raw_2_2", "serial")
-        (ret_code, _, _) = compiler.serial_codegen()
+        (ret_code, _, _) = compiler.serial_codegen(0)
         self.assertEqual(
             ret_code, 0,
             "Compiling " + spec_filename + " failed for " + alu_filename)
@@ -74,7 +74,7 @@ class TestDirectSolver(unittest.TestCase):
         compiler = Compiler(
             path.join(SPEC_DIR, spec_filename), path.join(
                 ALU_DIR, alu_filename), 1, 2, "simple_raw_1_2", "serial")
-        (ret_code, _, _) = compiler.serial_codegen()
+        (ret_code, _, _) = compiler.serial_codegen(0)
         self.assertEqual(
             1, ret_code, "Compiling " + spec_filename + " used to fail for " +
             alu_filename + ", but it succeeded, please check and upate " +
@@ -87,7 +87,7 @@ class TestDirectSolver(unittest.TestCase):
         compiler = Compiler(
             path.join(SPEC_DIR, spec_filename), path.join(
                 ALU_DIR, alu_filename), 3, 3, "test_raw_3_3", "parallel")
-        (ret_code, _, _) = compiler.serial_codegen()
+        (ret_code, _, _) = compiler.serial_codegen(0)
         self.assertEqual(
             1, ret_code, "Compiling " + spec_filename + " used to fail for " +
             alu_filename + ", but it succeeded, please check and upate " +
@@ -96,7 +96,7 @@ class TestDirectSolver(unittest.TestCase):
         compiler = Compiler(
             path.join(SPEC_DIR, spec_filename), path.join(
                 ALU_DIR, alu_filename), 4, 4, "test_raw_4_4", "parallel")
-        (ret_code, _, _) = compiler.serial_codegen()
+        (ret_code, _, _) = compiler.serial_codegen(0)
         self.assertEqual(
             ret_code, 0,
             "Compiling " + spec_filename + " failed for " + alu_filename)
