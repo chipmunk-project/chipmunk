@@ -19,8 +19,9 @@ TRANSFORM_DIR = path.join(BASE_PATH, "../example_transforms/")
 
 class TestDirectSolver(unittest.TestCase):
     """Tests codegen method from chipmunk.Compiler."""
+    """Set the default value iter_cnt to be 0"""
 
-    def test_codegen_with_simple_sketch_for_all_alus(self):
+    def test_codegen_with_simple_sketch_for_all_alus(self, iter_cnt=0):
         alus = [
             f for f in listdir(ALU_DIR) if path.isfile(path.join(ALU_DIR, f))
         ]
@@ -31,7 +32,7 @@ class TestDirectSolver(unittest.TestCase):
             compiler = Compiler(
                 path.join(SPEC_DIR, "simple.sk"), path.join(ALU_DIR, alu), 2,
                 2, "simple", "serial")
-            self.assertEqual(compiler.serial_codegen(0)[0], 0,
+            self.assertEqual(compiler.serial_codegen(iter_cnt)[0], 0,
                              "Compiling simple.sk failed for " + alu)
             # TODO(taegyunkim): When all tests pass, clean up intermediary
             # files or at least have an option to keep intermediary files, with
@@ -47,14 +48,16 @@ class TestDirectSolver(unittest.TestCase):
                 path.join(ALU_DIR, alu_filename), 1, 0, "simple_raw_1_2",
                 "serial")
 
-    def test_simple_raw_succeeds_with_two_two_grid(self):
+    """Set the default value iter_cnt to be 0"""
+
+    def test_simple_raw_succeeds_with_two_two_grid(self, iter_cnt=0):
         spec_filename = "simple.sk"
         alu_filename = "raw.stateful_alu"
 
         compiler = Compiler(
             path.join(SPEC_DIR, spec_filename), path.join(
                 ALU_DIR, alu_filename), 2, 2, "simple_raw_2_2", "serial")
-        (ret_code, _, _) = compiler.serial_codegen(0)
+        (ret_code, _, _) = compiler.serial_codegen(iter_cnt)
         self.assertEqual(
             ret_code, 0,
             "Compiling " + spec_filename + " failed for " + alu_filename)
@@ -67,27 +70,27 @@ class TestDirectSolver(unittest.TestCase):
 
         self.assertEqual(sorted(expected_holes), sorted(output_holes))
 
-    def test_simple_raw_fails_with_one_two_grid(self):
+    def test_simple_raw_fails_with_one_two_grid(self, iter_cnt=0):
         spec_filename = "simple.sk"
         alu_filename = "raw.stateful_alu"
 
         compiler = Compiler(
             path.join(SPEC_DIR, spec_filename), path.join(
                 ALU_DIR, alu_filename), 1, 2, "simple_raw_1_2", "serial")
-        (ret_code, _, _) = compiler.serial_codegen(0)
+        (ret_code, _, _) = compiler.serial_codegen(iter_cnt)
         self.assertEqual(
             1, ret_code, "Compiling " + spec_filename + " used to fail for " +
             alu_filename + ", but it succeeded, please check and upate " +
             "this test accordingly if this is expected.")
 
-    def test_test_sketch(self):
+    def test_test_sketch(self, iter_cnt=0):
         spec_filename = "test.sk"
         alu_filename = "raw.stateful_alu"
         # Running in parallel mode to minimize test run time.
         compiler = Compiler(
             path.join(SPEC_DIR, spec_filename), path.join(
                 ALU_DIR, alu_filename), 3, 3, "test_raw_3_3", "parallel")
-        (ret_code, _, _) = compiler.serial_codegen(0)
+        (ret_code, _, _) = compiler.serial_codegen(iter_cnt)
         self.assertEqual(
             1, ret_code, "Compiling " + spec_filename + " used to fail for " +
             alu_filename + ", but it succeeded, please check and upate " +
@@ -96,7 +99,7 @@ class TestDirectSolver(unittest.TestCase):
         compiler = Compiler(
             path.join(SPEC_DIR, spec_filename), path.join(
                 ALU_DIR, alu_filename), 4, 4, "test_raw_4_4", "parallel")
-        (ret_code, _, _) = compiler.serial_codegen(0)
+        (ret_code, _, _) = compiler.serial_codegen(iter_cnt)
         self.assertEqual(
             ret_code, 0,
             "Compiling " + spec_filename + " failed for " + alu_filename)
