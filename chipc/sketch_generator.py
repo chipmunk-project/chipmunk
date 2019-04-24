@@ -83,11 +83,14 @@ class SketchGenerator:
             arg_list=["int " + x for x in potential_operands],
             alu_name=self.sketch_name_ + "_" + alu_name,
             mux1=self.sketch_name_ + "_" + alu_name + "_mux1",
-            mux2=self.sketch_name_ + "_" + alu_name + "_mux2")
+            mux2=self.sketch_name_ + "_" + alu_name + "_mux2",
+            mux3=self.sketch_name_ + "_" + alu_name + "_mux3")
         mux_op_1 = self.generate_mux(
             len(potential_operands), alu_name + "_mux1")
         mux_op_2 = self.generate_mux(
             len(potential_operands), alu_name + "_mux2")
+        mux_op_3 = self.generate_mux(
+            len(potential_operands), alu_name + "_mux3")
         self.add_hole(self.sketch_name_ + "_" + alu_name + "_opcode", 5)
         self.add_hole(self.sketch_name_ + "_" + alu_name + "_immediate", 2)
         self.add_assert(
@@ -95,7 +98,7 @@ class SketchGenerator:
             + self.sketch_name_ + "_" + alu_name + "_mux1_ctrl <= " +
             self.sketch_name_ + "_" + alu_name +
             "_mux2_ctrl)")  # symmetry breaking for commutativity
-        return mux_op_1 + mux_op_2 + stateless_alu
+        return mux_op_1 + mux_op_2 + mux_op_3 + stateless_alu
 
     # Generate Sketch code for a simple stateful alu (+,-,*,/)
     # Takes one state and one packet operand (or immediate operand) as inputs
