@@ -232,11 +232,6 @@ class Compiler:
             self.sketch_name + "_sol_verify_iteration_" +
             str(iter_cnt) + ".sk")
 
-        # Store the output of running sketch
-        with open(self.sketch_name + "_sol_verify_iteration_" +
-                  str(iter_cnt) + "_output.txt", "w") as sketch_file:
-            sketch_file.write(output)
-
         z3_slv = z3.Solver()
         # We expect there is only one assert from smt2 file.
         formula = z3.parse_smt2_file(self.sketch_name + ".smt2")[0]
