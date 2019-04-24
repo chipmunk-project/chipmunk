@@ -222,11 +222,13 @@ class Compiler:
         with open(self.sketch_name + "_sol_verify_iteration_" +
                   str(iter_cnt) + ".sk", "w") as sketch_file:
             sketch_file.write(sol_verify_code)
+
         # Set --slv-timeout=0.001 to quit sketch immediately, we only want the
         # SMT file.
         (ret_code, output) = subprocess.getstatusoutput(
             "sketch -V 12 --slv-seed=1 --slv-timeout=0.001 " +
-            "--beopt:writeSMT " + self.sketch_name + ".smt2 " +
+            "--beopt:writeSMT " + self.sketch_name + "_iteration_" +
+            str(iter_cnt) + ".smt2 " +
             self.sketch_name + "_sol_verify_iteration_" +
             str(iter_cnt) + ".sk")
 
