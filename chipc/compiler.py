@@ -234,7 +234,8 @@ class Compiler:
 
         z3_slv = z3.Solver()
         # We expect there is only one assert from smt2 file.
-        formula = z3.parse_smt2_file(self.sketch_name + ".smt2")[0]
+        formula = z3.parse_smt2_file(self.sketch_name + "_iteration_" +
+                                     str(iter_cnt) + ".smt2")[0]
 
         variables = [z3.Int(formula.var_name(i))
                      for i in range(0, formula.num_vars())]
