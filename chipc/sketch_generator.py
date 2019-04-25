@@ -86,6 +86,8 @@ class SketchGenerator:
             mux1=self.sketch_name_ + "_" + alu_name + "_mux1",
             mux2=self.sketch_name_ + "_" + alu_name + "_mux2",
             mux3=self.sketch_name_ + "_" + alu_name + "_mux3")
+        # TODO: now fix # of mux to be 3 and will later make them flexible
+        # according to the number of mux used in stateless_alu
         mux_op_1 = self.generate_mux(
             len(potential_operands), alu_name + "_mux1")
         mux_op_2 = self.generate_mux(
