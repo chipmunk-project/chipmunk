@@ -1,4 +1,4 @@
-// Total num of opcode is 20
+// Max value of opcode is 20
 int {{ alu_name }}({{arg_list|join(',')}}, int opcode_hole_local, int immediate_operand_hole_local, int mux1_ctrl_hole_local, int mux2_ctrl_hole_local, int mux3_ctrl_hole_local) {
   int opcode = opcode_hole_local;
   int immediate_operand = immediate_operand_hole_local;

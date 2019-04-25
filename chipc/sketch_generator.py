@@ -99,7 +99,7 @@ class SketchGenerator:
         # these two should be exactly the same
         max_value_of_opcode = stateless_alu.count("opcode ==")
         max_value = int(
-            re.search(r"// Total num of opcode is (\d+)",
+            re.search(r"// Max value of opcode is (\d+)",
                       stateless_alu).group(1)
         )
         assert(max_value == max_value_of_opcode)
