@@ -1,5 +1,6 @@
 # Helper functions to generate sketch code for synthesis
 import math
+import re
 from pathlib import Path
 
 from antlr4 import CommonTokenStream
@@ -91,7 +92,21 @@ class SketchGenerator:
             len(potential_operands), alu_name + "_mux2")
         mux_op_3 = self.generate_mux(
             len(potential_operands), alu_name + "_mux3")
-        self.add_hole(self.sketch_name_ + "_" + alu_name + "_opcode", 5)
+
+        # Two ways to get the max value of opcode
+        # one is through read comment line //
+        # the other one is through find the number of opcode ==
+        # these two should be exactly the same
+        max_value_of_opcode = stateless_alu.count("opcode ==")
+        max_value = int(
+            re.search(r"// Total num of opcode is (\d+)",
+                      stateless_alu).group(1)
+        )
+        assert(max_value == max_value_of_opcode)
+        bit_of_opcode = math.ceil(math.log(max_value_of_opcode, 2))
+
+        self.add_hole(self.sketch_name_ + "_" +
+                      alu_name + "_opcode", bit_of_opcode)
         self.add_hole(self.sketch_name_ + "_" + alu_name + "_immediate", 2)
         self.add_assert(
             "(" + self.sketch_name_ + "_" + alu_name + "_opcode == 1)" + "|| ("
