@@ -102,7 +102,9 @@ class SketchGenerator:
             re.search(r"// Max value of opcode is (\d+)",
                       stateless_alu).group(1)
         )
-        assert(max_value == max_value_of_opcode)
+        assert (max_value == max_value_of_opcode), \
+            "Number of opcodes in stateless ALU doesn't match up with" + \
+            " the number at the beginning of the stateless ALU file."
         bit_of_opcode = math.ceil(math.log(max_value_of_opcode, 2))
 
         self.add_hole(self.sketch_name_ + "_" +
