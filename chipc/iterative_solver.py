@@ -121,11 +121,12 @@ def main(argv):
 
     # Get the state vars information
     state_group_info = get_info_of_state_groups(program_content)
-
     sketch_name = args.program_file.split('/')[-1].split('.')[0] + \
         "_" + args.stateful_alu_file.split('/')[-1].split('.')[0] + \
+        "_" + args.stateless_alu_file.split('/')[-1].split('.')[0] + \
         "_" + str(args.num_pipeline_stages) + \
         "_" + str(args.num_alus_per_stage)
+
     compiler = Compiler(args.program_file, args.stateful_alu_file,
                         args.stateless_alu_file,
                         args.num_pipeline_stages, args.num_alus_per_stage,
