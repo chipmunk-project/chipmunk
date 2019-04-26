@@ -61,7 +61,8 @@ class Compiler:
         # Initialize jinja2 environment for templates
         self.jinja2_env = Environment(
             loader=FileSystemLoader(
-                path.join(path.dirname(__file__), './templates')),
+                [path.join(path.dirname(__file__), './templates'),
+                 ".", "/"]),
             undefined=StrictUndefined,
             trim_blocks=True,
             lstrip_blocks=True)

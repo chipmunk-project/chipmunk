@@ -82,7 +82,11 @@ class SketchGenerator:
         # Grab the stateless alu file name by using
         # self.stateless_alu_file_[self.stateless_alu_file_.rfind('/')+1:]
         stateless_alu_template = self.jinja2_env_.get_template(
-            self.stateless_alu_file_[self.stateless_alu_file_.rfind('/')+1:])
+            self.stateless_alu_file_)
+#        print(stateless_alu_template1)
+#        print("--------------------------")
+#        stateless_alu_template = self.jinja2_env_.get_template(
+#            self.stateless_alu_file_[self.stateless_alu_file_.rfind('/')+1:])
         stateless_alu = stateless_alu_template.render(
             potential_operands=potential_operands,
             arg_list=["int " + x for x in potential_operands],
