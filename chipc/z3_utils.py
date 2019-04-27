@@ -56,7 +56,7 @@ def generate_counter_examples(smt2_filename):
     state_vars = {}
 
     result = z3_slv.check()
-    if result != z3:
+    if result != z3.sat:
         print("Failed to generate counter examples, z3 returned", result)
         return (pkt_vars, state_vars)
 
