@@ -27,48 +27,37 @@ def generate_additional_testcases(hole_assignments, compiler,
     counter_example_definition = ""
     counter_example_assert = ""
     for bits in range(2, 10):
-        print("Trying to generate counterexample of " + str(bits) + " bits ")
-        (pkt_group, state_group) = compiler.counter_example_generator(
+        print("Generating counterexamples of", str(bits), "bits.")
+        (pkt_fields, state_vars) = compiler.counter_example_generator(
             bits, hole_assignments, iter_cnt=count)
 
-        # Check if all packet fields are included in pkt_group as part
-        # of the counterexample.
-        # If not, set those packet fields to a default (0) since they
-        # don't matter for the counterexample.
+        # Check if all packet fields and state variables exist in returned
+        # counterexamples dictionary. If not, set those to 0 since they don't
+        # matter.
         for i in range(int(num_fields_in_prog)):
-            if ("pkt_" + str(i) in [
-                    regex_match[0] for regex_match in pkt_group
-            ]):
-                continue
-            else:
-                pkt_group.append(("pkt_" + str(i), str(0)))
-
-        # Check if all state vars are included in state_group as part
-        # of the counterexample. If not, set those state vars to
-        # default (0) since they don't matter for the counterexample
-
+            field_name = "pkt_" + str(i)
+            if field_name not in pkt_fields:
+                pkt_fields[field_name] = 0
         for i in range(len(state_group_info)):
-            if ("state_group_" + state_group_info[i][0] + "_state_" +
-                    state_group_info[i][1] in [
-                        regex_match[0] for regex_match in state_group
-            ]):
-                continue
-            else:
-                state_group.append(
-                    ("state_group_" + state_group_info[i][0] + "_state_" +
-                     state_group_info[i][1] + str(i), str(0)))
+            state_var_name = "state_group_" + \
+                state_group_info[i][0] + "_state_" + state_group_info[i][1]
+            if state_var_name not in state_vars:
+                state_vars[state_var_name] = 0
+
         counter_example_definition += "|StateAndPacket| x_" + str(
             count) + "_" + str(bits) + " = |StateAndPacket|(\n"
-        for group in pkt_group:
-            counter_example_definition += group[0] + " = " + str(
-                int(group[1]) + 2**bits) + ',\n'
-        for i, group in enumerate(state_group):
-            counter_example_definition += group[0] + " = " + str(
-                int(group[1]) + 2**bits)
-            if i < len(state_group) - 1:
+        for field_name, value in pkt_fields.items():
+            counter_example_definition += field_name + " = " + str(
+                value + 2**bits) + ',\n'
+
+        for i, (state_var_name, value) in enumerate(state_vars.items()):
+            counter_example_definition += state_var_name + " = " + str(
+                value + 2**bits)
+            if i < len(state_vars) - 1:
                 counter_example_definition += ',\n'
             else:
                 counter_example_definition += ");\n"
+
         counter_example_assert += "assert (pipeline(" + "x_" + str(
             count) + "_" + str(bits) + ")" + " == " + "program(" + "x_" + str(
                 count) + "_" + str(bits) + "));\n"

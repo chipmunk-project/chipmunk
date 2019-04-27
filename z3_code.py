@@ -1,3 +1,5 @@
+import re
+
 import z3
 
 z3.set_param(proof=True)
@@ -22,5 +24,22 @@ new_f = z3.Not(z3.substitute_vars(impl, *variables))
 
 z3_slv = z3.Solver()
 z3_slv.add(new_f)
-print(z3_slv.check())
-print(z3_slv.model())
+
+pkt_vars = {}
+state_vars = {}
+
+result = z3_slv.check()
+
+model = z3_slv.model()
+for var in variables:
+    var_str = re.sub(r"_\d+_\d+_\d+$", "", str(var), count=1)
+    value = model.eval(var).as_long()
+    if var_str.startswith("pkt_"):
+        pkt_vars[var_str] = value
+    elif var_str.startswith("state_group_"):
+        state_vars[var_str] = value
+
+for i, (k, v) in enumerate(pkt_vars.items()):
+    print(i, k, v)
+
+print(pkt_vars, state_vars)

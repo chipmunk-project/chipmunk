@@ -2,7 +2,6 @@ import concurrent.futures as cf
 import itertools
 import os
 import pickle
-import re
 import signal
 import subprocess
 from os import path
@@ -14,6 +13,7 @@ from jinja2 import Environment
 from jinja2 import FileSystemLoader
 from jinja2 import StrictUndefined
 
+from chipc import z3_utils
 from chipc.chipmunk_pickle import ChipmunkPickle
 from chipc.mode import Mode
 from chipc.sketch_generator import SketchGenerator
@@ -259,25 +259,20 @@ class Compiler:
             mode=Mode.CEXGEN,
             hole_assignments=hole_assignments,
             input_offset=2**bits_val)
-        with open(self.sketch_name + "_cexgen_iteration_" +
-                  str(iter_cnt) + "_bits_" + str(bits_val)
-                  + ".sk", "w") as sketch_file:
+        cex_filename = self.sketch_name + "_cexgen_iteration_" + \
+            str(iter_cnt) + "_bits_" + str(bits_val)
+        cex_sketch_filename = cex_filename + ".sk"
+        cex_smt2_filename = cex_filename + ".smt2"
+        with open(cex_sketch_filename, "w") as sketch_file:
             sketch_file.write(cex_code)
 
-        # Use --debug-cex mode and get counter examples.
-        (ret_code, output) = subprocess.getstatusoutput(
-            "sketch -V 3 --debug-cex --bnd-inbits=" + str(bits_val) + " " +
-            self.sketch_name + "_cexgen_iteration_" +
-            str(iter_cnt) + "_bits_" + str(bits_val) + ".sk")
-        # Store the output of running sketch
-        with open(self.sketch_name + "_cexgen_iteration_" +
-                  str(iter_cnt) + "_output.txt", "w") as sketch_file:
-            sketch_file.write(output)
-        # Extract counterexample using regular expression.
-        pkt_group = re.findall(
-            r"input (pkt_\d+)\w+ has value \d+= \((\d+)\)",
-            output)
-        state_group = re.findall(
-            r"input (state_group_\d+_state_\d+)\w+ has value \d+= \((\d+)\)",
-            output)
-        return (pkt_group, state_group)
+        subprocess.run(["sketch",
+                        "-V 3",
+                        "--debug-cex",
+                        "--slv-timeout=0.001",
+                        "--bnd-inbits=" + str(bits_val),
+                        cex_sketch_filename,
+                        "--beopt:writeSMT",
+                        cex_smt2_filename])
+
+        return z3_utils.generate_counter_examples(cex_smt2_filename)
