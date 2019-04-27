@@ -260,14 +260,15 @@ class Compiler:
             hole_assignments=hole_assignments,
             input_offset=2**bits_val)
         with open(self.sketch_name + "_cexgen_iteration_" +
-                  str(iter_cnt) + ".sk", "w") as sketch_file:
+                  str(iter_cnt) + "_bits_" + str(bits_val)
+                  + ".sk", "w") as sketch_file:
             sketch_file.write(cex_code)
 
         # Use --debug-cex mode and get counter examples.
         (ret_code, output) = subprocess.getstatusoutput(
             "sketch -V 3 --debug-cex --bnd-inbits=" + str(bits_val) + " " +
             self.sketch_name + "_cexgen_iteration_" +
-            str(iter_cnt) + ".sk")
+            str(iter_cnt) + "_bits_" + str(bits_val) + ".sk")
         # Store the output of running sketch
         with open(self.sketch_name + "_cexgen_iteration_" +
                   str(iter_cnt) + "_output.txt", "w") as sketch_file:
