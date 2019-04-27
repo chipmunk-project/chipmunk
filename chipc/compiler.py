@@ -62,6 +62,8 @@ class Compiler:
         self.jinja2_env = Environment(
             loader=FileSystemLoader(
                 [path.join(path.dirname(__file__), './templates'),
+                 path.join(os.getcwd(),
+                           stateless_alu_file[:stateless_alu_file.rfind('/')]),
                  ".", "/"]),
             undefined=StrictUndefined,
             trim_blocks=True,
