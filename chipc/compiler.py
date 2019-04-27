@@ -273,6 +273,7 @@ class Compiler:
                         "--bnd-inbits=" + str(bits_val),
                         cex_sketch_filename,
                         "--beopt:writeSMT",
-                        cex_smt2_filename])
+                        cex_smt2_filename],
+                       stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
 
         return z3_utils.generate_counter_examples(cex_smt2_filename)
