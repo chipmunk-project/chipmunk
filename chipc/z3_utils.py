@@ -49,7 +49,7 @@ def generate_counter_examples(smt2_filename):
     new_formula = z3.Not(z3.substitute_vars(formula.body(), *variables))
 
     z3_slv = z3.Solver()
-    z3_slv.option(proof=True, unsat_core=True)
+    z3_slv.set(proof=True, unsat_core=True)
     z3_slv.add(new_formula)
 
     pkt_vars = {}
