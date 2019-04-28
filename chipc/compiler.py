@@ -267,8 +267,6 @@ class Compiler:
             sketch_file.write(cex_code)
 
         subprocess.run(["sketch",
-                        "-V 3",
-                        "--debug-cex",
                         "--slv-timeout=0.001",
                         "--bnd-inbits=" + str(bits_val),
                         cex_sketch_filename,

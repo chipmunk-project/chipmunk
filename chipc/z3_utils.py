@@ -57,7 +57,7 @@ def generate_counter_examples(smt2_filename):
 
     result = z3_slv.check()
     if result != z3.sat:
-        print("Failed to generate counter examples, z3 returned", result)
+        print("Failed to generate counterexamples, z3 returned", result)
         return (pkt_vars, state_vars)
 
     model = z3_slv.model()
