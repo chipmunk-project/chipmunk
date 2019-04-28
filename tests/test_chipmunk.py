@@ -12,7 +12,7 @@ from chipc.utils import get_hole_dicts
 
 BASE_PATH = path.abspath(path.dirname(__file__))
 DATA_DIR = path.join(BASE_PATH, "data/")
-ALU_DIR = path.join(BASE_PATH, "../example_alus/")
+STATEFUL_ALU_DIR = path.join(BASE_PATH, "../example_alus/")
 STATELESS_ALU_DIR = path.join(BASE_PATH, "../chipc/templates/")
 SPEC_DIR = path.join(BASE_PATH, "../example_specs/")
 TRANSFORM_DIR = path.join(BASE_PATH, "../example_transforms/")
@@ -23,14 +23,14 @@ class TestDirectSolver(unittest.TestCase):
 
     def test_codegen_with_simple_sketch_for_all_alus(self):
         alus = [
-            f for f in listdir(ALU_DIR) if path.isfile(path.join(ALU_DIR, f))
+            f for f in listdir(STATEFUL_ALU_DIR) if path.isfile(path.join(STATEFUL_ALU_DIR, f))
         ]
 
         for alu in alus:
             # TODO(taegyunkim): Instead of writing to the same success and
             # failure files, use different files for each ALU.
             compiler = Compiler(
-                path.join(SPEC_DIR, "simple.sk"), path.join(ALU_DIR, alu),
+                path.join(SPEC_DIR, "simple.sk"), path.join(STATEFUL_ALU_DIR, alu),
                 path.join(STATELESS_ALU_DIR, "stateless_alu.j2"), 2,
                 2, "simple", "serial")
             self.assertEqual(compiler.serial_codegen()[0], 0,
@@ -46,7 +46,7 @@ class TestDirectSolver(unittest.TestCase):
         with self.assertRaises(AssertionError):
             Compiler(
                 path.join(SPEC_DIR, spec_filename),
-                path.join(ALU_DIR, alu_filename),
+                path.join(STATEFUL_ALU_DIR, alu_filename),
                 path.join(STATELESS_ALU_DIR, "stateless_alu.j2"),
                 1, 0, "simple_raw_1_2", "serial")
 
@@ -56,7 +56,7 @@ class TestDirectSolver(unittest.TestCase):
 
         compiler = Compiler(
             path.join(SPEC_DIR, spec_filename), path.join(
-                ALU_DIR, alu_filename),
+                STATEFUL_ALU_DIR, alu_filename),
             path.join(STATELESS_ALU_DIR, "stateless_alu.j2"),
             2, 2, "simple_raw_2_2", "serial")
         (ret_code, _, _) = compiler.serial_codegen()
@@ -80,7 +80,7 @@ class TestDirectSolver(unittest.TestCase):
 
         compiler = Compiler(
             path.join(SPEC_DIR, spec_filename), path.join(
-                ALU_DIR, alu_filename),
+                STATEFUL_ALU_DIR, alu_filename),
             path.join(STATELESS_ALU_DIR, "stateless_alu.j2"),
             1, 2, "simple_raw_1_2", "serial")
         (ret_code, _, _) = compiler.serial_codegen()
@@ -95,7 +95,7 @@ class TestDirectSolver(unittest.TestCase):
         # Running in parallel mode to minimize test run time.
         compiler = Compiler(
             path.join(SPEC_DIR, spec_filename), path.join(
-                ALU_DIR, alu_filename),
+                STATEFUL_ALU_DIR, alu_filename),
             path.join(STATELESS_ALU_DIR, "stateless_alu.j2"),
             3, 3, "test_raw_3_3", "parallel")
         (ret_code, _, _) = compiler.serial_codegen()
@@ -106,7 +106,7 @@ class TestDirectSolver(unittest.TestCase):
 
         compiler = Compiler(
             path.join(SPEC_DIR, spec_filename), path.join(
-                ALU_DIR, alu_filename),
+                STATEFUL_ALU_DIR, alu_filename),
             path.join(STATELESS_ALU_DIR, "stateless_alu.j2"),
             4, 4, "test_raw_4_4", "parallel")
         (ret_code, _, _) = compiler.serial_codegen()
@@ -122,7 +122,7 @@ class OptverifyTest(unittest.TestCase):
 
         compiler = Compiler(
             path.join(SPEC_DIR, spec_filename), path.join(
-                ALU_DIR, alu_filename),
+                STATEFUL_ALU_DIR, alu_filename),
             path.join(STATELESS_ALU_DIR, "stateless_alu.j2"),
             1, 1, "sample1", "serial")
 
@@ -130,7 +130,7 @@ class OptverifyTest(unittest.TestCase):
 
         compiler = Compiler(
             path.join(SPEC_DIR, spec_filename), path.join(
-                ALU_DIR, alu_filename),
+                STATEFUL_ALU_DIR, alu_filename),
             path.join(STATELESS_ALU_DIR, "stateless_alu.j2"),
             1, 1, "sample2", "serial")
 
@@ -148,7 +148,7 @@ class IterativeSolverTest(unittest.TestCase):
             iterative_solver.main([
                 "iterative_solver",
                 path.join(SPEC_DIR, "simple.sk"),
-                path.join(ALU_DIR, "raw.stateful_alu"),
+                path.join(STATEFUL_ALU_DIR, "raw.stateful_alu"),
                 path.join(STATELESS_ALU_DIR, "stateless_alu.j2"),
                 "2", "2"]),
         )
@@ -158,7 +158,7 @@ class IterativeSolverTest(unittest.TestCase):
             0,
             iterative_solver.main([
                 "iterative_solver", path.join(SPEC_DIR, "simple.sk"),
-                path.join(ALU_DIR, "raw.stateful_alu"),
+                path.join(STATEFUL_ALU_DIR, "raw.stateful_alu"),
                 path.join(STATELESS_ALU_DIR, "stateless_alu.j2"),
                 "2", "2",
                 "--hole-elimination"]),
@@ -170,7 +170,7 @@ class IterativeSolverTest(unittest.TestCase):
             iterative_solver.main([
                 "iterative_solver",
                 path.join(SPEC_DIR, "sampling_revised.sk"),
-                path.join(ALU_DIR, "raw.stateful_alu"),
+                path.join(STATEFUL_ALU_DIR, "raw.stateful_alu"),
                 path.join(STATELESS_ALU_DIR, "stateless_alu.j2"),
                 "2", "2"]),
         )

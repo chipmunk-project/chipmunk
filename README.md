@@ -6,8 +6,9 @@
 - Install [antlr](https://www.antlr.org/)
 - Install [sketch](https://people.csail.mit.edu/asolar/sketch-1.7.5.tar.gz)
 - `pip3 install -r requirements-dev.txt -e . && pre-commit install` (if you want to make changes to
-  this repo), `pip3 install -e .` (if you wantt o simply use this.). Add sudo if
-  you want to install system wide.
+  this repo),
+- `pip3 install -e .` (if you want to simply use chipmunk.).
+- Add sudo if you want to install system wide.
 
 ## How to
 
