@@ -1,4 +1,5 @@
 import unittest
+from pathlib import Path
 from unittest.mock import patch
 
 import z3
@@ -42,13 +43,21 @@ class NegatedBodyTest(unittest.TestCase):
 
 
 class GenerateCounterExampleTest(unittest.TestCase):
-    def test_success(self):
+    def test_successs_with_mock(self):
         x = z3.Int('pkt_0_0_0_0')
         simple_formula = z3.ForAll([x], z3.And(x > 3, x < 2))
         with patch('z3.parse_smt2_file', return_value=[simple_formula]):
             pkt_fields, _ = z3_utils.generate_counter_examples(
                 "foobar")
             self.assertDictEqual(pkt_fields, {'pkt_0': 0})
+
+    def test_with_real_file(self):
+        test_filepath = Path(__file__).parent.joinpath(
+            './data/counterexample.smt2').resolve()
+        pkt_fields, state_vars = z3_utils.generate_counter_examples(
+            str(test_filepath))
+        self.assertDictEqual(pkt_fields, {'pkt_0': 0})
+        self.assertDictEqual(state_vars, {'state_group_0_state_0': 13})
 
     def test_unsat_formula(self):
         x = z3.Int('x')
