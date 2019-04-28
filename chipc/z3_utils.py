@@ -22,6 +22,17 @@ def parse_smt2_file(smt2_filename):
     return formulas[0]
 
 
+def negated_body(formula):
+    """Given a z3.QuantiferRef formula return negation of the body.
+
+    Returns:
+        A z3.BoolRef which is the negation of the formula body.
+    """
+    var_names = [formula.var_names(i) for i in range(formula.num_vars())]
+    vs = [z3.Int(n) for n in var_names]
+    return z3.Not(z3.substitute_vars(formula.body(), *reversed(vs)))
+
+
 def generate_counter_examples(smt2_filename):
     """Given a smt2 file that was generated from sketch, returns counterexample
     values for input packet fields and state group variables.
@@ -32,21 +43,7 @@ def generate_counter_examples(smt2_filename):
         state group variables.
     """
     formula = parse_smt2_file(smt2_filename)
-
-    # The formula is of form Forall(variables, Implies(A, B)). If the formula
-    # is unsatisfiable we want to get the value of counterexample. To do so, we
-    # need to negate the Implies part of the formula and strip off Forall. If
-    # we simply take the Implies part, it will contain free variables intead of
-    # named variables. We need to get the list of variables in the order they
-    # appear in the Implies part and substitute them.
-    var_names = [formula.var_name(i) for i in range(formula.num_vars())]
-    f_str = str(formula)
-    implies_str = f_str[f_str.index("Implies"):]
-    var_names.sort(key=lambda c: implies_str.index(c))
-
-    # Now declare variables and new formula only containing Implies part.
-    variables = [z3.Int(n) for n in var_names]
-    new_formula = z3.Not(z3.substitute_vars(formula.body(), *variables))
+    new_formula = negated_body(formula)
 
     z3_slv = z3.Solver()
     z3_slv.set(proof=True, unsat_core=True)
@@ -61,11 +58,11 @@ def generate_counter_examples(smt2_filename):
         return (pkt_vars, state_vars)
 
     model = z3_slv.model()
-    for var in variables:
+    for var in model.decls():
         # The variable names used by sketch have trailing _\d+_\d+_\d+ pattern,
         # need to remove them to get original variable names.
-        var_str = re.sub(r"_\d+_\d+_\d+$", "", str(var), count=1)
-        value = model.eval(var).as_long()
+        var_str = re.sub(r"_\d+_\d+_\d+$", "", var.name(), count=1)
+        value = model.get_interp(var).as_long()
         if var_str.startswith("pkt_"):
             pkt_vars[var_str] = value
         elif var_str.startswith("state_group_"):
