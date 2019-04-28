@@ -23,14 +23,16 @@ class TestDirectSolver(unittest.TestCase):
 
     def test_codegen_with_simple_sketch_for_all_alus(self):
         alus = [
-            f for f in listdir(STATEFUL_ALU_DIR) if path.isfile(path.join(STATEFUL_ALU_DIR, f))
+            f for f in listdir(STATEFUL_ALU_DIR)
+            if path.isfile(path.join(STATEFUL_ALU_DIR, f))
         ]
 
         for alu in alus:
             # TODO(taegyunkim): Instead of writing to the same success and
             # failure files, use different files for each ALU.
             compiler = Compiler(
-                path.join(SPEC_DIR, "simple.sk"), path.join(STATEFUL_ALU_DIR, alu),
+                path.join(SPEC_DIR, "simple.sk"), path.join(
+                    STATEFUL_ALU_DIR, alu),
                 path.join(STATELESS_ALU_DIR, "stateless_alu.j2"), 2,
                 2, "simple", "serial")
             self.assertEqual(compiler.serial_codegen()[0], 0,
