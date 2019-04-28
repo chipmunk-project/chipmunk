@@ -266,7 +266,11 @@ class Compiler:
         with open(cex_sketch_filename, "w") as sketch_file:
             sketch_file.write(cex_code)
 
+        # We only need following sketch call's side-effect, corresponding .smt2
+        # file for the sketch.
         subprocess.run(["sketch",
+                        # To immediately return from sketch, without running
+                        # its verification.
                         "--slv-timeout=0.001",
                         "--bnd-inbits=" + str(bits_val),
                         cex_sketch_filename,
