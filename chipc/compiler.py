@@ -8,7 +8,6 @@ from os import path
 from pathlib import Path
 
 import psutil
-import z3
 from jinja2 import Environment
 from jinja2 import FileSystemLoader
 from jinja2 import StrictUndefined
@@ -219,36 +218,35 @@ class Compiler:
             program_file=self.program_file,
             mode=Mode.SOL_VERIFY,
             hole_assignments=hole_assignments)
-        with open(self.sketch_name + "_sol_verify_iteration_" +
-                  str(iter_cnt) + ".sk", "w") as sketch_file:
+
+        sol_verify_sketch_filename = self.sketch_name + \
+            "_sol_verify_iteration_" + str(iter_cnt) + ".sk"
+        smt2_filename = self.sketch_name + \
+            "_sol_verify_iteration_" + str(iter_cnt) + ".smt2"
+        with open(sol_verify_sketch_filename, "w") as sketch_file:
             sketch_file.write(sol_verify_code)
 
-        # Set --slv-timeout=0.001 to quit sketch immediately, we only want the
-        # SMT file.
-        (ret_code, output) = subprocess.getstatusoutput(
-            "sketch -V 12 --slv-seed=1 --slv-timeout=0.001 " +
-            "--beopt:writeSMT " + self.sketch_name + "_iteration_" +
-            str(iter_cnt) + ".smt2 " +
-            self.sketch_name + "_sol_verify_iteration_" +
-            str(iter_cnt) + ".sk")
+        subprocess.run(
+            [
+                "sketch",
+                "--slv-seed=1"
+                # To quit sketch immediately, we only want the .smt2 file.
+                "--slv-timeout=0.001",
+                "--beopt:writeSMT",
+                smt2_filename,
+                sol_verify_sketch_filename
+            ],
+            stdout=subprocess.DEVNULL,
+            stderr=subprocess.DEVNULL
+        )
+        # (ret_code, output) = subprocess.getstatusoutput(
+        #     "sketch -V 12 --slv-seed=1 --slv-timeout=0.001 " +
+        #     "--beopt:writeSMT " + self.sketch_name + "_iteration_" +
+        #     str(iter_cnt) + ".smt2 " +
+        #     self.sketch_name + "_sol_verify_iteration_" +
+        #     str(iter_cnt) + ".sk")
 
-        z3_slv = z3.Solver()
-        # We expect there is only one assert from smt2 file.
-        formula = z3.parse_smt2_file(self.sketch_name + "_iteration_" +
-                                     str(iter_cnt) + ".smt2")[0]
-
-        variables = [z3.Int(formula.var_name(i))
-                     for i in range(0, formula.num_vars())]
-        # The original formula's body is comprised of
-        # Implies(A, B) where A is usually range of inputs and B is where a
-        # condition that must hold for the program. We only want to get the B.
-        body = formula.body().children()[1]
-
-        formula_without_bounds = z3.ForAll(variables, body)
-
-        z3_slv.add(formula_without_bounds)
-
-        if z3_slv.check() == z3.sat:
+        if z3_utils.check_without_bnds(smt2_filename):
             return 0
         return -1
 
