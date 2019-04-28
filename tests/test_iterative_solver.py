@@ -4,10 +4,9 @@ from os import path
 from chipc import iterative_solver
 
 BASE_PATH = path.abspath(path.dirname(__file__))
-DATA_DIR = path.join(BASE_PATH, "data/")
-ALU_DIR = path.join(BASE_PATH, "../example_alus/")
+STATEFUL_ALU_DIR = path.join(BASE_PATH, "../example_alus/")
+STATELESS_ALU_DIR = path.join(BASE_PATH, "../chipc/templates/")
 SPEC_DIR = path.join(BASE_PATH, "../example_specs/")
-TRANSFORM_DIR = path.join(BASE_PATH, "../example_transforms/")
 
 
 class IterativeSolverTest(unittest.TestCase):
@@ -17,7 +16,9 @@ class IterativeSolverTest(unittest.TestCase):
             iterative_solver.main([
                 "iterative_solver",
                 path.join(SPEC_DIR, "simple.sk"),
-                path.join(ALU_DIR, "raw.stateful_alu"), "2", "2"]),
+                path.join(STATEFUL_ALU_DIR, "raw.stateful_alu"),
+                path.join(STATELESS_ALU_DIR, "stateless_alu.j2"),
+                "2", "2"]),
         )
 
     def test_simple_2_2_raw_hole_elimination_mode(self):
@@ -25,7 +26,9 @@ class IterativeSolverTest(unittest.TestCase):
             0,
             iterative_solver.main([
                 "iterative_solver", path.join(SPEC_DIR, "simple.sk"),
-                path.join(ALU_DIR, "raw.stateful_alu"), "2", "2",
+                path.join(STATEFUL_ALU_DIR, "raw.stateful_alu"),
+                path.join(STATELESS_ALU_DIR, "stateless_alu.j2"),
+                "2", "2",
                 "--hole-elimination"]),
         )
 
@@ -35,7 +38,9 @@ class IterativeSolverTest(unittest.TestCase):
             iterative_solver.main([
                 "iterative_solver",
                 path.join(SPEC_DIR, "sampling_revised.sk"),
-                path.join(ALU_DIR, "raw.stateful_alu"), "2", "2"]),
+                path.join(STATEFUL_ALU_DIR, "raw.stateful_alu"),
+                path.join(STATELESS_ALU_DIR, "stateless_alu.j2"),
+                "2", "2"]),
         )
 
     def test_set_default_values(self):
