@@ -239,12 +239,6 @@ class Compiler:
             stdout=subprocess.DEVNULL,
             stderr=subprocess.DEVNULL
         )
-        # (ret_code, output) = subprocess.getstatusoutput(
-        #     "sketch -V 12 --slv-seed=1 --slv-timeout=0.001 " +
-        #     "--beopt:writeSMT " + self.sketch_name + "_iteration_" +
-        #     str(iter_cnt) + ".smt2 " +
-        #     self.sketch_name + "_sol_verify_iteration_" +
-        #     str(iter_cnt) + ".sk")
 
         if z3_utils.check_without_bnds(smt2_filename):
             return 0

@@ -76,12 +76,13 @@ def generate_counter_examples(smt2_filename):
 
 def check_without_bnds(smt2_filename):
     """Given a smt2 file generated from a sketch, parses assertion from the
-    file and checks whether it holds for all integers in z3.
+    file and checks whether it holds for all integers representable in z3.
 
     Returns:
         True if satisfiable else False.
     """
     formula = parse_smt2_file(smt2_filename)
+    print(formula)
 
     # The original formula's body is comprised of Implies(A, B) where A
     # specifies range of input variables and where B is a condition that we're
@@ -91,6 +92,7 @@ def check_without_bnds(smt2_filename):
     variables = [z3.Int(formula.var_name(i))
                  for i in range(formula.num_vars())]
     formula_without_bounds = z3.ForAll(variables, body)
+    print(formula_without_bounds)
 
     z3_slv = z3.Solver()
     z3_slv.add(formula_without_bounds)
