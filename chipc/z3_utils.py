@@ -49,26 +49,26 @@ def generate_counter_examples(smt2_filename):
     z3_slv.set(proof=True, unsat_core=True)
     z3_slv.add(new_formula)
 
-    pkt_vars = {}
+    pkt_fields = {}
     state_vars = {}
 
     result = z3_slv.check()
     if result != z3.sat:
         print("Failed to generate counterexamples, z3 returned", result)
-        return (pkt_vars, state_vars)
+        return (pkt_fields, state_vars)
 
     model = z3_slv.model()
     for var in model.decls():
         # The variable names used by sketch have trailing _\d+_\d+_\d+ pattern,
         # need to remove them to get original variable names.
-        var_str = re.sub(r"_\d+_\d+_\d+$", "", var.name(), count=1)
+        var_name = re.sub(r"_\d+_\d+_\d+$", "", var.name(), count=1)
         value = model.get_interp(var).as_long()
-        if var_str.startswith("pkt_"):
-            pkt_vars[var_str] = value
-        elif var_str.startswith("state_group_"):
-            state_vars[var_str] = value
+        if var_name.startswith("pkt_"):
+            pkt_fields[var_name] = value
+        elif var_name.startswith("state_group_"):
+            state_vars[var_name] = value
 
-    return (pkt_vars, state_vars)
+    return (pkt_fields, state_vars)
 
 
 def check_without_bnds(smt2_filename):
