@@ -219,12 +219,11 @@ class Compiler:
             mode=Mode.SOL_VERIFY,
             hole_assignments=hole_assignments)
 
-        sol_verify_sketch_filename = self.sketch_name + \
-            "_sol_verify_iteration_" + str(iter_cnt) + ".sk"
-        smt2_filename = self.sketch_name + \
-            "_sol_verify_iteration_" + str(iter_cnt) + ".smt2"
-        with open(sol_verify_sketch_filename, "w") as sketch_file:
-            sketch_file.write(sol_verify_code)
+        sol_verify_basename = self.sketch_name + \
+            "_sol_verify_iteration_" + str(iter_cnt)
+        sketch_filename = sol_verify_basename + ".sk"
+        smt2_filename = sol_verify_basename + ".smt2"
+        Path(sketch_filename).write_text(sol_verify_code)
 
         subprocess.run(
             [
@@ -234,7 +233,7 @@ class Compiler:
                 "--slv-timeout=0.001",
                 "--beopt:writeSMT",
                 smt2_filename,
-                sol_verify_sketch_filename
+                sketch_filename
             ],
             stdout=subprocess.DEVNULL,
             stderr=subprocess.DEVNULL
@@ -251,23 +250,28 @@ class Compiler:
             mode=Mode.CEXGEN,
             hole_assignments=hole_assignments,
             input_offset=2**bits_val)
-        cex_filename = self.sketch_name + "_cexgen_iteration_" + \
+
+        cex_basename = self.sketch_name + "_cexgen_iteration_" + \
             str(iter_cnt) + "_bits_" + str(bits_val)
-        cex_sketch_filename = cex_filename + ".sk"
-        cex_smt2_filename = cex_filename + ".smt2"
-        with open(cex_sketch_filename, "w") as sketch_file:
-            sketch_file.write(cex_code)
+        sketch_filename = cex_basename + ".sk"
+        smt2_filename = cex_basename + ".smt2"
+        Path(sketch_filename).write_text(cex_code)
 
         # We only need following sketch call's side-effect, corresponding .smt2
         # file for the sketch.
-        subprocess.run(["sketch",
-                        # To immediately return from sketch, without running
-                        # its verification.
-                        "--slv-timeout=0.001",
-                        "--bnd-inbits=" + str(bits_val),
-                        cex_sketch_filename,
-                        "--beopt:writeSMT",
-                        cex_smt2_filename],
-                       stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+        subprocess.run(
+            [
+                "sketch",
+                # To immediately return from sketch, without running
+                # its verification.
+                "--slv-timeout=0.001",
+                "--bnd-inbits=" + str(bits_val),
+                "--beopt:writeSMT",
+                smt2_filename,
+                sketch_filename,
+            ],
+            stdout=subprocess.DEVNULL,
+            stderr=subprocess.DEVNULL
+        )
 
-        return z3_utils.generate_counter_examples(cex_smt2_filename)
+        return z3_utils.generate_counter_examples(smt2_filename)
