@@ -28,7 +28,7 @@ def negated_body(formula):
     Returns:
         A z3.BoolRef which is the negation of the formula body.
     """
-    var_names = [formula.var_names(i) for i in range(formula.num_vars())]
+    var_names = [formula.var_name(i) for i in range(formula.num_vars())]
     vs = [z3.Int(n) for n in var_names]
     return z3.Not(z3.substitute_vars(formula.body(), *reversed(vs)))
 
