@@ -38,6 +38,20 @@ class IterativeSolverTest(unittest.TestCase):
                 path.join(ALU_DIR, "raw.stateful_alu"), "2", "2"]),
         )
 
+    def test_set_default_values(self):
+        num_fields_in_prog = 2
+        state_group_info = [['0', '0'], ['0', '1']]
+
+        pkt_fields = {'pkt_1': 1}
+        state_vars = {'state_group_0_state_0': 2}
+
+        pkt_fields, state_vars = iterative_solver.set_default_values(
+            pkt_fields, state_vars, num_fields_in_prog, state_group_info)
+
+        self.assertDictEqual(pkt_fields, {'pkt_0': 0, 'pkt_1': 1})
+        self.assertDictEqual(state_vars, {'state_group_0_state_0': 2,
+                                          'state_group_0_state_1': 0})
+
 
 if __name__ == '__main__':
     unittest.main()

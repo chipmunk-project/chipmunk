@@ -20,10 +20,28 @@ def generate_hole_elimination_assert(hole_assignments):
     return [hole_elimination_string]
 
 
-# Create multiple counterexamples in the range from 2 bits to 10 bits.
+def set_default_values(pkt_fields, state_vars, num_fields_in_prog,
+                       state_group_info):
+    """Check if all packet fields and state variables exist in counterexample
+    dictionaries, pkt_fields and state_vars. If not, set those missing to 0
+    since they don't really matter.
+    """
+    for i in range(int(num_fields_in_prog)):
+        field_name = "pkt_" + str(i)
+        if field_name not in pkt_fields:
+            pkt_fields[field_name] = 0
+    for i in range(len(state_group_info)):
+        state_var_name = "state_group_" + \
+            state_group_info[i][0] + "_state_" + state_group_info[i][1]
+        if state_var_name not in state_vars:
+            state_vars[state_var_name] = 0
+    return (pkt_fields, state_vars)
+
+
 def generate_additional_testcases(hole_assignments, compiler,
                                   num_fields_in_prog, num_state_groups,
                                   state_group_info, count):
+    """Creates multiple counterexamples from 2 bits to 10 bit input ranges."""
     counter_example_definition = ""
     counter_example_assert = ""
     for bits in range(2, 10):
@@ -31,18 +49,8 @@ def generate_additional_testcases(hole_assignments, compiler,
         (pkt_fields, state_vars) = compiler.counter_example_generator(
             bits, hole_assignments, iter_cnt=count)
 
-        # Check if all packet fields and state variables exist in returned
-        # counterexamples dictionary. If not, set those to 0 since they don't
-        # matter.
-        for i in range(int(num_fields_in_prog)):
-            field_name = "pkt_" + str(i)
-            if field_name not in pkt_fields:
-                pkt_fields[field_name] = 0
-        for i in range(len(state_group_info)):
-            state_var_name = "state_group_" + \
-                state_group_info[i][0] + "_state_" + state_group_info[i][1]
-            if state_var_name not in state_vars:
-                state_vars[state_var_name] = 0
+        pkt_fields, state_vars = set_default_values(
+            pkt_fields, state_vars, num_fields_in_prog, state_group_info)
 
         counter_example_definition += "|StateAndPacket| x_" + str(
             count) + "_" + str(bits) + " = |StateAndPacket|(\n"
