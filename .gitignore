@@ -3,11 +3,7 @@ __pycache__
 *.pickle
 *.success
 *.errors
-*_codegen.sk
-*_cexgen.sk
-*_sol_verify.sk
-*_optverify.sk
-*_verifier.sk
+*.sk
 *.class
 *.java
 *.interp
@@ -18,5 +14,6 @@ __pycache__
 *Listener.py
 *.egg-info
 *.smt2
+*_output.txt
 
 !tests/data/*.sk
