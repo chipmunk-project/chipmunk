@@ -15,5 +15,6 @@ __pycache__
 *.egg-info
 *.smt2
 *_output.txt
+.vscode/
 
 !tests/data/*.sk
