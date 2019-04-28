@@ -80,8 +80,8 @@ class StripInputBoundsTest(unittest.TestCase):
         a = z3.Int('a')
         input_formula = z3.ForAll([a], z3.Implies(a > 0, a == 0))
         expected_formula = z3.ForAll([a], a == 0)
-        self.assetEquals(expected_formula,
-                         z3_utils.strip_input_bounds(input_formula))
+        self.assertEquals(expected_formula,
+                          z3_utils.strip_input_bounds(input_formula))
 
 
 class CheckWithoutBndsTest(unittest.TestCase):
