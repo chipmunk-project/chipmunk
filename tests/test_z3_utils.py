@@ -8,14 +8,18 @@ from chipc import z3_utils
 
 
 class ParseSmt2FileTest(unittest.TestCase):
-    @patch('z3.parse_smt2_file', return_value=['1', '2'])
+    @patch('z3.parse_smt2_file', return_value=['1'])
     def test_success(self, mock_z3_parse_smt2_file):
         self.assertEqual('1', z3_utils.parse_smt2_file('foo'))
 
-    @patch('z3.parse_smt2_file', return_value=[])
-    def test_raise_assert_for_empty_file(self, mock_z3_parse_smt2_file):
-        with self.assertRaisesRegex(AssertionError, "doesn't contain"):
-            z3_utils.parse_smt2_file('bar')
+    def test_raise_assert_for_unexpected_inputs(self):
+        with patch('z3.parse_smt2_file', return_value=[]):
+            with self.assertRaisesRegex(AssertionError,
+                                        '0 or more than 1 asserts'):
+                z3_utils.parse_smt2_file('bar')
+        with patch('z3.parse_smt2_file', return_value=['1', '2']):
+            with self.assertRaises(AssertionError):
+                z3_utils.parse_smt2_file('baz')
 
 
 class NegatedBodyTest(unittest.TestCase):
