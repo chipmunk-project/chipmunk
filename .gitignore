@@ -4,6 +4,7 @@ __pycache__
 *.success
 *.errors
 *.sk
+!example_specs/*.sk
 *.class
 *.java
 *.interp
