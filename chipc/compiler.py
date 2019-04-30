@@ -113,8 +113,7 @@ class Compiler:
                 'time sketch -V 12 --slv-seed=1 --bnd-inbits=2 ' +
                 sketch_file_name)
         # Avoid syntax error in sketch
-        assert(output.rfind('[SKETCH] DONE') != -1 or
-               output.rfind('UNSATISFIABLE ASSERTION') != -1)
+        assert(output.rfind('Program Parse Error:') == -1)
         # Store sketch output
         with open(sketch_file_name[:sketch_file_name.find('.sk')] +
                   '_output.txt', 'w') as output_file:

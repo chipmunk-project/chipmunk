@@ -67,8 +67,7 @@ def optverify(sketch1_name, sketch2_name, transform_file):
     # Call sketch on it
     (ret_code,
      output) = subprocess.getstatusoutput('time sketch -V 12 ' + verifier_file)
-    assert(output.rfind('[SKETCH] DONE') != -1 or
-           output.rfind('UNSATISFIABLE ASSERTION') != -1)
+    assert(output.rfind('Program Parse Error:') == -1)
     if ret_code != 0:
         errors_file = open(verifier_file + '.errors', 'w')
         errors_file.write(output)
