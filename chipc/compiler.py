@@ -29,10 +29,10 @@ def kill_child_processes(parent_pid, sig=signal.SIGTERM):
     for process in children:
         try:
             process.send_signal(sig)
-            print("send_signal killed a child process", process)
+            print('send_signal killed a child process', process)
         except psutil.NoSuchProcess as e:
             print("send_signal didn't have any effect because process didn't"
-                  "exist")
+                  'exist')
             print(e)
 
 
@@ -53,8 +53,8 @@ class Compiler:
              Path(program_file).read_text())
 
         assert self.num_fields_in_prog <= num_alus_per_stage, (
-            "Number of fields in program %d is greater than number of "
-            "alus per stage %d. Try increasing number of alus per stage." % (
+            'Number of fields in program %d is greater than number of '
+            'alus per stage %d. Try increasing number of alus per stage.' % (
                 self.num_fields_in_prog, num_alus_per_stage))
 
         # Initialize jinja2 environment for templates
@@ -63,7 +63,7 @@ class Compiler:
                 [path.join(path.dirname(__file__), './templates'),
                  path.join(os.getcwd(),
                            stateless_alu_file[:stateless_alu_file.rfind('/')]),
-                 ".", "/"]),
+                 '.', '/']),
             undefined=StrictUndefined,
             trim_blocks=True,
             lstrip_blocks=True)
@@ -97,24 +97,27 @@ class Compiler:
             additional_testcases=additional_testcases)
 
         # Create file and write sketch_harness into it.
-        with open(sketch_file_name, "w") as sketch_file:
+        with open(sketch_file_name, 'w') as sketch_file:
             sketch_file.write(codegen_code)
 
         # Call sketch on it
-        print("Total number of hole bits is",
+        print('Total number of hole bits is',
               self.sketch_generator.total_hole_bits_)
-        print("Sketch file is ", sketch_file_name)
-        if self.parallel_or_serial == "parallel":
+        print('Sketch file is ', sketch_file_name)
+        if self.parallel_or_serial == 'parallel':
             (ret_code, output) = subprocess.getstatusoutput(
-                "time sketch -V 12 --slv-seed=1 --slv-parallel " +
-                "--bnd-inbits=2 " + sketch_file_name)
+                'time sketch -V 12 --slv-seed=1 --slv-parallel ' +
+                '--bnd-inbits=2 ' + sketch_file_name)
         else:
             (ret_code, output) = subprocess.getstatusoutput(
-                "time sketch -V 12 --slv-seed=1 --bnd-inbits=2 " +
+                'time sketch -V 12 --slv-seed=1 --bnd-inbits=2 ' +
                 sketch_file_name)
+        # Avoid syntax error in sketch
+        assert(output.rfind('[SKETCH] DONE') != -1 or
+               output.rfind('UNSATISFIABLE ASSERTION') != -1)
         # Store sketch output
-        with open(sketch_file_name[:sketch_file_name.find(".sk")] +
-                  "_output.txt", 'w') as output_file:
+        with open(sketch_file_name[:sketch_file_name.find('.sk')] +
+                  '_output.txt', 'w') as output_file:
             output_file.write(output)
         if (ret_code == 0):
             holes_to_values = get_hole_value_assignments(
@@ -124,16 +127,16 @@ class Compiler:
         return (ret_code, output, holes_to_values)
 
     def serial_codegen(self, iter_cnt=1, additional_constraints=[],
-                       additional_testcases=""):
+                       additional_testcases=''):
         return self.single_codegen_run((additional_constraints,
                                         additional_testcases,
                                         self.sketch_name +
-                                        "_codegen_iteration_" +
-                                        str(iter_cnt) + ".sk"))
+                                        '_codegen_iteration_' +
+                                        str(iter_cnt) + '.sk'))
 
     def parallel_codegen(self,
                          additional_constraints=[],
-                         additional_testcases=""):
+                         additional_testcases=''):
         # For each state_group, pick a pipeline_stage exhaustively.
         # Note that some of these assignments might be infeasible, but that's
         # OK. Sketch will reject these anyway.
@@ -145,23 +148,23 @@ class Compiler:
                 repeat=self.num_state_groups):
             constraint_list = additional_constraints.copy()
             count = count + 1
-            print("Now in assignment # ", count, " assignment is ", assignment)
+            print('Now in assignment # ', count, ' assignment is ', assignment)
             for state_group in range(self.num_state_groups):
                 assigned_stage = assignment[state_group]
                 for stage in range(self.num_pipeline_stages):
                     if (stage == assigned_stage):
                         constraint_list += [
-                            self.sketch_name + "_salu_config_" +
-                            str(stage) + "_" + str(state_group) + " == 1"
+                            self.sketch_name + '_salu_config_' +
+                            str(stage) + '_' + str(state_group) + ' == 1'
                         ]
                     else:
                         constraint_list += [
-                            self.sketch_name + "_salu_config_" +
-                            str(stage) + "_" + str(state_group) + " == 0"
+                            self.sketch_name + '_salu_config_' +
+                            str(stage) + '_' + str(state_group) + ' == 0'
                         ]
             compiler_inputs += [
                 (constraint_list, additional_testcases,
-                 self.sketch_name + "_" + str(count) + "_codegen.sk")
+                 self.sketch_name + '_' + str(count) + '_codegen.sk')
             ]
 
         with cf.ProcessPoolExecutor(max_workers=count) as executor:
@@ -173,13 +176,13 @@ class Compiler:
             for f in cf.as_completed(futures):
                 compiler_output = f.result()
                 if (compiler_output[0] == 0):
-                    print("Success")
+                    print('Success')
                     # TODO: Figure out the right way to do this in the future.
                     executor.shutdown(wait=False)
                     kill_child_processes(os.getpid())
                     return compiler_output
                 else:
-                    print("One run failed, waiting for others.")
+                    print('One run failed, waiting for others.')
         return compiler_output
 
     def optverify(self):
@@ -190,13 +193,13 @@ class Compiler:
             additional_constraints=[])
 
         # Create file and write sketch_function into it
-        with open(self.sketch_name + "_optverify.sk", "w") as sketch_file:
+        with open(self.sketch_name + '_optverify.sk', 'w') as sketch_file:
             sketch_file.write(optverify_code)
-            print("Sketch file is ", sketch_file.name)
+            print('Sketch file is ', sketch_file.name)
 
         # Put the rest (holes, hole arguments, constraints, etc.) into a
         # .pickle file.
-        with open(self.sketch_name + ".pickle", "wb") as pickle_file:
+        with open(self.sketch_name + '.pickle', 'wb') as pickle_file:
             pickle.dump(
                 ChipmunkPickle(
                     holes=self.sketch_generator.holes_,
@@ -206,9 +209,9 @@ class Compiler:
                     num_state_groups=self.num_state_groups,
                     num_state_slots=self.sketch_generator.num_state_slots_),
                 pickle_file)
-            print("Pickle file is ", pickle_file.name)
+            print('Pickle file is ', pickle_file.name)
 
-        print("Total number of hole bits is",
+        print('Total number of hole bits is',
               self.sketch_generator.total_hole_bits_)
 
     def sol_verify(self, hole_assignments, iter_cnt=1):
@@ -225,18 +228,18 @@ class Compiler:
             hole_assignments=hole_assignments)
 
         sol_verify_basename = self.sketch_name + \
-            "_sol_verify_iteration_" + str(iter_cnt)
-        sketch_filename = sol_verify_basename + ".sk"
-        smt2_filename = sol_verify_basename + ".smt2"
+            '_sol_verify_iteration_' + str(iter_cnt)
+        sketch_filename = sol_verify_basename + '.sk'
+        smt2_filename = sol_verify_basename + '.smt2'
         Path(sketch_filename).write_text(sol_verify_code)
 
         subprocess.run(
             [
-                "sketch",
-                "--slv-seed=1"
+                'sketch',
+                '--slv-seed=1'
                 # To quit sketch immediately, we only want the .smt2 file.
-                "--slv-timeout=0.001",
-                "--beopt:writeSMT",
+                '--slv-timeout=0.001',
+                '--beopt:writeSMT',
                 smt2_filename,
                 sketch_filename
             ],
@@ -256,22 +259,22 @@ class Compiler:
             hole_assignments=hole_assignments,
             input_offset=2**bits_val)
 
-        cex_basename = self.sketch_name + "_cexgen_iteration_" + \
-            str(iter_cnt) + "_bits_" + str(bits_val)
-        sketch_filename = cex_basename + ".sk"
-        smt2_filename = cex_basename + ".smt2"
+        cex_basename = self.sketch_name + '_cexgen_iteration_' + \
+            str(iter_cnt) + '_bits_' + str(bits_val)
+        sketch_filename = cex_basename + '.sk'
+        smt2_filename = cex_basename + '.smt2'
         Path(sketch_filename).write_text(cex_code)
 
         # We only need following sketch call's side-effect, corresponding .smt2
         # file for the sketch.
         subprocess.run(
             [
-                "sketch",
+                'sketch',
                 # To immediately return from sketch, without running
                 # its verification.
-                "--slv-timeout=0.001",
-                "--bnd-inbits=" + str(bits_val),
-                "--beopt:writeSMT",
+                '--slv-timeout=0.001',
+                '--bnd-inbits=' + str(bits_val),
+                '--beopt:writeSMT',
                 smt2_filename,
                 sketch_filename,
             ],
