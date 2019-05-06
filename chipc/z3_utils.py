@@ -76,7 +76,7 @@ def generate_counter_examples(smt2_filename):
 
 def simple_check(smt2_filename):
     """Given a smt2 file generated from a sketch, parses assertion from the
-    file and checks whether it holds for all integers representable in z3.
+    file and checks whether it holds for specific range representable in z3.
 
     Returns:
         True if satisfiable else False.
@@ -84,8 +84,8 @@ def simple_check(smt2_filename):
     formula = parse_smt2_file(smt2_filename)
 
     # The original formula's body is comprised of Implies(A, B) where A
-    # specifies range of input variables and where B is a condition that we're
-    # interested to check. We only want to get the B.
+    # specifies range of input variables and where B is a condition. We're
+    # interested to check whether B is True within the range specified by A
 
     z3_slv = z3.Solver()
     z3_slv.add(formula)
