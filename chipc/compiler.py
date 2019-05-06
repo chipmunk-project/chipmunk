@@ -235,8 +235,9 @@ class Compiler:
         subprocess.run(
             [
                 'sketch',
-                '--slv-seed=1'
+                '--slv-seed=1',
                 # To quit sketch immediately, we only want the .smt2 file.
+                '--bnd-inbits=10',
                 '--slv-timeout=0.001',
                 '--beopt:writeSMT',
                 smt2_filename,

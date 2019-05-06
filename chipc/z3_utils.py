@@ -105,9 +105,10 @@ def check_without_bnds(smt2_filename):
     # The original formula's body is comprised of Implies(A, B) where A
     # specifies range of input variables and where B is a condition that we're
     # interested to check. We only want to get the B.
-    formula_without_bounds = strip_input_bounds(formula)
+    # formula_without_bounds = strip_input_bounds(formula)
 
     z3_slv = z3.Solver()
-    z3_slv.add(formula_without_bounds)
+    # z3_slv.add(formula_without_bounds)
+    z3_slv.add(formula)
 
     return z3_slv.check() == z3.sat
