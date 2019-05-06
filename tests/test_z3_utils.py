@@ -77,4 +77,4 @@ class CheckWithZ3Test(unittest.TestCase):
         a = z3.Int('a')
         input_formula = z3.ForAll([a], z3.Implies(a > 0, a + 1 > a))
         with patch('z3.parse_smt2_file', return_value=[input_formula]):
-            self.assertTrue(z3_utils.check_with_z3('foobar'))
+            self.assertTrue(z3_utils.simple_check('foobar'))
