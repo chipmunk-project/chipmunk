@@ -74,7 +74,7 @@ def generate_counter_examples(smt2_filename):
     return (pkt_fields, state_vars)
 
 
-def check_without_bnds(smt2_filename):
+def check_with_z3(smt2_filename):
     """Given a smt2 file generated from a sketch, parses assertion from the
     file and checks whether it holds for all integers representable in z3.
 
