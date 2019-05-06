@@ -74,25 +74,6 @@ def generate_counter_examples(smt2_filename):
     return (pkt_fields, state_vars)
 
 
-def strip_input_bounds(formula):
-    """Given a z3.QuantiferRef(variables, z3.Implies(a, b)) returns
-    z3.QuantifierRef(variables, b)
-
-    Raises:
-        Assertion if the formula isn't a z3.QuantifierRef nor does have a
-        z3.Implies as a body.
-    """
-    assert z3.is_quantifier(
-        formula), ('Formula is not a quantifier:\n', formula)
-    variables = [z3.Int(formula.var_name(i))
-                 for i in range(formula.num_vars())]
-    body = formula.body()
-    assert z3.is_implies(
-        body), ("Given formula doesn't have z3.Implies as body:\n", body)
-    new_body = formula.body().children()[1]
-    return z3.ForAll(variables, new_body)
-
-
 def check_without_bnds(smt2_filename):
     """Given a smt2 file generated from a sketch, parses assertion from the
     file and checks whether it holds for all integers representable in z3.

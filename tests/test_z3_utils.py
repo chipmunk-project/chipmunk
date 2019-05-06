@@ -72,22 +72,6 @@ class GenerateCounterExampleTest(unittest.TestCase):
             self.assertDictEqual(state_vars, {})
 
 
-class StripInputBoundsTest(unittest.TestCase):
-    def test_raise_asserts_for_invalid_formulas(self):
-        a = z3.Int('a')
-        with self.assertRaisesRegex(AssertionError, 'not a quantifier'):
-            z3_utils.strip_input_bounds(a)
-        with self.assertRaisesRegex(AssertionError, "doesn't have z3.Implies"):
-            z3_utils.strip_input_bounds(z3.ForAll([a], a == a))
-
-    def test_success(self):
-        a = z3.Int('a')
-        input_formula = z3.ForAll([a], z3.Implies(a > 0, a == 0))
-        expected_formula = z3.ForAll([a], a == 0)
-        self.assertEqual(expected_formula,
-                         z3_utils.strip_input_bounds(input_formula))
-
-
 class CheckWithoutBndsTest(unittest.TestCase):
     def test_success(self):
         a = z3.Int('a')
