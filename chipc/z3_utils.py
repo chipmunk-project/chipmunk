@@ -77,7 +77,7 @@ def generate_counter_examples(smt2_filename):
 def simple_check(smt2_filename):
     """Given a smt2 file generated from a sketch, parses assertion from the
     file and checks with z3. We assume that the file already has input bit
-    ranges defined by sketch. 
+    ranges defined by sketch.
 
     Returns:
         True if satisfiable else False.
