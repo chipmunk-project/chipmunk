@@ -72,7 +72,7 @@ class GenerateCounterExampleTest(unittest.TestCase):
             self.assertDictEqual(state_vars, {})
 
 
-class CheckWithZ3Test(unittest.TestCase):
+class SimpleCheckTest(unittest.TestCase):
     def test_success(self):
         a = z3.Int('a')
         input_formula = z3.ForAll([a], z3.Implies(a > 0, a + 1 > a))
