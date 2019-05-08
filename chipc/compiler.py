@@ -227,8 +227,6 @@ class Compiler:
         sketch_filename = sol_verify_basename + '.sk'
         smt2_filename = sol_verify_basename + '.smt2'
         Path(sketch_filename).write_text(sol_verify_code)
-        # TODO: set the sol_verify bit to be 10 now
-        # Later will pass this value as a parameter
         sketch_utils.generate_smt2_formula(
             sketch_filename, smt2_filename, sol_verify_bit)
 
