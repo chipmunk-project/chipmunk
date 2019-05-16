@@ -104,11 +104,12 @@ class Compiler:
         print('Total number of hole bits is',
               self.sketch_generator.total_hole_bits_)
         print('Sketch file is ', sketch_file_name)
-        assert (self.parallel_sketch  in [True, False])
-        (ret_code, output) = sketch_utils.synthesize(sketch_file_name,
-                                                     bnd_inbits=2,
-                                                     slv_seed=1,
-                                                     slv_parallel=self.parallel_sketch)
+        assert (self.parallel_sketch in [True, False])
+        (ret_code, output) = sketch_utils.synthesize(
+            sketch_file_name,
+            bnd_inbits=2,
+            slv_seed=1,
+            slv_parallel=self.parallel_sketch)
 
         # Store sketch output
         with open(sketch_file_name[:sketch_file_name.find('.sk')] +

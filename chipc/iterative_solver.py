@@ -104,7 +104,8 @@ def main(argv):
         action='store_const',
         const='parallel_codegen',
         default='serial_codegen',
-        help='Whether to run multiple smaller sketches in parallel by setting salu_config variables explicitly.')
+        help='Whether to run multiple smaller sketches in parallel by\
+              setting salu_config variables explicitly.')
     parser.add_argument(
         '--parallel-sketch',
         action='store_true',
