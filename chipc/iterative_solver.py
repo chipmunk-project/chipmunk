@@ -101,9 +101,7 @@ def main(argv):
     parser.add_argument(
         '-p',
         '--parallel',
-        action='store_const',
-        const='parallel_codegen',
-        default='serial_codegen',
+        action='store_true',
         help='Whether to run multiple smaller sketches in parallel by\
               setting salu_config variables explicitly.')
     parser.add_argument(
@@ -151,23 +149,23 @@ def main(argv):
     sol_verify_bit = args.max_input_bit
     while 1:
         if args.hole_elimination == 'hole_elimination_mode':
-            (synthesis_ret_code, output, hole_assignments) = \
+            (synthesis_ret_code, _, hole_assignments) = \
+                compiler.parallel_codegen(
+                    additional_constraints=hole_elimination_assert) \
+                if args.parallel else \
                 compiler.serial_codegen(
                 iter_cnt=count,
-                additional_constraints=hole_elimination_assert) \
-                if args.parallel == 'serial_codegen' else \
-                compiler.parallel_codegen(
-                    additional_constraints=hole_elimination_assert)
+                additional_constraints=hole_elimination_assert)
 
         else:
             assert (args.hole_elimination == 'cex_mode')
-            (synthesis_ret_code, output, hole_assignments) = \
+            (synthesis_ret_code, _, hole_assignments) = \
+                compiler.parallel_codegen(
+                    additional_testcases=additional_testcases) \
+                if args.parallel else \
                 compiler.serial_codegen(
                 iter_cnt=count,
-                additional_testcases=additional_testcases) \
-                if args.parallel == 'serial_codegen' else \
-                compiler.parallel_codegen(
-                    additional_testcases=additional_testcases)
+                additional_testcases=additional_testcases)
 
         print('Iteration #' + str(count))
         if synthesis_ret_code == 0:
