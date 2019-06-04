@@ -51,7 +51,7 @@ class IterativeSolverTest(unittest.TestCase):
                 path.join(SPEC_DIR, 'blue_decrease.sk'),
                 path.join(STATEFUL_ALU_DIR, 'sub.stateful_alu'),
                 path.join(STATELESS_ALU_DIR, 'stateless_alu.j2'),
-                '4', '3', '10']),
+                '4', '3', '10', '--parallel']),
         )
 
     def test_marple_tcp_nmo_3_2_pred_raw_cex_mode(self):
