@@ -47,7 +47,7 @@ def generate_additional_testcases(hole_assignments, compiler,
     to sol_verify_bit input ranges."""
     counter_example_definition = ''
     counter_example_assert = ''
-    for bits in range(2, sol_verify_bit):
+    for bits in range(2, sol_verify_bit + 1):
         print('Generating counterexamples of', str(bits), 'bits.')
         (cex_pkt_fields, cex_state_vars) = compiler.counter_example_generator(
             bits, hole_assignments, iter_cnt=count)
@@ -60,11 +60,11 @@ def generate_additional_testcases(hole_assignments, compiler,
             count) + '_' + str(bits) + ' = |StateAndPacket|(\n'
         for field_name, value in pkt_fields.items():
             counter_example_definition += field_name + ' = ' + str(
-                value + 2**bits) + ',\n'
+                value + 2**(bits-1)) + ',\n'
 
         for i, (state_var_name, value) in enumerate(state_vars.items()):
             counter_example_definition += state_var_name + ' = ' + str(
-                value + 2**bits)
+                value + 2**(bits-1))
             if i < len(state_vars) - 1:
                 counter_example_definition += ',\n'
             else:
