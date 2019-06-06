@@ -18,6 +18,11 @@ class GenerateHoleEliminationTest(unittest.TestCase):
             ['!((a == 1) && (b == 2) && 1)']
         )
 
+    def test_handle_empty_assignments(self):
+        self.assertListEqual(
+            generate_hole_elimination_assert({}), []
+        )
+
 
 class IterativeSolverTest(unittest.TestCase):
     def test_sampling_2_1_if_else_raw_cex_mode(self):
