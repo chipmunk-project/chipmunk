@@ -15,7 +15,7 @@ class GenerateHoleEliminationTest(unittest.TestCase):
         hole_assignments = {'a': '1', 'b': '2'}
         self.assertListEqual(
             generate_hole_elimination_assert(hole_assignments),
-            ['!((a == 1) && (b == 2) && 1)']
+            ['!((a == 1) && (b == 2))']
         )
 
     def test_handle_empty_assignments(self):
