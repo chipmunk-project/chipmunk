@@ -146,25 +146,17 @@ def main(argv):
     additional_testcases = ''
     sol_verify_bit = args.max_input_bit
     while 1:
-        if args.hole_elimination:
-            (synthesis_ret_code, _, hole_assignments) = \
-                compiler.parallel_codegen(
-                    additional_constraints=hole_elimination_assert) \
-                if args.parallel else \
-                compiler.serial_codegen(
-                iter_cnt=count,
-                additional_constraints=hole_elimination_assert)
-
-        else:
-            (synthesis_ret_code, _, hole_assignments) = \
-                compiler.parallel_codegen(
-                    additional_testcases=additional_testcases) \
-                if args.parallel else \
-                compiler.serial_codegen(
-                iter_cnt=count,
-                additional_testcases=additional_testcases)
-
         print('Iteration #' + str(count))
+        (synthesis_ret_code, _, hole_assignments) = \
+            compiler.parallel_codegen(
+                additional_constraints=hole_elimination_assert,
+                additional_testcases=additional_testcases) \
+            if args.parallel else \
+            compiler.serial_codegen(
+            iter_cnt=count,
+            additional_constraints=hole_elimination_assert,
+            additional_testcases=additional_testcases)
+
         if synthesis_ret_code == 0:
             print('Synthesis succeeded with 2 bits, proceeding to '
                   'verification.')
