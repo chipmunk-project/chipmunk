@@ -12,10 +12,10 @@ SPEC_DIR = path.join(BASE_PATH, '../example_specs/')
 
 class GenerateHoleEliminationTest(unittest.TestCase):
     def test_success(self):
-        hole_assignments = {'a': '1', 'b': '2'}
+        hole_assignments = {'c': '3', 'a': '1', 'b': '2'}
         self.assertListEqual(
             generate_hole_elimination_assert(hole_assignments),
-            ['!((a == 1) && (b == 2))']
+            ['!((a == 1) && (b == 2) && (c == 3))']
         )
 
     def test_handle_empty_assignments(self):
