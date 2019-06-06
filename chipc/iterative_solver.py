@@ -13,10 +13,10 @@ from chipc.utils import get_state_group_info
 # i.e., {'sample1_stateless_alu_0_0_mux1_ctrl': '0'}
 def generate_hole_elimination_assert(hole_assignments):
     # The ! is to ensure a hole combination isn't present.
-    hole_elimination_string = '!'
-    for hole, value in hole_assignments.items():
+    hole_elimination_string = '!('
+    for hole, value in sorted(hole_assignments.items(), key=lambda x: x[0]):
         hole_elimination_string += '(' + hole + ' == ' + value + ') && '
-    hole_elimination_string += '1'
+    hole_elimination_string += '1)'
     return [hole_elimination_string]
 
 
