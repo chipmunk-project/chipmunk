@@ -110,14 +110,13 @@ def main(argv):
         help='Whether sketch process internally uses parallelism')
     parser.add_argument(
         '--hole-elimination',
-        action='store_const',
-        const='hole_elimination_mode',
-        default='cex_mode',
-        help='Whether to iterate by eliminating holes or using counterexamples'
+        action='store_true',
+        help='If set, use hole elimination mode instead of counterexample '
+        'generation mode.'
     )
 
     args = parser.parse_args(argv[1:])
-    # Use program_content to store the program file text rather than use it
+    # Use program_content to store the program file text rather than using it
     # twice
     program_content = Path(args.program_file).read_text()
     num_fields_in_prog = get_num_pkt_fields(program_content)
@@ -147,7 +146,7 @@ def main(argv):
     additional_testcases = ''
     sol_verify_bit = args.max_input_bit
     while 1:
-        if args.hole_elimination == 'hole_elimination_mode':
+        if args.hole_elimination:
             (synthesis_ret_code, _, hole_assignments) = \
                 compiler.parallel_codegen(
                     additional_constraints=hole_elimination_assert) \
@@ -157,7 +156,6 @@ def main(argv):
                 additional_constraints=hole_elimination_assert)
 
         else:
-            assert (args.hole_elimination == 'cex_mode')
             (synthesis_ret_code, _, hole_assignments) = \
                 compiler.parallel_codegen(
                     additional_testcases=additional_testcases) \
@@ -177,12 +175,11 @@ def main(argv):
                 return 0
             else:
                 print('Verification failed. Trying again.')
-                if args.hole_elimination == 'hole_elimination_mode':
+                if args.hole_elimination:
                     hole_elimination_assert += \
                         generate_hole_elimination_assert(
                             hole_assignments)
                 else:
-                    assert (args.hole_elimination == 'cex_mode')
                     additional_testcases += generate_additional_testcases(
                         hole_assignments, compiler, num_fields_in_prog,
                         state_group_info, count, sol_verify_bit)
