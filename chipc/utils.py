@@ -58,11 +58,13 @@ def compilation_success(sketch_name, hole_assignments, output):
     print('Compilation succeeded. Hole value assignments are following:')
     for hole, value in hole_assignments.items():
         print('int', hole, '=', value)
-    output_file = Path(sketch_name + '.success').write_text(output)
-    print('Output left in', output_file.name)
+    p = Path(sketch_name + '.success')
+    p.write_text(output)
+    print('Output left in', p.name)
 
 
 def compilation_failure(sketch_name, output):
     print('Compilation failed.')
-    output_file = Path(sketch_name + '.errors').write_text(output)
-    print('Output left in', output_file.name)
+    p = Path(sketch_name + '.errors')
+    p.write_text(output)
+    print('Output left in', p.name)
