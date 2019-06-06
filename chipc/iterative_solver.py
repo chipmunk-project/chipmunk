@@ -52,6 +52,11 @@ def generate_additional_testcases(hole_assignments, compiler,
         (cex_pkt_fields, cex_state_vars) = compiler.counter_example_generator(
             bits, hole_assignments, iter_cnt=count)
 
+        # This means, z3 was not able to find counterexamples for this specific
+        # input range.
+        if len(cex_pkt_fields) == 0 and len(cex_state_vars) == 0:
+            continue
+
         pkt_fields, state_vars = set_default_values(
             cex_pkt_fields, cex_state_vars, num_fields_in_prog,
             state_group_info)
