@@ -19,6 +19,8 @@ def generate_hole_elimination_assert(hole_assignments):
 
     # The ! is to ensure a hole combination isn't present.
     hole_elimination_string = '!('
+    # To make it easier to test, sort the hole value assignments using the hole
+    # names.
     for idx, (hole, value) in enumerate(
             sorted(hole_assignments.items(), key=lambda x: x[0])):
         hole_elimination_string += '(' + hole + ' == ' + value + ')'
