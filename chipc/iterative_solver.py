@@ -68,6 +68,8 @@ def generate_additional_testcases(hole_assignments, compiler,
         if len(cex_pkt_fields) == 0 and len(cex_state_vars) == 0:
             continue
 
+        print(bits, cex_pkt_fields, cex_state_vars)
+
         pkt_fields, state_vars = set_default_values(
             cex_pkt_fields, cex_state_vars, num_fields_in_prog,
             state_group_info)
