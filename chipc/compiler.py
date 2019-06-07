@@ -242,7 +242,7 @@ class Compiler:
             program_file=self.program_file,
             mode=Mode.CEXGEN,
             hole_assignments=hole_assignments,
-            input_offset=2**bits_val)
+            input_offset=0)
 
         cex_basename = self.sketch_name + '_cexgen_iteration_' + \
             str(iter_cnt) + '_bits_' + str(bits_val)
