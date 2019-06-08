@@ -230,8 +230,7 @@ class SketchGenerator:
         return ret
 
     def generate_sketch(self, program_file, mode, additional_constraints=[],
-                        hole_assignments=dict(), additional_testcases='',
-                        input_offset=0):
+                        hole_assignments=dict(), additional_testcases=''):
         self.reset_holes_and_asserts()
         if mode == Mode.CODEGEN or mode == Mode.SOL_VERIFY or \
                 mode == Mode.CEXGEN:
@@ -278,5 +277,4 @@ class SketchGenerator:
             hole_assignments='\n'.join(
                 ['int ' + str(hole) + ' = ' + str(value) + ';'
                     for hole, value in hole_assignments.items()]),
-            additional_testcases=additional_testcases,
-            input_offset=input_offset)
+            additional_testcases=additional_testcases)

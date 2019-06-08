@@ -241,8 +241,7 @@ class Compiler:
         cex_code = self.sketch_generator.generate_sketch(
             program_file=self.program_file,
             mode=Mode.CEXGEN,
-            hole_assignments=hole_assignments,
-            input_offset=0)
+            hole_assignments=hole_assignments)
 
         cex_basename = self.sketch_name + '_cexgen_iteration_' + \
             str(iter_cnt) + '_bits_' + str(bits_val)
