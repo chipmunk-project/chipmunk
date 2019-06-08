@@ -3,7 +3,7 @@ from enum import Enum
 
 class Mode(Enum):
     OPTVERIFY = 1
-    SOL_VERIFY = 2
+    SOL_VERIFY = 2  # Deprecated, no longer in use.
     CODEGEN = 3
     CEXGEN = 4
 
