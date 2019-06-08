@@ -116,8 +116,8 @@ def main(argv):
     parser.add_argument(
         '--hole-elimination',
         action='store_true',
-        help='If set, use hole elimination mode instead of counterexample '
-        'generation mode.'
+        help='If set, add addtional assert statements to sketch, so that we \
+              would not see the same combination of hole value assignments.'
     )
 
     args = parser.parse_args(argv[1:])
