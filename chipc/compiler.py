@@ -230,7 +230,7 @@ class Compiler:
         # input bit length.
         sketch_to_verify = self.sketch_generator.generate_sketch(
             program_file=self.program_file,
-            mode=Mode.CEXGEN,
+            mode=Mode.VERIFY,
             hole_assignments=hole_assignments
         )
 

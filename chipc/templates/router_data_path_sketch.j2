@@ -1,4 +1,4 @@
-{% if mode.is_CODEGEN() or mode.is_SOL_VERIFY() or mode.is_CEXGEN() %}
+{% if mode.is_CODEGEN() or mode.is_SOL_VERIFY() or mode.is_VERIFY() %}
   |StateAndPacket| pipeline (|StateAndPacket| state_and_packet) {
   // Any additional constraints to speed up synthesis through parallel execution.
   {{additional_constraints}}
@@ -155,7 +155,7 @@
   return state_and_packet;
 }
 
-{% if mode.is_CODEGEN() or mode.is_CEXGEN() or  mode.is_SOL_VERIFY() %}
+{% if mode.is_CODEGEN() or mode.is_VERIFY() or  mode.is_SOL_VERIFY() %}
   harness void main(
     {{range(num_fields_in_prog)|map('add_prefix_suffix', "int pkt_", "")|join(',')}}
     {% for state_group_number in range(num_state_groups) %}
