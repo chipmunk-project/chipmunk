@@ -57,10 +57,6 @@ def generate_counterexample_asserts(pkt_fields, state_vars, num_fields_in_prog,
     counterexample_defs = ''
     counterexample_asserts = ''
 
-    pkt_fields, state_vars = set_default_values(
-        pkt_fields, state_vars, num_fields_in_prog, state_group_info
-    )
-
     counterexample_defs += '|StateAndPacket| x_' + str(
         count) + ' = |StateAndPacket|(\n'
     for field_name, value in pkt_fields.items():
