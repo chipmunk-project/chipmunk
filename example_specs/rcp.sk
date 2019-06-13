@@ -15,11 +15,13 @@ state_group_2_state_0+=1;
 ;}
 } */
 
-|StateAndPacket| program (|StateAndPacket| state_and_packet) {
-state_and_packet.state_group_0_state_0+=state_and_packet.pkt_0;
-if (state_and_packet.pkt_1<2) {state_and_packet.state_group_1_state_0+=state_and_packet.pkt_1;
-state_and_packet.state_group_2_state_0+=1;
+| StateAndPacket | program(| StateAndPacket | state_and_packet) {
+  state_and_packet.state_group_0_state_0 += state_and_packet.pkt_0;
+  if (state_and_packet.pkt_1 < 2) {
+    state_and_packet.state_group_1_state_0 += state_and_packet.pkt_1;
+    state_and_packet.state_group_2_state_0 += 1;
 
-;}
+    ;
+  }
   return state_and_packet;
 }
