@@ -163,6 +163,8 @@ def main(argv):
             return 1
 
         print('Synthesis succeeded with 2 bits, proceeding to verification.')
+        for k, v in sorted(hole_assignments.items(), key=lambda x: x[0]):
+            print(k, v)
         pkt_fields, state_vars = compiler.verify(
             hole_assignments, sol_verify_bit, iter_cnt=count
         )
