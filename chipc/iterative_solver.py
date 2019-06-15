@@ -163,8 +163,6 @@ def main(argv):
             return 1
 
         print('Synthesis succeeded with 2 bits, proceeding to verification.')
-        for k, v in sorted(hole_assignments.items(), key=lambda x: x[0]):
-            print(k, v)
         pkt_fields, state_vars = compiler.verify(
             hole_assignments, sol_verify_bit, iter_cnt=count
         )
@@ -181,6 +179,7 @@ def main(argv):
         if args.hole_elimination:
             hole_elimination_assert += generate_hole_elimination_assert(
                 hole_assignments)
+            print(hole_elimination_assert)
         else:
             print('Use returned counterexamples', pkt_fields, state_vars)
 
