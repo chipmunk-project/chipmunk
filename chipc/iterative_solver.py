@@ -115,6 +115,11 @@ def main(argv):
         help='If set, add addtional assert statements to sketch, so that we \
               would not see the same combination of hole value assignments.'
     )
+    parser.add_argument(
+        '--synthesized-allocation',
+        action='store_true',
+        help='Making it set means to use synthesized allocation'
+    )
 
     args = parser.parse_args(argv[1:])
     # Use program_content to store the program file text rather than using it
@@ -134,7 +139,8 @@ def main(argv):
     compiler = Compiler(args.program_file, args.stateful_alu_file,
                         args.stateless_alu_file,
                         args.num_pipeline_stages, args.num_alus_per_stage,
-                        sketch_name, args.parallel_sketch, args.pkt_fields)
+                        sketch_name, args.parallel_sketch, args.pkt_fields,
+                        args.synthesized_allocation)
 
     # Repeatedly run synthesis at 2 bits and verification using all valid ints
     # until either verification succeeds or synthesis fails at 2 bits. Note

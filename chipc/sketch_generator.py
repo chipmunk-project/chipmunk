@@ -27,7 +27,7 @@ class SketchGenerator:
     def __init__(self, sketch_name, num_phv_containers, num_state_groups,
                  num_alus_per_stage, num_pipeline_stages, num_fields_in_prog,
                  pkt_fields_to_check, jinja2_env, stateful_alu_file,
-                 stateless_alu_file):
+                 stateless_alu_file, synthesized_allocation):
         self.sketch_name_ = sketch_name
         self.total_hole_bits_ = 0
         self.hole_names_ = []
@@ -48,6 +48,7 @@ class SketchGenerator:
         self.stateless_alu_file_ = stateless_alu_file
         self.num_operands_to_stateful_alu_ = 0
         self.num_state_slots_ = 0
+        self.synthesized_allocation_ = synthesized_allocation
 
     def reset_holes_and_asserts(self):
         self.total_hole_bits_ = 0
@@ -262,11 +263,17 @@ class SketchGenerator:
         if mode == Mode.CODEGEN or mode == Mode.SOL_VERIFY or \
                 mode == Mode.VERIFY:
             # TODO: Need better name for j2 file.
-            template = self.jinja2_env_.get_template('code_generator.j2')
+            if (self.synthesized_allocation_):
+               template = self.jinja2_env_.get_template('code_generator_synthesized_allocation.j2')
+            else:
+               template = self.jinja2_env_.get_template('code_generator.j2')
         else:
             assert(mode == Mode.OPTVERIFY), 'Found mode ' + mode
             # TODO: Need better name for j2 file.
-            template = self.jinja2_env_.get_template('sketch_functions.j2')
+            if (self.synthesized_allocation_):
+               template = self.jinja2_env_.get_template('sketch_functions_synthesized_allocation.j2')
+            else:
+               template = self.jinja2_env_.get_template('sketch_functions.j2')
 
         # Create stateless and stateful ALUs, operand muxes for stateful ALUs,
         # and output muxes.
@@ -278,7 +285,8 @@ class SketchGenerator:
         # Create allocator to ensure each state var is assigned to exactly
         # stateful ALU and vice versa.
         self.generate_state_allocator()
-        self.generate_pkt_field_allocator()
+        if (self.synthesized_allocation_):
+           self.generate_pkt_field_allocator()
 
         return template.render(
             mode=mode,
