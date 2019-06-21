@@ -42,10 +42,6 @@
         {% endfor %}
       {% endfor %}
 
-      {% for field_number in range(num_fields_in_prog) %}
-        input_0_{{field_number}} = state_and_packet.pkt_{{field_number}};
-      {% endfor %}
-
     {% else %}
       // Input of this stage is the output of the previous one.
       {% for container_number in range(num_phv_containers) %}
@@ -155,16 +151,12 @@
   {% endfor %}
 
   {% for field_number in range(num_fields_in_prog) %}
+    // Write pkt_{{field_number}}
     {% for container_number in range(num_phv_containers) %}
       if (phv_config_{{num_pipeline_stages - 1}}_{{field_number}}_{{container_number}} == 1){
         state_and_packet.pkt_{{field_number}} = output_{{num_pipeline_stages - 1}}_{{container_number}};
       }
     {% endfor %}
-  {% endfor %}
-
-  {% for field_number in range(num_fields_in_prog) %}
-    // Write pkt_{{field_number}}
-    state_and_packet.pkt_{{field_number}} = output_{{num_pipeline_stages - 1}}_{{field_number}};
   {% endfor %}
 
   // Return updated packet fields and state vars
