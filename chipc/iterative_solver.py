@@ -139,8 +139,8 @@ def main(argv):
     compiler = Compiler(args.program_file, args.stateful_alu_file,
                         args.stateless_alu_file,
                         args.num_pipeline_stages, args.num_alus_per_stage,
-                        sketch_name, args.parallel_sketch, args.pkt_fields,
-                        args.synthesized_allocation)
+                        sketch_name, args.parallel_sketch,
+                        args.synthesized_allocation, args.pkt_fields)
 
     # Repeatedly run synthesis at 2 bits and verification using all valid ints
     # until either verification succeeds or synthesis fails at 2 bits. Note

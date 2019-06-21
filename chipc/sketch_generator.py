@@ -160,7 +160,7 @@ class SketchGenerator:
                 for j in range(self.num_phv_containers_):
                     assert_predicate = '('
                     for k in range(self.num_fields_in_prog_):
-                        assert_predicate += 'phv_config_' + str(i) + '_' + \
+                        assert_predicate += ' phv_config_' + str(i) + '_' + \
                                             str(k) + '_' + str(j) + '+'
                     assert_predicate += '0) <= 1'
                     self.add_assert(assert_predicate)
@@ -168,7 +168,7 @@ class SketchGenerator:
                 for k in range(self.num_fields_in_prog_):
                     assert_predicate = '('
                     for j in range(self.num_phv_containers_):
-                        assert_predicate += 'phv_config_' + str(i) + '_' + \
+                        assert_predicate += ' phv_config_' + str(i) + '_' + \
                                             str(k) + '_' + str(j) + '+'
                     assert_predicate += '0) == 1'
                     self.add_assert(assert_predicate)
