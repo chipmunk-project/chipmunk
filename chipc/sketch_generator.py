@@ -145,6 +145,33 @@ class SketchGenerator:
         return (stateful_alu_sketch_generator.helperFunctionStrings +
                 stateful_alu_sketch_generator.mainFunction)
 
+    def generate_pkt_field_allocator(self):
+        for i in range(self.num_pipeline_stages_):
+            if (i == 0 or i == self.num_pipeline_stages_ - 1):
+                # TODO: rename phv_config because now only support >=2 stages
+                for j in range(self.num_phv_containers_):
+                    for k in range(self.num_fields_in_prog_):
+                        self.add_hole(
+                            'phv_config_' + str(i) + '_' + str(k) + '_' +
+                            str(j), 1)
+                # TODO: add assert for phv_config
+                # assert sum(field) phv_config_0_{field}_{container} <= 1
+                for j in range(self.num_phv_containers_):
+                    assert_predicate = '('
+                    for k in range(self.num_fields_in_prog_):
+                        assert_predicate += 'phv_config_' + str(i) + '_' + \
+                                            str(k) + '_' + str(j) + '+'
+                    assert_predicate += '0) <= 1'
+                    self.add_assert(assert_predicate)
+                # assert sum(container) phv_config_0_{field}_{container} == 1
+                for k in range(self.num_fields_in_prog_):
+                    assert_predicate = '('
+                    for j in range(self.num_phv_containers_):
+                        assert_predicate += 'phv_config_' + str(i) + '_' + \
+                                            str(k) + '_' + str(j) + '+'
+                    assert_predicate += '0) == 1'
+                    self.add_assert(assert_predicate)
+
     def generate_state_allocator(self):
         for i in range(self.num_pipeline_stages_):
             for l in range(self.num_state_groups_):
@@ -251,6 +278,7 @@ class SketchGenerator:
         # Create allocator to ensure each state var is assigned to exactly
         # stateful ALU and vice versa.
         self.generate_state_allocator()
+        self.generate_pkt_field_allocator()
 
         return template.render(
             mode=mode,
