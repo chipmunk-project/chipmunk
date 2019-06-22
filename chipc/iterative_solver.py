@@ -118,7 +118,9 @@ def main(argv):
     parser.add_argument(
         '--synthesized-allocation',
         action='store_true',
-        help='Making it set means to use synthesized allocation'
+        help='If set let sketch allocate state variables otherwise \
+              use canonical allocation, i.e, first state variable assigned \
+              to first phv container.'
     )
 
     args = parser.parse_args(argv[1:])
