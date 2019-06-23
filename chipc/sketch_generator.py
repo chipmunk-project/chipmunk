@@ -148,14 +148,13 @@ class SketchGenerator:
 
     def generate_pkt_field_allocator(self):
         for i in range(self.num_pipeline_stages_):
-            if (i == 0 or i == self.num_pipeline_stages_ - 1):
-                # TODO: rename phv_config because now only support >=2 stages
+            if (i == 0):
                 for j in range(self.num_phv_containers_):
                     for k in range(self.num_fields_in_prog_):
                         self.add_hole(
                             'phv_config_' + str(i) + '_' + str(k) + '_' +
                             str(j), 1)
-                # TODO: add assert for phv_config
+                # add assert for phv_config
                 # assert sum(field) phv_config_0_{field}_{container} <= 1
                 for j in range(self.num_phv_containers_):
                     assert_predicate = '('
