@@ -40,7 +40,8 @@ def kill_child_processes(parent_pid, sig=signal.SIGTERM):
 class Compiler:
     def __init__(self, program_file, stateful_alu_file, stateless_alu_file,
                  num_pipeline_stages, num_alus_per_stage, sketch_name,
-                 parallel_sketch, synthesized_allocation=False, pkt_fields_to_check=[]):
+                 parallel_sketch, synthesized_allocation=False,
+                 pkt_fields_to_check=[]):
         self.program_file = program_file
         self.stateful_alu_file = stateful_alu_file
         self.stateless_alu_file = stateless_alu_file

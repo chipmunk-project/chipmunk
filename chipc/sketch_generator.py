@@ -263,16 +263,18 @@ class SketchGenerator:
                 mode == Mode.VERIFY:
             # TODO: Need better name for j2 file.
             if (self.synthesized_allocation_):
-               template = self.jinja2_env_.get_template('code_generator_synthesized_allocation.j2')
+                template = self.jinja2_env_.get_template(
+                    'code_generator_synthesized_allocation.j2')
             else:
-               template = self.jinja2_env_.get_template('code_generator.j2')
+                template = self.jinja2_env_.get_template('code_generator.j2')
         else:
             assert(mode == Mode.OPTVERIFY), 'Found mode ' + mode
             # TODO: Need better name for j2 file.
             if (self.synthesized_allocation_):
-               template = self.jinja2_env_.get_template('sketch_functions_synthesized_allocation.j2')
+                template = self.jinja2_env_.get_template(
+                    'sketch_functions_synthesized_allocation.j2')
             else:
-               template = self.jinja2_env_.get_template('sketch_functions.j2')
+                template = self.jinja2_env_.get_template('sketch_functions.j2')
 
         # Create stateless and stateful ALUs, operand muxes for stateful ALUs,
         # and output muxes.
@@ -285,7 +287,7 @@ class SketchGenerator:
         # stateful ALU and vice versa.
         self.generate_state_allocator()
         if (self.synthesized_allocation_):
-           self.generate_pkt_field_allocator()
+            self.generate_pkt_field_allocator()
 
         return template.render(
             mode=mode,
