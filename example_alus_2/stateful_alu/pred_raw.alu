@@ -1,0 +1,8 @@
+stateful
+state_0
+void
+pkt_0, pkt_1
+
+if (rel_op(Opt(state_0), Mux3(pkt_0, pkt_1, C()))) {
+    state_0 = Opt(state_0) + Mux3(pkt_0, pkt_1, C());
+}
