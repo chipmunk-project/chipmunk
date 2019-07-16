@@ -1,0 +1,34 @@
+state : stateless
+state variables : {}
+hole variables : {opcode_hole_local, immediate_operand_hole_local}
+packet fields : {pkt_0, pkt_1}
+
+if (opcode == 0) {
+  return immediate_operand_hole_local;
+} elif (opcode == 1) {
+  return pkt_0 + pkt_1;
+} elif (opcode == 2) {
+  return pkt_0 + immediate_operand_hole_local;
+} elif (opcode == 3) {
+  return pkt_0 - pkt_1;
+} elif (opcode == 4) {
+  return pkt_0 - immediate_operand_hole_local;
+} elif (opcode == 5) {
+  return immediate_operand_hole_local - pkt_0;
+} elif (opcode == 6) {
+  return (pkt_0 != pkt_1);
+} elif (opcode == 7) {
+  return (pkt_0 != immediate_operand_hole_local);
+} elif (opcode == 8) {
+  return (pkt_0 == pkt_1);
+} elif (opcode == 9) {
+  return (pkt_0 == immediate_operand_hole_local);
+} elif (opcode == 10) {
+  return (pkt_0 >= pkt_1);
+} elif (opcode == 11) {
+  return (pkt_0 >= immediate_operand_hole_local);
+} elif (opcode == 12) {
+  return  (pkt_0 < pkt_1);
+} else {
+  return (pkt_0 < immediate_operand_hole_local);
+}

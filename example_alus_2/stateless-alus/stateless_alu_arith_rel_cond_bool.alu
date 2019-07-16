@@ -1,0 +1,48 @@
+state : stateless
+state variables : {}
+hole variables : {opcode_hole_local, immediate_operand_hole_local}
+packet fields : {pkt_0, pkt_1, pkt_2}
+
+if (opcode_hole_local == 0) {
+  return immediate_operand_hole_local;
+} elif (opcode_hole_local == 1) {
+  return pkt_0 + pkt_1;
+} elif (opcode_hole_local == 2) {
+  return pkt_0 + immediate_operand_hole_local;
+} elif (opcode_hole_local == 3) {
+  return pkt_0 - pkt_1;
+} elif (opcode_hole_local == 4) {
+  return pkt_0 - immediate_operand_hole_local;
+} elif (opcode_hole_local == 5) {
+  return immediate_operand_hole_local - pkt_0;
+} elif (opcode_hole_local == 6) {
+  return ( pkt_0 != pkt_1);
+} elif (opcode_hole_local == 7) {
+  return (pkt_0 != immediate_operand_hole_local);
+} elif (opcode_hole_local == 8) {
+  return (pkt_0 == pkt_1);
+} elif (opcode_hole_local == 9) {
+  return (pkt_0 == immediate_operand_hole_local);
+} elif (opcode_hole_local == 10) {
+  return (pkt_0 >= pkt_1);
+} elif (opcode_hole_local == 11) {
+  return  (pkt_0 >= immediate_operand_hole_local);
+} elif (opcode_hole_local == 12) {
+  return ( pkt_0 < pkt_1);
+} elif (opcode_hole_local == 13) {
+  return ( pkt_0 < immediate_operand_hole_local);
+} elif (opcode_hole_local == 14) {
+  return ( pkt_0 != 0 );
+} elif (opcode_hole_local == 15) {
+  return ( pkt_0 != 0 );
+} elif (opcode_hole_local == 16) {
+  return ((pkt_0 != 0) || (pkt_1 != 0));
+} elif (opcode_hole_local == 17) {
+  return ((pkt_0 != 0) || (immediate_operand_hole_local != 0));
+} elif (opcode_hole_local == 18) {
+  return ((pkt_0 != 0) && (pkt_1 != 0));
+} elif (opcode_hole_local == 19) {
+  return ((pkt_0 != 0) && (immediate_operand_hole_local != 0));
+} else {
+  return (pkt_0 == 0);
+}

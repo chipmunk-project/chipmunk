@@ -1,6 +1,0 @@
-stateful
-state_0
-void
-pkt_0
-
-state_0 = Opt(state_0) + Mux2(pkt_0, C());
