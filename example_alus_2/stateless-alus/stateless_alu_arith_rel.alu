@@ -1,4 +1,4 @@
-state : stateless
+type : stateless
 state variables : {}
 hole variables : {opcode_hole_local, immediate_operand_hole_local}
 packet fields : {pkt_0, pkt_1}
@@ -30,5 +30,6 @@ if (opcode == 0) {
 } elif (opcode == 12) {
   return  (pkt_0 < pkt_1);
 } else {
-  return (pkt_0 < immediate_operand_hole_local);
+  return (pkt_0 < immediate_operand_hole_local); 
 }
+

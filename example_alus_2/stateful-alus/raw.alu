@@ -1,4 +1,4 @@
-state : stateful
+type : stateful
 state variables : {state_0}
 hole variables : {}
 packet fields : {pkt_0}
