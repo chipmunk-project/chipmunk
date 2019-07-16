@@ -1,0 +1,42 @@
+
+Comments (//)
+  - Will be ignored and not added to parse tree
+
+Added keywords (used in guard):
+  - Equal (==)
+  - Greater (>)
+  - Less (<)
+  - Greater or equal (>=)
+  - Less or equal (<=)
+  - Not equal (!=)
+  - Or (||)
+  - And (&&)
+
+Header:
+  - type : (stateful | stateless)
+  - state variables : {state_0, state_1, ... , state_n}
+  - hole variables : {hole_0, hole_1, ... , hole_n}
+  - packet fields : {pkt_0, pkt_1, ... , pkt_n}
+
+Guard:
+  - Relational op keywords above
+  - Nested guards
+  - Parenthesis around guards
+  - Multiple elif statements:
+    - if (guard) { alu_body }
+      elif (guard) { alu_body }
+      ...
+      elif (guard) { alu_body }
+      else { alu_body }
+
+Return statements:
+  - return (expr | guard)
+
+Updates:
+  - state_var = (expr | guard)
+
+Expr:
+  - hole_var and packet_field are expr
+  - NUM (constant non-hole value) is an expr
+
+

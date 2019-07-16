@@ -1,4 +1,4 @@
-state :stateless
+type :stateless
 state variables : {}
 hole variables : {opcode_hole_local, immediate_operand_hole_local}
 packet fields : {pkt_0, pkt_1, pkt_2}
@@ -36,3 +36,4 @@ if (opcode_hole_local == 0) {
 } else {
   return ( pkt_0 != 0 );
 }
+
