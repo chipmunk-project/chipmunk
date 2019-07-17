@@ -16,7 +16,8 @@ def main(argv):
     tree = parser.alu()
     alu_gen_visitor = ALUVisitor(alu_file)
     alu_gen_visitor.visit(tree)
-    print(alu_gen_visitor.mainFunction)
+    print(alu_gen_visitor.helper_function_strings + '\n\n\n\n')
+    print(alu_gen_visitor.main_function)
 
 
 if __name__ == '__main__':
