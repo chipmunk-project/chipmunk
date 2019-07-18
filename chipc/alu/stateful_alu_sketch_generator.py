@@ -1,13 +1,13 @@
 from textwrap import dedent
 
-from aluParser import aluParser
-from aluVisitor import aluVisitor
+from chipc.alu.aluParser import aluParser
+from chipc.alu.aluVisitor import aluVisitor
 
 
-class ALUVisitor(aluVisitor):
-    def __init__(self, instruction_file):
-        self.instruction_file = instruction_file
-        self.alu_name = 'simple_sub_stateless_alu_2_2_stateful_alu_1_0'  # temp
+class StatefulALUSketchGenerator(aluVisitor):
+    def __init__(self, alu_file, alu_name):
+        self.instruction_file = alu_file
+        self.alu_name = alu_name
         self.num_state_slots = 0
         self.num_packet_fields = 0
         self.mux3_count = 0
@@ -30,7 +30,7 @@ class ALUVisitor(aluVisitor):
         self.alu_args[hole_name] = hole_width
 
     def visitAlu(self, ctx):
-        self.main_function += ('|StateGroup|' + self.alu_name +
+        self.main_function += ('|StateGroup| ' + self.alu_name +
                                '(ref |StateGroup| state_group, ')
 
         self.visit(ctx.getChild(0, aluParser.Packet_fieldsContext))
@@ -131,7 +131,8 @@ class ALUVisitor(aluVisitor):
         self.main_function += ctx.getChild(0).getText()
 
     def visitMux3(self, ctx):
-        self.main_function += self.alu_name + '_Mux3('
+        self.main_function += self.alu_name + '_' + 'Mux3_' + str(
+            self.mux3_count) + '('
         self.visit(ctx.getChild(0, aluParser.ExprContext))
         self.main_function += ','
         self.visit(ctx.getChild(1, aluParser.ExprContext))
@@ -142,19 +143,19 @@ class ALUVisitor(aluVisitor):
         self.mux3_count += 1
 
     def visitMux3WithNum(self, ctx):
-        self.mainFunction += self.alu_name + '_Mux3_' + str(
-            self.mux3Count) + '('
+        self.main_function += self.alu_name + '_Mux3_' + str(
+            self.mux3_count) + '('
         self.visit(ctx.getChild(0, aluParser.ExprContext))
-        self.mainFunction += ','
+        self.main_function += ','
         self.visit(ctx.getChild(1, aluParser.ExprContext))
-        self.mainFunction += ',' + 'Mux3_' + str(self.mux3Count) + ')'
+        self.main_function += ',' + 'Mux3_' + str(self.mux3_count) + ')'
         # Here it's the child with index 6. The grammar parse for this
         # expression as whole is following, NUM '(' expr ',' expr ',' NUM ')'
         # Where NUM is not considered as an expr. Consider parsing NUM as expr
         # so we could simply do ctx.getChild(2, stateful_aluParser.ExprContext)
         # below.
         self.generateMux3WithNum(ctx.getChild(6).getText())
-        self.mux3Count += 1
+        self.mux3_count += 1
 
     def visitMux2(self, ctx):
         self.main_function += self.alu_name + '_' + 'Mux2_' + str(
