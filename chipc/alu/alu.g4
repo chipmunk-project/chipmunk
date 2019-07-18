@@ -98,9 +98,8 @@ updates: update+;
 update : state_var '=' expr ';'
        | state_var '=' guard ';';
 
-expr   : state_var #StateVar
-       |  packet_field #PacketField
-       | hole_var #HoleVar
+variable : ID ;
+expr   : variable #Var
        | expr op=('+'|'-'|'*'|'/') expr #ExprWithOp
        | '(' expr ')' #ExprWithParen
        | MUX3 '(' expr ',' expr ',' NUM ')' #Mux3WithNum

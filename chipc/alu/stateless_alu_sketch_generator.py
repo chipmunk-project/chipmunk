@@ -40,9 +40,15 @@ class StatelessAluSketchGenerator (aluVisitor):
         self.mainFunction += 'int ' + self.stateless_alu_name + '('
         self.visit(ctx.getChild(0, aluParser.Packet_fieldsContext))
         self.visit(ctx.getChild(0, aluParser.Hole_varsContext))
-        self.mainFunction += ' ){\n'
+        #TODO: Allow hole params from relop, opt, etc.
+        if self.mainFunction[-1] == ',':
+            self.mainFunction = self.mainFunction [:-1]
+
+        self.mainFunction += ' %s){\n'
         self.visit(ctx.getChild(0, aluParser.Alu_bodyContext))
         self.mainFunction += '\n}'
+        argument_string = ','.join (['int ' + hole for hole in sorted (self.stateless_alu_args)])
+        self.mainFunction = self.mainFunction % argument_string
 
     @overrides
     def visitState_indicator(self, ctx):
@@ -54,7 +60,7 @@ class StatelessAluSketchGenerator (aluVisitor):
                 ' and not \'stateless\' for stateless ALU '
         except AssertionError as e:
             raise
-
+    '''
     @overrides
     def visitState_var(self, ctx):
         # TODO: When state_var is listed first in expr in
@@ -62,7 +68,7 @@ class StatelessAluSketchGenerator (aluVisitor):
         # labeled as state_var. This is when there are
         # no state vars described
         self.mainFunction += ctx.getText()
-
+    '''
     @overrides
     def visitState_vars(self, ctx):
         try:
@@ -75,14 +81,6 @@ class StatelessAluSketchGenerator (aluVisitor):
         pass
 
     @overrides
-    def visitHoleVar(self, ctx):
-        self.mainFunction += ctx.getText()
-
-    @overrides
-    def visitHole_var(self, ctx):
-        self.mainFunction += ctx.getText()
-
-    @overrides
     def visitHole_vars(self, ctx):
         # Empty set of hole vars
         if (ctx.getChildCount() == 5):
@@ -93,19 +91,11 @@ class StatelessAluSketchGenerator (aluVisitor):
             for i in range(5, ctx.getChildCount()-1):
                 pass
                 self.visit(ctx.getChild(i))
-        self.mainFunction = self.mainFunction[:-1]  # Trim out the last comma
+        #self.mainFunction = self.mainFunction[:-1]  # Trim out the last comma
 
     def visitHole_var_with_comma(self, ctx):
         assert (ctx.getChild(0).getText() == ',')
-        self.mainFunction += ctx.getChild(1).getText() + ','
-
-    @overrides
-    def visitPacketField(self, ctx):
-        self.mainFunction += ctx.getText()
-
-    @overrides
-    def visitPacket_field(self, ctx):
-        self.mainFunction += ctx.getText()
+        self.mainFunction += 'int ' + ctx.getChild(1).getText() + ','
 
     @overrides
     def visitPacket_fields(self, ctx):
@@ -115,16 +105,20 @@ class StatelessAluSketchGenerator (aluVisitor):
         self.mainFunction += 'int '
         self.mainFunction += ctx.getChild(4).getText() + ','
         self.num_packet_fields = 1
-        if (ctx.getChildCount() > 1):
+        if (ctx.getChildCount() > 5):
             for i in range(5, ctx.getChildCount()):
                 self.visit(ctx.getChild(i))
                 self.num_packet_fields += 1
-        self.mainFunction = self.mainFunction[:-1]  # Trim out the last comma
+#        self.mainFunction = self.mainFunction[:-1]  # Trim out the last comma
 
     @overrides
     def visitPacket_field_with_comma(self, ctx):
         assert (ctx.getChild(0).getText() == ',')
-        self.mainFunction += ctx.getChild(1).getText() + ','
+        self.mainFunction += 'int '+ctx.getChild(1).getText() + ','
+    
+    @overrides
+    def visitVar (self, ctx):
+        self.mainFunction += ctx.getText ()
 
     @overrides
     def visitAlu_body(self, ctx):
@@ -137,17 +131,10 @@ class StatelessAluSketchGenerator (aluVisitor):
             self.mainFunction += 'if ('
             self.visit(ctx.if_guard)
             self.mainFunction += ') {'
-            print(ctx.if_body.getText())
 
             self.visit(ctx.if_body)
             self.mainFunction += '}'
-            # if there is an elif
-            count = 0
-#            for c in ctx.getChildren():
-#                print (count, ' : ',c.getText())
-#                count+=1
             elif_index = 7
-            alu_index = 0
             while (ctx.getChildCount() > elif_index and ctx.getChild(elif_index).getText() == 'elif'):
 
                 self.mainFunction += 'else if ('
@@ -166,9 +153,9 @@ class StatelessAluSketchGenerator (aluVisitor):
 
     @overrides
     def visitNested(self, ctx):
-        self.visit(ctx.getChild(0, aluParser.GuardContext))
+        self.visit (ctx.getChild (0))
         self.mainFunction += ctx.getChild(1).getText()
-        self.visit(ctx.getChild(1, aluParser.GuardContext))
+        self.visit (ctx.getChild (2))
 
     @overrides
     def visitMux2(self, ctx):
@@ -197,8 +184,7 @@ class StatelessAluSketchGenerator (aluVisitor):
     @overrides
     def visitReturn_statement(self, ctx):
         self.mainFunction += 'return '
-#        self.visit (ctx.getChild (0))
-        self.visit(ctx.getChild(0, aluParser.ExprContext))
+        self.visit (ctx.getChild (1))
         self.mainFunction += ';'
 
     @overrides
@@ -214,7 +200,7 @@ class StatelessAluSketchGenerator (aluVisitor):
         # Where NUM is not considered as an expr. Consider parsing NUM as expr
         # so we could simply do ctx.getChild(2, aluParser.ExprContext)
         # below.
-#        self.generateMux3WithNum(ctx.getChild(6).getText())
+        self.generateMux3WithNum(ctx.getChild(6).getText())
         self.mux3Count += 1
 
     @overrides
@@ -242,7 +228,6 @@ class StatelessAluSketchGenerator (aluVisitor):
 
         self.visit(ctx.getChild(0, aluParser.ExprContext))
         self.mainFunction += '=='
-
         self.visit(ctx.getChild(1, aluParser.ExprContext))
 
     @overrides
@@ -266,8 +251,10 @@ class StatelessAluSketchGenerator (aluVisitor):
         self.mainFunction += '<'
         self.visit(ctx.getChild(1, aluParser.ExprContext))
 
+
     @overrides
     def visitLessEqual(self, ctx):
+        
         self.visit(ctx.getChild(0, aluParser.ExprContext))
         self.mainFunction += '<='
         self.visit(ctx.getChild(1, aluParser.ExprContext))
@@ -322,7 +309,9 @@ class StatelessAluSketchGenerator (aluVisitor):
 
     @overrides
     def visitParen(self, ctx):
-        pass
+        self.mainFunction += '('
+        self.visit (ctx.getChild(1))
+        self.mainFunction += ')'
 
     @overrides
     def visitExprWithParen(self, ctx):
