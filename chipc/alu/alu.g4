@@ -40,8 +40,8 @@ hole_var : ID;
 // Determines whether the ALU is stateless or stateful
 stateless : 'stateless';
 stateful  : 'stateful';
-state_indicator : 'state' ':' stateless
-                | 'state' ':' stateful;
+state_indicator : 'type' ':' stateless
+                | 'type' ':' stateful;
 
 // list of state_var
 state_var_with_comma : ',' state_var;
@@ -99,8 +99,8 @@ update : state_var '=' expr ';'
        | state_var '=' guard ';';
 
 expr   : state_var #StateVar
+       |  packet_field #PacketField
        | hole_var #HoleVar
-       | packet_field #PacketField
        | expr op=('+'|'-'|'*'|'/') expr #ExprWithOp
        | '(' expr ')' #ExprWithParen
        | MUX3 '(' expr ',' expr ',' NUM ')' #Mux3WithNum
