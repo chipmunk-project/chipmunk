@@ -69,7 +69,7 @@ guard  : guard (EQUAL
               | LESS_OR_EQUAL
               | NOT_EQUAL
               | AND
-              | OR) guard #Nested 
+              | OR) guard #Nested
        | '(' guard ')' #Paren
        | RELOP '(' expr ',' expr ')' #RelOp
        | expr EQUAL expr #Equals
@@ -89,7 +89,7 @@ alu_body : alu_update = updates
          | return_update = return_statement
          | IF '(' if_guard = guard ')' '{' if_body =  alu_body '}' (ELIF '(' elif_guard = guard ')' '{' elif_body = alu_body '}')* (ELSE  '{' else_body = alu_body '}')?
          ;
- 
+
 return_statement : RETURN expr ';'
                  | RETURN guard ';';
 
@@ -98,9 +98,8 @@ updates: update+;
 update : state_var '=' expr ';'
        | state_var '=' guard ';';
 
-expr   : state_var #StateVar
-       | hole_var #HoleVar
-       | packet_field #PacketField
+variable : ID ;
+expr   : variable #Var
        | expr op=('+'|'-'|'*'|'/') expr #ExprWithOp
        | '(' expr ')' #ExprWithParen
        | MUX3 '(' expr ',' expr ',' NUM ')' #Mux3WithNum
@@ -113,4 +112,3 @@ expr   : state_var #StateVar
        ;
 
 alu: state_indicator state_vars hole_vars packet_fields alu_body;
-
