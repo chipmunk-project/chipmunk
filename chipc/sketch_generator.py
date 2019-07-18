@@ -1,4 +1,3 @@
-# Helper functions to generate sketch code for synthesis
 import math
 import re
 from pathlib import Path
