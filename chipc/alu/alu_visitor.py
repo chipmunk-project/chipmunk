@@ -1,3 +1,5 @@
+from textwrap import dedent
+
 from aluParser import aluParser
 from aluVisitor import aluVisitor
 
@@ -5,8 +7,9 @@ from aluVisitor import aluVisitor
 class ALUVisitor(aluVisitor):
     def __init__(self, instruction_file):
         self.instruction_file = instruction_file
-        self.alu_name = 'aatish_alu'  # temp
+        self.alu_name = 'simple_sub_stateless_alu_2_2_stateful_alu_1_0'  # temp
         self.num_state_slots = 0
+        self.num_packet_fields = 0
         self.mux3_count = 0
         self.mux2_count = 0
         self.relop_count = 0
@@ -37,8 +40,12 @@ class ALUVisitor(aluVisitor):
         self.main_function += \
             ', %s) {\n |StateGroup| old_state_group = state_group;'
 
-        self.visit(ctx.getChild(0, aluParser.Alu_bodyContext))
+        assert(self.num_state_slots > 0)
+        for slot in range(self.num_state_slots):
+            self.main_function += '\nint state_' + str(
+                slot) + ' = state_group.state_' + str(slot) + ';'
 
+        self.visit(ctx.getChild(0, aluParser.Alu_bodyContext))
         for slot in range(self.num_state_slots):
             self.main_function += '\nstate_group.state_' + str(
                 slot) + ' = state_' + str(slot) + ';'
@@ -107,19 +114,21 @@ class ALUVisitor(aluVisitor):
         self.visitChildren(ctx)
 
     def visitUpdate(self, ctx):
-        self.main_function += ctx.getChild(0).getText() + ' = '
+        assert ctx.getChild(ctx.getChildCount() - 1).getText() == ';', \
+            'Every update must end with a semicolon.'
+
+        self.visit(ctx.getChild(0, aluParser.State_varContext))
+        self.main_function += ' = '
         self.visit(ctx.getChild(2))
         self.main_function += ';'
 
+    def visitExprWithOp(self, ctx):
+        self.visit(ctx.getChild(0, aluParser.ExprContext))
+        self.main_function += ctx.getChild(1).getText()
+        self.visit(ctx.getChild(1, aluParser.ExprContext))
+
     def visitState_var(self, ctx):
         self.main_function += ctx.getChild(0).getText()
-
-    # def visitRelOp(self, ctx):
-    #     self.main_function += self.alu_name + '_rel_op('
-    #     self.visit(ctx.getChild(2))
-    #     self.main_function += ','
-    #     self.visit(ctx.getChild(4))
-    #     self.main_function += ')'
 
     def visitMux3(self, ctx):
         self.main_function += self.alu_name + '_Mux3('
@@ -128,16 +137,32 @@ class ALUVisitor(aluVisitor):
         self.visit(ctx.getChild(1, aluParser.ExprContext))
         self.main_function += ','
         self.visit(ctx.getChild(2, aluParser.ExprContext))
-        self.main_function += ')'
+        self.main_function += ',' + 'Mux3_' + str(self.mux3_count) + ')'
         self.generateMux3()
         self.mux3_count += 1
 
+    def visitMux3WithNum(self, ctx):
+        self.mainFunction += self.alu_name + '_Mux3_' + str(
+            self.mux3Count) + '('
+        self.visit(ctx.getChild(0, aluParser.ExprContext))
+        self.mainFunction += ','
+        self.visit(ctx.getChild(1, aluParser.ExprContext))
+        self.mainFunction += ',' + 'Mux3_' + str(self.mux3Count) + ')'
+        # Here it's the child with index 6. The grammar parse for this
+        # expression as whole is following, NUM '(' expr ',' expr ',' NUM ')'
+        # Where NUM is not considered as an expr. Consider parsing NUM as expr
+        # so we could simply do ctx.getChild(2, stateful_aluParser.ExprContext)
+        # below.
+        self.generateMux3WithNum(ctx.getChild(6).getText())
+        self.mux3Count += 1
+
     def visitMux2(self, ctx):
-        self.main_function += self.alu_name + '_Mux2('
+        self.main_function += self.alu_name + '_' + 'Mux2_' + str(
+            self.mux2Count) + '('
         self.visit(ctx.getChild(0, aluParser.ExprContext))
         self.main_function += ','
         self.visit(ctx.getChild(1, aluParser.ExprContext))
-        self.main_function += ')'
+        self.main_function += ',' + 'Mux2_' + str(self.mux2_count) + ')'
         self.generateMux2()
         self.mux2_count += 1
 
@@ -151,6 +176,16 @@ class ALUVisitor(aluVisitor):
             str(self.relop_count) + ') == 1'
         self.generateRelOp()
         self.relop_count += 1
+
+    def visitArithOp(self, ctx):
+        self.main_function += self.alu_name + '_' + 'arith_op_' + str(
+            self.arithop_count) + '('
+        self.visit(ctx.getChild(0, aluParser.ExprContext))
+        self.main_function += ','
+        self.visit(ctx.getChild(1, aluParser.ExprContext))
+        self.main_function += ',' + 'arith_op_' + str(self.arithop_count) + ')'
+        self.generateArithOp()
+        self.arithop_count += 1
 
     def visitOpt(self, ctx):
         self.main_function += self.alu_name + '_' + 'Opt_' + str(
@@ -177,6 +212,22 @@ class ALUVisitor(aluVisitor):
     } \n\n"""
         self.add_hole('Mux3_' + str(self.mux3_count), 2)
 
+    def generateMux3WithNum(self, num):
+        # NOTE: To escape curly brace, use double curly brace.
+        function_str = """\
+            int {0}_Mux3_{1}(int op1, int op2, int choice) {{
+                if (choice == 0) return op1;
+                else if (choice == 1) return op2;
+                else return {2};
+            }}\n
+        """
+        self.helper_function_strings += dedent(
+            function_str.format(self.alu_name, str(self.mux3_count),
+                                num))
+        # Add two bit width hole, to express 3 possible values for choice in
+        # the above code.
+        self.add_hole('Mux3_' + str(self.mux3_count), 2)
+
     def generateMux2(self):
         self.helper_function_strings += 'int ' + self.alu_name + '_' + \
             'Mux2_' + str(self.mux2_count) + \
@@ -188,10 +239,10 @@ class ALUVisitor(aluVisitor):
 
     def generateConstant(self):
         self.helper_function_strings += 'int ' + self.alu_name + '_' + \
-            'C_' + str(self.constCount) + """(int const) {
+            'C_' + str(self.constant_count) + """(int const) {
     return const;
     }\n\n"""
-        self.add_hole('const_' + str(self.constCount), 2)
+        self.add_hole('const_' + str(self.constant_count), 2)
 
     def generateRelOp(self):
         self.helper_function_strings += 'int ' + self.alu_name + '_' + \
