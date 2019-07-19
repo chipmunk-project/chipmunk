@@ -11,6 +11,7 @@ from chipc.utils import get_hole_dicts
 
 BASE_PATH = path.abspath(path.dirname(__file__))
 DATA_DIR = path.join(BASE_PATH, 'data/')
+
 STATELESS_ALU_DIR = path.join(BASE_PATH, '../example_alus_2/stateless-alus/')
 STATEFUL_ALU_DIR = path.join(BASE_PATH, '../example_alus_2/stateful-alus/')
 SPEC_DIR = path.join(BASE_PATH, '../example_specs/')
