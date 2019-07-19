@@ -49,12 +49,13 @@ class StatefulALUSketchGenerator(aluVisitor):
         for slot in range(self.num_state_slots):
             self.main_function += '\nstate_group.state_' + str(
                 slot) + ' = state_' + str(slot) + ';'
-            self.main_function += '\nreturn old_state_group;\n}'
+        self.main_function += '\nreturn old_state_group;\n}'
         argument_string = ','.join(
             ['int ' + hole for hole in sorted(self.alu_args)])
         self.main_function = self.main_function % argument_string
 
     def visitPacket_fields(self, ctx):
+        print('reached here')
         self.main_function += 'int '
         self.main_function += ctx.getChild(
             0, aluParser.Packet_fieldContext).getText() + ','
@@ -159,7 +160,7 @@ class StatefulALUSketchGenerator(aluVisitor):
 
     def visitMux2(self, ctx):
         self.main_function += self.alu_name + '_' + 'Mux2_' + str(
-            self.mux2Count) + '('
+            self.mux2_count) + '('
         self.visit(ctx.getChild(0, aluParser.ExprContext))
         self.main_function += ','
         self.visit(ctx.getChild(1, aluParser.ExprContext))
