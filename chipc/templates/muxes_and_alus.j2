@@ -2,6 +2,8 @@
 // Total of {{ num_pipeline_stages }} * {{ num_alus_per_stage }} * 3 {{num_phv_containers}}-to-1 muxes
 // The 3 is for two stateless operands and one stateful operand.
 
+{{ stateless_operand_mux_definitions }}
+
 {{ stateful_operand_mux_definitions }}
 
 // Output mux for each PHV container

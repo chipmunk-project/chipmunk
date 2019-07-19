@@ -11,8 +11,9 @@ from chipc.utils import get_hole_dicts
 
 BASE_PATH = path.abspath(path.dirname(__file__))
 DATA_DIR = path.join(BASE_PATH, 'data/')
+
+STATELESS_ALU_DIR = path.join(BASE_PATH, '../example_alus_2/stateless-alus/')
 STATEFUL_ALU_DIR = path.join(BASE_PATH, '../example_alus_2/stateful-alus/')
-STATELESS_ALU_DIR = path.join(BASE_PATH, '../chipc/templates/')
 SPEC_DIR = path.join(BASE_PATH, '../example_specs/')
 TRANSFORM_DIR = path.join(BASE_PATH, '../example_transforms/')
 
@@ -32,7 +33,7 @@ class TestDirectSolver(unittest.TestCase):
             compiler = Compiler(
                 path.join(SPEC_DIR, 'simple.sk'), path.join(
                     STATEFUL_ALU_DIR, alu),
-                path.join(STATELESS_ALU_DIR, 'stateless_alu.j2'), 2,
+                path.join(STATELESS_ALU_DIR, 'stateless_alu.alu'), 2,
                 2, 'simple', parallel_sketch=False)
             self.assertEqual(compiler.serial_codegen()[0], 0,
                              'Compiling simple.sk failed for ' + alu)
@@ -48,7 +49,7 @@ class TestDirectSolver(unittest.TestCase):
             Compiler(
                 path.join(SPEC_DIR, spec_filename),
                 path.join(STATEFUL_ALU_DIR, alu_filename),
-                path.join(STATELESS_ALU_DIR, 'stateless_alu.j2'),
+                path.join(STATELESS_ALU_DIR, 'stateless_alu.alu'),
                 1, 0, 'simple_raw_1_2', 'serial')
 
     def test_simple_raw_succeeds_with_two_two_grid(self):
@@ -58,7 +59,7 @@ class TestDirectSolver(unittest.TestCase):
         compiler = Compiler(
             path.join(SPEC_DIR, spec_filename), path.join(
                 STATEFUL_ALU_DIR, alu_filename),
-            path.join(STATELESS_ALU_DIR, 'stateless_alu.j2'),
+            path.join(STATELESS_ALU_DIR, 'stateless_alu.alu'),
             2, 2, 'simple_raw_2_2', parallel_sketch=False)
         (ret_code, _, _) = compiler.serial_codegen()
         self.assertEqual(
@@ -82,7 +83,7 @@ class TestDirectSolver(unittest.TestCase):
         compiler = Compiler(
             path.join(SPEC_DIR, spec_filename), path.join(
                 STATEFUL_ALU_DIR, alu_filename),
-            path.join(STATELESS_ALU_DIR, 'stateless_alu.j2'),
+            path.join(STATELESS_ALU_DIR, 'stateless_alu.alu'),
             1, 2, 'simple_raw_1_2', parallel_sketch=False)
         (ret_code, _, _) = compiler.serial_codegen()
         self.assertEqual(
@@ -97,7 +98,7 @@ class TestDirectSolver(unittest.TestCase):
         compiler = Compiler(
             path.join(SPEC_DIR, spec_filename), path.join(
                 STATEFUL_ALU_DIR, alu_filename),
-            path.join(STATELESS_ALU_DIR, 'stateless_alu.j2'),
+            path.join(STATELESS_ALU_DIR, 'stateless_alu.alu'),
             3, 3, 'test_raw_3_3', parallel_sketch=True)
         (ret_code, _, _) = compiler.serial_codegen()
         self.assertEqual(
@@ -108,7 +109,7 @@ class TestDirectSolver(unittest.TestCase):
         compiler = Compiler(
             path.join(SPEC_DIR, spec_filename), path.join(
                 STATEFUL_ALU_DIR, alu_filename),
-            path.join(STATELESS_ALU_DIR, 'stateless_alu.j2'),
+            path.join(STATELESS_ALU_DIR, 'stateless_alu.alu'),
             4, 4, 'test_raw_4_4', parallel_sketch=True)
         (ret_code, _, _) = compiler.serial_codegen()
         self.assertEqual(
@@ -124,7 +125,7 @@ class OptverifyTest(unittest.TestCase):
         compiler = Compiler(
             path.join(SPEC_DIR, spec_filename), path.join(
                 STATEFUL_ALU_DIR, alu_filename),
-            path.join(STATELESS_ALU_DIR, 'stateless_alu.j2'),
+            path.join(STATELESS_ALU_DIR, 'stateless_alu.alu'),
             1, 1, 'sample1', parallel_sketch=False)
 
         compiler.optverify()
@@ -132,7 +133,7 @@ class OptverifyTest(unittest.TestCase):
         compiler = Compiler(
             path.join(SPEC_DIR, spec_filename), path.join(
                 STATEFUL_ALU_DIR, alu_filename),
-            path.join(STATELESS_ALU_DIR, 'stateless_alu.j2'),
+            path.join(STATELESS_ALU_DIR, 'stateless_alu.alu'),
             1, 1, 'sample2', parallel_sketch=False)
 
         compiler.optverify()
