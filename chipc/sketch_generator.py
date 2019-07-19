@@ -142,7 +142,6 @@ class SketchGenerator:
         self.num_operands_to_stateful_alu_ = (
             stateful_alu_sketch_generator.num_packet_fields)
         self.num_state_slots_ = stateful_alu_sketch_generator.num_state_slots
-        print(stateful_alu_sketch_generator.main_function)
         return (stateful_alu_sketch_generator.helper_function_strings +
                 stateful_alu_sketch_generator.main_function)
 
