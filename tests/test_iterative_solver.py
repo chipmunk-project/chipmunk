@@ -6,8 +6,8 @@ from chipc.iterative_solver import generate_hole_elimination_assert
 
 BASE_PATH = path.abspath(path.dirname(__file__))
 
-STATELESS_ALU_DIR = path.join(BASE_PATH, '../example_alus_2/stateless-alus/')
-STATEFUL_ALU_DIR = path.join(BASE_PATH, '../example_alus_2/stateful-alus/')
+STATELESS_ALU_DIR = path.join(BASE_PATH, '../example_alus/stateless-alus/')
+STATEFUL_ALU_DIR = path.join(BASE_PATH, '../example_alus/stateful-alus/')
 SPEC_DIR = path.join(BASE_PATH, '../example_specs/')
 
 
