@@ -4,12 +4,10 @@ from pathlib import Path
 from antlr4 import CommonTokenStream
 from antlr4 import FileStream
 
+from chipc.alu.stateful_alu_sketch_generator import StatefulALUSketchGenerator
 from chipc.aluLexer import aluLexer
 from chipc.aluParser import aluParser
 from chipc.mode import Mode
-from chipc.stateful_alu_sketch_generator import StatefulAluSketchGenerator
-from chipc.stateful_aluLexer import stateful_aluLexer
-from chipc.stateful_aluParser import stateful_aluParser
 from chipc.stateless_alu_sketch_generator import StatelessAluSketchGenerator
 
 
@@ -108,22 +106,22 @@ class SketchGenerator:
 
     def generate_stateful_alu(self, alu_name):
         input_stream = FileStream(self.stateful_alu_file_)
-        lexer = stateful_aluLexer(input_stream)
+        lexer = aluLexer(input_stream)
         stream = CommonTokenStream(lexer)
-        parser = stateful_aluParser(stream)
-        tree = parser.stateful_alu()
-        stateful_alu_sketch_generator = StatefulAluSketchGenerator(
+        parser = aluParser(stream)
+        tree = parser.alu()
+        stateful_alu_sketch_generator = StatefulALUSketchGenerator(
             self.stateful_alu_file_, self.sketch_name_ + '_' + alu_name)
         stateful_alu_sketch_generator.visit(tree)
-        self.add_holes(stateful_alu_sketch_generator.globalholes)
+        self.add_holes(stateful_alu_sketch_generator.global_holes)
         self.stateful_alu_hole_arguments_ = [
-            x for x in sorted(stateful_alu_sketch_generator.stateful_alu_args)
+            x for x in sorted(stateful_alu_sketch_generator.alu_args)
         ]
         self.num_operands_to_stateful_alu_ = (
             stateful_alu_sketch_generator.num_packet_fields)
         self.num_state_slots_ = stateful_alu_sketch_generator.num_state_slots
-        return (stateful_alu_sketch_generator.helperFunctionStrings +
-                stateful_alu_sketch_generator.mainFunction)
+        return (stateful_alu_sketch_generator.helper_function_strings +
+                stateful_alu_sketch_generator.main_function)
 
     def generate_pkt_field_allocator(self):
         for j in range(self.num_phv_containers_):

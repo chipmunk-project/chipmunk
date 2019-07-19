@@ -11,8 +11,8 @@ from chipc.utils import get_hole_dicts
 
 BASE_PATH = path.abspath(path.dirname(__file__))
 DATA_DIR = path.join(BASE_PATH, 'data/')
-STATEFUL_ALU_DIR = path.join(BASE_PATH, '../example_alus/')
 STATELESS_ALU_DIR = path.join(BASE_PATH, '../example_alus_2/stateless-alus/')
+STATEFUL_ALU_DIR = path.join(BASE_PATH, '../example_alus_2/stateful-alus/')
 SPEC_DIR = path.join(BASE_PATH, '../example_specs/')
 TRANSFORM_DIR = path.join(BASE_PATH, '../example_transforms/')
 
@@ -42,7 +42,7 @@ class TestDirectSolver(unittest.TestCase):
 
     def test_raise_assertion_for_grid_size(self):
         spec_filename = 'simple.sk'
-        alu_filename = 'raw.stateful_alu'
+        alu_filename = 'raw.alu'
 
         with self.assertRaises(AssertionError):
             Compiler(
@@ -53,7 +53,7 @@ class TestDirectSolver(unittest.TestCase):
 
     def test_simple_raw_succeeds_with_two_two_grid(self):
         spec_filename = 'simple.sk'
-        alu_filename = 'raw.stateful_alu'
+        alu_filename = 'raw.alu'
 
         compiler = Compiler(
             path.join(SPEC_DIR, spec_filename), path.join(
@@ -77,7 +77,7 @@ class TestDirectSolver(unittest.TestCase):
 
     def test_simple_raw_fails_with_one_two_grid(self):
         spec_filename = 'simple.sk'
-        alu_filename = 'raw.stateful_alu'
+        alu_filename = 'raw.alu'
 
         compiler = Compiler(
             path.join(SPEC_DIR, spec_filename), path.join(
@@ -92,7 +92,7 @@ class TestDirectSolver(unittest.TestCase):
 
     def test_test_sketch(self):
         spec_filename = 'test.sk'
-        alu_filename = 'raw.stateful_alu'
+        alu_filename = 'raw.alu'
         # Running in parallel mode to minimize test run time.
         compiler = Compiler(
             path.join(SPEC_DIR, spec_filename), path.join(
@@ -119,7 +119,7 @@ class TestDirectSolver(unittest.TestCase):
 class OptverifyTest(unittest.TestCase):
     def test_simple_sketch_same_config(self):
         spec_filename = 'simple.sk'
-        alu_filename = 'raw.stateful_alu'
+        alu_filename = 'raw.alu'
 
         compiler = Compiler(
             path.join(SPEC_DIR, spec_filename), path.join(
