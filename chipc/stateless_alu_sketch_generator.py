@@ -93,13 +93,14 @@ class StatelessAluSketchGenerator (aluVisitor):
         # Empty set of hole vars
         if (ctx.getChildCount() == 5):
             return
-        self.add_hole(ctx.getChild(4).getText(), 4)
+        # TODO: Increase hole bits?
+        self.add_hole(ctx.getChild(4).getText(), 3)
 
         if (ctx.getChildCount() > 5):
             for i in range(5, ctx.getChildCount()-1):
                 self.visit(ctx.getChild(i))
 
-                self.add_hole(ctx.getChild(i).getText()[1:], 4)
+                self.add_hole(ctx.getChild(i).getText()[1:], 3)
 
     def visitHole_var_with_comma(self, ctx):
         assert (ctx.getChild(0).getText() == ',')

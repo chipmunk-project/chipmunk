@@ -31,7 +31,7 @@ class IterativeSolverTest(unittest.TestCase):
             iterative_solver.main([
                 'iterative_solver',
                 path.join(SPEC_DIR, 'sampling.sk'),
-                path.join(STATEFUL_ALU_DIR, 'if_else_raw.alu'),
+                path.join(STATEFUL_ALU_DIR, 'if_else_raw.stateful_alu'),
                 path.join(STATELESS_ALU_DIR, 'stateless_alu.alu'),
                 '2', '1', '10']),
         )
@@ -97,7 +97,7 @@ class IterativeSolverTest(unittest.TestCase):
             iterative_solver.main([
                 'iterative_solver',
                 path.join(SPEC_DIR, 'blue_decrease.sk'),
-                path.join(STATEFUL_ALU_DIR, 'sub.alu'),
+                path.join(STATEFUL_ALU_DIR, 'sub.stateful_alu'),
                 path.join(STATELESS_ALU_DIR, 'stateless_alu.alu'),
                 '4', '3', '10']),
         )
@@ -108,7 +108,7 @@ class IterativeSolverTest(unittest.TestCase):
             iterative_solver.main([
                 'iterative_solver',
                 path.join(SPEC_DIR, 'blue_decrease.sk'),
-                path.join(STATEFUL_ALU_DIR, 'sub.alu'),
+                path.join(STATEFUL_ALU_DIR, 'sub.stateful_alu'),
                 path.join(STATELESS_ALU_DIR, 'stateless_alu.alu'),
                 '4', '3', '10', '--synthesized-allocation']),
         )
@@ -119,7 +119,7 @@ class IterativeSolverTest(unittest.TestCase):
             iterative_solver.main([
                 'iterative_solver',
                 path.join(SPEC_DIR, 'marple_tcp_nmo.sk'),
-                path.join(STATEFUL_ALU_DIR, 'pred_raw.alu'),
+                path.join(STATEFUL_ALU_DIR, 'pred_raw.stateful_alu'),
                 path.join(STATELESS_ALU_DIR, 'stateless_alu.alu'),
                 '3', '2', '10']),
         )
