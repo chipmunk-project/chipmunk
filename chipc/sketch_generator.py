@@ -4,10 +4,10 @@ from pathlib import Path
 from antlr4 import CommonTokenStream
 from antlr4 import FileStream
 
-from chipc.alu.stateful_alu_sketch_generator import StatefulALUSketchGenerator
 from chipc.aluLexer import aluLexer
 from chipc.aluParser import aluParser
 from chipc.mode import Mode
+from chipc.stateful_alu_sketch_generator import StatefulALUSketchGenerator
 from chipc.stateless_alu_sketch_generator import StatelessAluSketchGenerator
 
 
