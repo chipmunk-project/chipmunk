@@ -55,14 +55,12 @@ class StatefulALUSketchGenerator(aluVisitor):
         self.main_function = self.main_function % argument_string
 
     def visitPacket_fields(self, ctx):
-        print('reached here')
         self.main_function += 'int '
         self.main_function += ctx.getChild(
             0, aluParser.Packet_fieldContext).getText() + ','
         self.num_packet_fields = 1
         if (ctx.getChildCount() > 6):
             for i in range(5, ctx.getChildCount() - 1):
-                print(i)
                 self.visit(ctx.getChild(i))
                 self.num_packet_fields += 1
         self.main_function = self.main_function[:-1]  # Trim out the last comma
@@ -79,8 +77,7 @@ class StatefulALUSketchGenerator(aluVisitor):
         self.num_state_slots = ctx.getChildCount() - 5
 
     def visitState_indicator(self, ctx):
-        print(ctx.getChildCount())
-        print(ctx.getChild(0))
+        pass
 
     def visitReturn_statement(self, ctx):
         # Stateful ALU's dont have return statements
