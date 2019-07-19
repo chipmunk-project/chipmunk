@@ -345,7 +345,7 @@ class StatelessAluSketchGenerator (aluVisitor):
     @overrides
     def visitExprWithOp(self, ctx):
         self.visit(ctx.getChild(0, aluParser.ExprContext))
-        self.mainFunction += ctx.getChild(1).getText()
+        self.eainFunction += ctx.getChild(1).getText()
         self.visit(ctx.getChild(1, aluParser.ExprContext))
 
     def generateMux2(self):

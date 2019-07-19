@@ -73,9 +73,9 @@
         {% endif %}
       {% endfor %},
       {# TODO: Add variable number of variables here. Try to make them not hard coded #}
-      {{sketch_name}}_stateless_alu_{{stage_number}}_{{alu_number}}_opcode_hole_local_global,
-      {{sketch_name}}_stateless_alu_{{stage_number}}_{{alu_number}}_immediate_operand_hole_local_global
-      );
+      {% set prefix_string = sketch_name + "_stateless_alu_" + stage_number|string + "_" + alu_number|string + "_" %}
+      {{stateless_alu_hole_arguments|map('add_prefix_suffix', prefix_string, "_global")|join(',')}});
+
     {% endfor %}
 
 

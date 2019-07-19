@@ -299,6 +299,7 @@ class SketchGenerator:
             spec_as_sketch=Path(program_file).read_text(),
             all_assertions=self.asserts_,
             hole_arguments=self.hole_arguments_,
+            stateless_alu_hole_arguments=self.stateless_alu_hole_arguments_,
             stateful_alu_hole_arguments=self.stateful_alu_hole_arguments_,
             num_operands_to_stateless_alu=self.num_operands_to_stateless_alu_,
             num_operands_to_stateful_alu=self.num_operands_to_stateful_alu_,

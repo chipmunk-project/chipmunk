@@ -1,0 +1,23 @@
+type :  stateless
+state variables : {}
+hole variables : {opcode_hole_local, immediate_operand_hole_local}
+packet fields : {pkt_0, pkt_1, pkt_2}
+
+
+if (rel_op(Opt(pkt_0), Mux3(pkt_0, pkt_1, C()))) {
+  return immediate_operand_hole_local + Opt (pkt_0);
+} elif (rel_op(Mux3(pkt_0, pkt_1, 0) + Mux3(pkt_1, pkt_2, 0) - Mux3(pkt_1, pkt_2, 0), C())) {
+  return Opt(pkt_0) + arith_op(Mux3(pkt_1, pkt_2, C()),  Mux3(pkt_1, pkt_2, C()));
+
+}
+elif (opcode_hole_local == 1 ){
+  return pkt_0 + pkt_1;
+} elif (opcode_hole_local == 2){
+  return pkt_0 + immediate_operand_hole_local;
+} elif (opcode_hole_local == 3){
+  return pkt_0 - pkt_1;
+} elif (opcode_hole_local == 4){
+  return pkt_0 - immediate_operand_hole_local;
+} else{
+  return immediate_operand_hole_local - pkt_0;
+}
