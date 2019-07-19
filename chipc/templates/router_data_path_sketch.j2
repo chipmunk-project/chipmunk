@@ -45,8 +45,6 @@
       {% endfor %}
 
     {% endif %}
-// NEW ADDITIONS:
-//
 
     // Stateless operands
     {% for alu_number in range(num_alus_per_stage) %}
@@ -64,7 +62,6 @@
     {% endfor %}
 
 
-{# Explicitly calls stateless ALU #}
 // Stateless ALUs
     {% for alu_number in range(num_alus_per_stage) %}
       int destination_{{stage_number}}_{{alu_number}} = {{sketch_name}}_stateless_alu_{{stage_number}}_{{alu_number}}(
@@ -81,25 +78,6 @@
       );
     {% endfor %}
 
-
-    {#
-    // Stateless ALUs
-    {% for alu_number in range(num_alus_per_stage) %}
-      int destination_{{stage_number}}_{{alu_number}} = {{sketch_name}}_stateless_alu_{{stage_number}}_{{alu_number}}(
-      {% for container_number in range(num_phv_containers) %}
-        {% if container_number != num_phv_containers - 1 %}
-          input_{{stage_number}}_{{container_number}},
-        {% else %}
-          input_{{stage_number}}_{{container_number}}
-        {% endif %}
-      {% endfor %},
-      {{sketch_name}}_stateless_alu_{{stage_number}}_{{alu_number}}_opcode,
-      {{sketch_name}}_stateless_alu_{{stage_number}}_{{alu_number}}_immediate,
-      {{sketch_name}}_stateless_alu_{{stage_number}}_{{alu_number}}_mux1_ctrl,
-      {{sketch_name}}_stateless_alu_{{stage_number}}_{{alu_number}}_mux2_ctrl,
-      {{sketch_name}}_stateless_alu_{{stage_number}}_{{alu_number}}_mux3_ctrl
-      );
-    {% endfor %} #}
 
     // Stateful operands
     {% for state_group_number in range(num_state_groups) %}

@@ -21,10 +21,8 @@ class StatelessAluSketchGenerator (aluVisitor):
         self.stateless_alu_args = dict()
         self.mainFunction = ''
         self.num_packet_fields = 0
-        self.hole_vars = []
         self.packet_fields = []
         self.parse_header = False
-        # no num_state_slots
 
     def add_hole(self, hole_name, hole_width):
         #        prefixed_hole = self.stateless_alu_name + '-' + hole_name
@@ -43,7 +41,6 @@ class StatelessAluSketchGenerator (aluVisitor):
         self.mainFunction += 'int ' + self.stateless_alu_name + '('
         self.visit(ctx.getChild(0, aluParser.Packet_fieldsContext))
         self.visit(ctx.getChild(0, aluParser.Hole_varsContext))
-        # TODO: Allow hole params from relop, opt, etc.
         if self.mainFunction[-1] == ',':
             self.mainFunction = self.mainFunction[:-1]
         self.parse_header = True
@@ -96,12 +93,10 @@ class StatelessAluSketchGenerator (aluVisitor):
         # Empty set of hole vars
         if (ctx.getChildCount() == 5):
             return
-        self.hole_vars.append(ctx.getChild(4).getText())
         self.add_hole(ctx.getChild(4).getText(), 4)
 
         if (ctx.getChildCount() > 5):
             for i in range(5, ctx.getChildCount()-1):
-                self.hole_vars.append(ctx.getChild(i).getText())
                 self.visit(ctx.getChild(i))
 
                 self.add_hole(ctx.getChild(i).getText()[1:], 4)
@@ -122,8 +117,6 @@ class StatelessAluSketchGenerator (aluVisitor):
                 self.visit(ctx.getChild(i))
                 self.packet_fields.append(ctx.getChild(i).getText()[1:])
                 self.num_packet_fields += 1
-
-#        self.mainFunction = self.mainFunction[:-1]  # Trim out the last comma
 
     @overrides
     def visitPacket_field_with_comma(self, ctx):
