@@ -16,7 +16,7 @@ if (opcode_hole_local == 0) {
 } elif (opcode_hole_local == 5) {
   return immediate_operand_hole_local - pkt_0;
 } elif (opcode_hole_local == 6) {
-  return x!=y;
+  return pkt_0!=pkt_1;
 } elif (opcode_hole_local == 7) {
   return (pkt_0 != immediate_operand_hole_local);
 } elif (opcode_hole_local == 8) {
@@ -46,6 +46,3 @@ if (opcode_hole_local == 0) {
 } else {
   return((pkt_0 == 0));
 }
-
-
-

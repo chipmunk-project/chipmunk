@@ -1,14 +1,16 @@
 import math
-import re
 from pathlib import Path
 
 from antlr4 import CommonTokenStream
 from antlr4 import FileStream
 
+from chipc.aluLexer import aluLexer
+from chipc.aluParser import aluParser
 from chipc.mode import Mode
 from chipc.stateful_alu_sketch_generator import StatefulAluSketchGenerator
 from chipc.stateful_aluLexer import stateful_aluLexer
 from chipc.stateful_aluParser import stateful_aluParser
+from chipc.stateless_alu_sketch_generator import StatelessAluSketchGenerator
 
 
 class Hole:
@@ -81,51 +83,29 @@ class SketchGenerator:
     def generate_stateless_alu(self, alu_name, potential_operands):
         # Grab the stateless alu file name by using
         # self.stateless_alu_file_[self.stateless_alu_file_.rfind('/')+1:]
-        stateless_alu_template = self.jinja2_env_.get_template(
-            self.stateless_alu_file_[self.stateless_alu_file_.rfind('/')+1:])
-        stateless_alu = stateless_alu_template.render(
-            potential_operands=potential_operands,
-            arg_list=['int ' + x for x in potential_operands],
-            alu_name=self.sketch_name_ + '_' + alu_name,
-            mux1=self.sketch_name_ + '_' + alu_name + '_mux1',
-            mux2=self.sketch_name_ + '_' + alu_name + '_mux2',
-            mux3=self.sketch_name_ + '_' + alu_name + '_mux3')
-        # TODO: now fix # of mux to be 3 and will later make them flexible
-        # according to the number of mux used in stateless_alu
-        mux_op_1 = self.generate_mux(
-            len(potential_operands), alu_name + '_mux1')
-        mux_op_2 = self.generate_mux(
-            len(potential_operands), alu_name + '_mux2')
-        mux_op_3 = self.generate_mux(
-            len(potential_operands), alu_name + '_mux3')
-
-        # Two ways to get the max value of opcode
-        # one is through read comment line //
-        # the other one is through find the number of opcode ==
-        # these two should be exactly the same
-        max_value_of_opcode = stateless_alu.count('opcode ==')
-        max_value = int(
-            re.search(r'// Max value of opcode is (\d+)',
-                      stateless_alu).group(1)
-        )
-        assert (max_value == max_value_of_opcode), \
-            "Number of opcodes in stateless ALU doesn't match up with" + \
-            ' the number at the beginning of the stateless ALU file.'
-        bit_of_opcode = math.ceil(math.log(max_value_of_opcode, 2))
-
-        self.add_hole(self.sketch_name_ + '_' +
-                      alu_name + '_opcode', bit_of_opcode)
-        self.add_hole(self.sketch_name_ + '_' + alu_name + '_immediate', 2)
-        self.add_assert(
-            '(' + self.sketch_name_ + '_' + alu_name + '_opcode == 1)' + '|| ('
-            + self.sketch_name_ + '_' + alu_name + '_mux1_ctrl <= ' +
-            self.sketch_name_ + '_' + alu_name +
-            '_mux2_ctrl)')  # symmetry breaking for commutativity
-        return mux_op_1 + mux_op_2 + mux_op_3 + stateless_alu
+        input_stream = FileStream(self.stateless_alu_file_)
+        lexer = aluLexer(input_stream)
+        stream = CommonTokenStream(lexer)
+        parser = aluParser(stream)
+        tree = parser.alu()
+        stateless_alu_sketch_generator = \
+            StatelessAluSketchGenerator(
+                self.stateless_alu_file_, self.sketch_name_ + '_' + alu_name)
+        stateless_alu_sketch_generator.visit(tree)
+        self.add_holes(stateless_alu_sketch_generator.globalholes)
+        self.stateless_alu_hole_arguments_ = [
+            x for x in sorted(
+                stateless_alu_sketch_generator.stateless_alu_args
+            )]
+        self.num_operands_to_stateless_alu_ = (
+            stateless_alu_sketch_generator.num_packet_fields)
+        return (stateless_alu_sketch_generator.helperFunctionStrings +
+                stateless_alu_sketch_generator.mainFunction)
 
     # Generate Sketch code for a simple stateful alu (+,-,*,/)
     # Takes one state and one packet operand (or immediate operand) as inputs
     # Updates the state in place and returns the old value of the state
+
     def generate_stateful_alu(self, alu_name):
         input_stream = FileStream(self.stateful_alu_file_)
         lexer = stateful_aluLexer(input_stream)
@@ -205,6 +185,17 @@ class SketchGenerator:
         self.add_hole(self.sketch_name_ + '_' + mux_name + '_ctrl', num_bits)
         return mux_code
 
+    def generate_stateless_operand_muxes(self):
+        ret = ''
+        assert(self.num_operands_to_stateless_alu_ > 0)
+        for i in range(self.num_pipeline_stages_):
+            for l in range(self.num_alus_per_stage_):
+                for k in range(self.num_operands_to_stateless_alu_):
+                    ret += self.generate_mux(
+                        self.num_phv_containers_, 'stateless_operand_mux_' +
+                        str(i) + '_' + str(l) + '_' + str(k)) + '\n'
+        return ret
+
     # Stateful operand muxes, stateless ones are part of generate_stateless_alu
     def generate_stateful_operand_muxes(self):
         ret = ''
@@ -278,6 +269,8 @@ class SketchGenerator:
         alu_definitions = self.generate_alus()
         stateful_operand_mux_definitions = (
             self.generate_stateful_operand_muxes())
+        stateless_operand_mux_definitions = (
+            self.generate_stateless_operand_muxes())
         output_mux_definitions = self.generate_output_muxes()
 
         # Create allocator to ensure each state var is assigned to exactly
@@ -294,6 +287,9 @@ class SketchGenerator:
             num_alus_per_stage=self.num_alus_per_stage_,
             num_phv_containers=self.num_phv_containers_,
             hole_definitions=self.hole_preamble_,
+
+            stateless_operand_mux_definitions=(
+                stateless_operand_mux_definitions),
             stateful_operand_mux_definitions=stateful_operand_mux_definitions,
             output_mux_definitions=output_mux_definitions,
             alu_definitions=alu_definitions,
@@ -304,6 +300,7 @@ class SketchGenerator:
             all_assertions=self.asserts_,
             hole_arguments=self.hole_arguments_,
             stateful_alu_hole_arguments=self.stateful_alu_hole_arguments_,
+            num_operands_to_stateless_alu=self.num_operands_to_stateless_alu_,
             num_operands_to_stateful_alu=self.num_operands_to_stateful_alu_,
             num_state_slots=self.num_state_slots_,
             additional_constraints='\n'.join(
