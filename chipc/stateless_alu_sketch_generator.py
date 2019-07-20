@@ -1,3 +1,5 @@
+import math
+import re
 from textwrap import dedent
 
 from overrides import overrides
@@ -25,12 +27,20 @@ class StatelessAluSketchGenerator (aluVisitor):
         self.parse_header = False
 
     def add_hole(self, hole_name, hole_width):
-        #        prefixed_hole = self.stateless_alu_name + '-' + hole_name
         prefixed_hole = self.stateless_alu_name + '_' + hole_name
         assert (prefixed_hole + '_global' not in self.globalholes)
         self.globalholes[prefixed_hole + '_global'] = hole_width
         assert (hole_name not in self.stateless_alu_args)
         self.stateless_alu_args[hole_name] = hole_width
+
+    def find_opcode_bits(self):
+        with open(self.stateless_alu_file) as f:
+            first_line = f.readline()
+
+            prog = re.compile(r'// Max value of opcode is (\d+)')
+            result = int(prog.match(first_line).groups(0)[0])
+
+            return math.ceil(math.log(result))
 
     @overrides
     def visitAlu(self, ctx):
@@ -93,14 +103,21 @@ class StatelessAluSketchGenerator (aluVisitor):
         # Empty set of hole vars
         if (ctx.getChildCount() == 5):
             return
-        # TODO: Increase hole bits?
-        self.add_hole(ctx.getChild(4).getText(), 3)
+
+        num_bits = 2
+        if 'opcode' in ctx.getChild(4).getText():
+            num_bits = self.find_opcode_bits()
+        self.add_hole(ctx.getChild(4).getText(), num_bits)
 
         if (ctx.getChildCount() > 5):
             for i in range(5, ctx.getChildCount()-1):
                 self.visit(ctx.getChild(i))
 
-                self.add_hole(ctx.getChild(i).getText()[1:], 3)
+                num_bits = 2
+                if 'opcode' in ctx.getChild(i).getText():
+                    num_bits = self.find_opcode_bits()
+
+                self.add_hole(ctx.getChild(i).getText()[1:], num_bits)
 
     def visitHole_var_with_comma(self, ctx):
         assert (ctx.getChild(0).getText() == ',')
