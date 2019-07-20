@@ -153,30 +153,30 @@ class StatelessAluSketchGenerator (aluVisitor):
 
             self.visit(ctx.return_update)
         else:  # if-elif-else update
-            self.mainFunction += 'if ('
+            self.mainFunction += '\tif ('
             self.visit(ctx.if_guard)
-            self.mainFunction += ') {'
+            self.mainFunction += ') {\n'
 
             self.visit(ctx.if_body)
-            self.mainFunction += '}'
+            self.mainFunction += '\n}\n'
             elif_index = 7
             while (ctx.getChildCount() > elif_index and
                     ctx.getChild(elif_index).getText() == 'elif'):
 
-                self.mainFunction += 'else if ('
+                self.mainFunction += '\telse if ('
                 self.visit(ctx.getChild(elif_index+2))
-                self.mainFunction += ') {'
+                self.mainFunction += ') {\n'
                 self.visit(ctx.getChild(elif_index+5))
 
-                self.mainFunction += '}'
+                self.mainFunction += '\n}\n'
                 elif_index += 7
 
             # if there is an else
             if (ctx.getChildCount() > elif_index and
                     ctx.getChild(elif_index).getText() == 'else'):
-                self.mainFunction += 'else {'
+                self.mainFunction += '\telse {\n'
                 self.visit(ctx.else_body)
-                self.mainFunction += '}'
+                self.mainFunction += '\n}\n'
 
     @overrides
     def visitNested(self, ctx):
@@ -210,7 +210,7 @@ class StatelessAluSketchGenerator (aluVisitor):
 
     @overrides
     def visitReturn_statement(self, ctx):
-        self.mainFunction += 'return '
+        self.mainFunction += '\t\treturn '
         self.visit(ctx.getChild(1))
         self.mainFunction += ';'
 
