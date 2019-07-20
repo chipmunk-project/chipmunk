@@ -33,9 +33,18 @@ if (opcode_hole_local == 0) {
 } elif (opcode_hole_local == 13) {
   return ( pkt_0 < immediate_operand_hole_local);
 } elif (opcode_hole_local == 14) {
-  return ( pkt_0 != 0 );
+  if ( pkt_0 != 0 ){
+    return pkt_1;
+  }
+  else {
+    return pkt_2;
+  }
 } elif (opcode_hole_local == 15) {
-  return ( pkt_0 != 0 );
+  if ( pkt_0 != 0 ){
+    return pkt_1;
+  } else{
+    return immediate_operand_hole_local;
+  }
 } elif (opcode_hole_local == 16) {
   return ((pkt_0 != 0) || (pkt_1 != 0));
 } elif (opcode_hole_local == 17) {
