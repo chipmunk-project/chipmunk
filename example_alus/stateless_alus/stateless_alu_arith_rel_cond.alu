@@ -1,3 +1,4 @@
+// Max value of opcode is 14
 type :stateless
 state variables : {}
 hole variables : {opcode_hole_local, immediate_operand_hole_local}
