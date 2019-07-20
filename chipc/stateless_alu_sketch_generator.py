@@ -36,11 +36,9 @@ class StatelessAluSketchGenerator (aluVisitor):
     def find_opcode_bits(self):
         with open(self.stateless_alu_file) as f:
             first_line = f.readline()
-
             prog = re.compile(r'// Max value of opcode is (\d+)')
             result = int(prog.match(first_line).groups(0)[0])
-
-            return math.ceil(math.log(result))
+            return math.ceil(math.log2(result))
 
     @overrides
     def visitAlu(self, ctx):
