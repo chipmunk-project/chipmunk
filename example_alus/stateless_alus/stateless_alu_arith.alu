@@ -1,19 +1,19 @@
 // Max value of opcode is 4
 type :  stateless
 state variables : {}
-hole variables : {opcode_hole_local, immediate_operand_hole_local}
+hole variables : {opcode, immediate_operand}
 packet fields : {pkt_0, pkt_1}
 
-if (opcode_hole_local == 0){
-  return immediate_operand_hole_local;
-} elif (opcode_hole_local == 1 ){
+if (opcode == 0){
+  return immediate_operand;
+} elif (opcode == 1 ){
   return pkt_0 + pkt_1;
-} elif (opcode_hole_local == 2){
-  return pkt_0 + immediate_operand_hole_local;
-} elif (opcode_hole_local == 3){
+} elif (opcode == 2){
+  return pkt_0 + immediate_operand;
+} elif (opcode == 3){
   return pkt_0 - pkt_1;
-} elif (opcode_hole_local == 4){
-  return pkt_0 - immediate_operand_hole_local;
+} elif (opcode == 4){
+  return pkt_0 - immediate_operand;
 } else{
-  return immediate_operand_hole_local - pkt_0;
+  return immediate_operand - pkt_0;
 }

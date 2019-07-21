@@ -46,38 +46,23 @@
 
     {% endif %}
 
-    // Stateless operands
-    {% for alu_number in range(num_alus_per_stage) %}
-      {% for operand_number in range(num_operands_to_stateless_alu) %}
-        int packet_operand_slalu{{stage_number}}_{{alu_number}}_{{operand_number}} = {{sketch_name}}_stateless_operand_mux_{{stage_number}}_{{alu_number}}_{{operand_number}}(
-        {% for container_number in range(num_phv_containers) %}
-          {% if container_number != num_phv_containers - 1 %}
-            input_{{stage_number}}_{{container_number}},
-          {% else %}
-            input_{{stage_number}}_{{container_number}}
-          {% endif %}
-        {% endfor %}
-      , {{sketch_name}}_stateless_operand_mux_{{stage_number}}_{{alu_number}}_{{operand_number}}_ctrl);
-      {% endfor %}
-    {% endfor %}
-
-
-// Stateless ALUs
+    // Stateless ALUs
     {% for alu_number in range(num_alus_per_stage) %}
       int destination_{{stage_number}}_{{alu_number}} = {{sketch_name}}_stateless_alu_{{stage_number}}_{{alu_number}}(
-      {% for operand_number in range(num_operands_to_stateless_alu) %}
-        {% if operand_number != num_operands_to_stateless_alu - 1 %}
-          packet_operand_slalu{{stage_number}}_{{alu_number}}_{{operand_number}},
+      {% for container_number in range(num_phv_containers) %}
+        {% if container_number != num_phv_containers - 1 %}
+          input_{{stage_number}}_{{container_number}},
         {% else %}
-          packet_operand_slalu{{stage_number}}_{{alu_number}}_{{operand_number}}
+          input_{{stage_number}}_{{container_number}}
         {% endif %}
       {% endfor %},
-      {# TODO: Add variable number of variables here. Try to make them not hard coded #}
-      {% set prefix_string = sketch_name + "_stateless_alu_" + stage_number|string + "_" + alu_number|string + "_" %}
-      {{stateless_alu_hole_arguments|map('add_prefix_suffix', prefix_string, "_global")|join(',')}});
-
+      {{sketch_name}}_stateless_alu_{{stage_number}}_{{alu_number}}_opcode,
+      {{sketch_name}}_stateless_alu_{{stage_number}}_{{alu_number}}_immediate,
+      {{sketch_name}}_stateless_alu_{{stage_number}}_{{alu_number}}_mux1_ctrl,
+      {{sketch_name}}_stateless_alu_{{stage_number}}_{{alu_number}}_mux2_ctrl,
+      {{sketch_name}}_stateless_alu_{{stage_number}}_{{alu_number}}_mux3_ctrl
+      );
     {% endfor %}
-
 
     // Stateful operands
     {% for state_group_number in range(num_state_groups) %}

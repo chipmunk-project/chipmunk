@@ -1,38 +1,38 @@
 // Max value of opcode is 14
 type :stateless
 state variables : {}
-hole variables : {opcode_hole_local, immediate_operand_hole_local}
+hole variables : {opcode, immediate_operand}
 packet fields : {pkt_0, pkt_1, pkt_2}
 
-if (opcode_hole_local == 0) {
-  return immediate_operand_hole_local;
-} elif (opcode_hole_local == 1) {
+if (opcode == 0) {
+  return immediate_operand;
+} elif (opcode == 1) {
   return pkt_0 + pkt_1;
-} elif (opcode_hole_local == 2) {
-  return pkt_0 + immediate_operand_hole_local;
-} elif (opcode_hole_local == 3) {
+} elif (opcode == 2) {
+  return pkt_0 + immediate_operand;
+} elif (opcode == 3) {
   return pkt_0 - pkt_1;
-} elif (opcode_hole_local == 4) {
-  return pkt_0 - immediate_operand_hole_local;
-} elif (opcode_hole_local == 5) {
-  return immediate_operand_hole_local - pkt_0;
-} elif (opcode_hole_local == 6) {
+} elif (opcode == 4) {
+  return pkt_0 - immediate_operand;
+} elif (opcode == 5) {
+  return immediate_operand - pkt_0;
+} elif (opcode == 6) {
   return (pkt_0 != pkt_1);
-} elif (opcode_hole_local == 7) {
-  return ( pkt_0 != immediate_operand_hole_local);
-} elif (opcode_hole_local == 8) {
+} elif (opcode == 7) {
+  return ( pkt_0 != immediate_operand);
+} elif (opcode == 8) {
   return (pkt_0 == pkt_1);
-} elif (opcode_hole_local == 9) {
-  return (pkt_0 == immediate_operand_hole_local);
-} elif (opcode_hole_local == 10) {
+} elif (opcode == 9) {
+  return (pkt_0 == immediate_operand);
+} elif (opcode == 10) {
   return (pkt_0 >= pkt_1);
-} elif (opcode_hole_local == 11) {
-  return (pkt_0 >= immediate_operand_hole_local);
-} elif (opcode_hole_local == 12) {
+} elif (opcode == 11) {
+  return (pkt_0 >= immediate_operand);
+} elif (opcode == 12) {
   return (pkt_0 < pkt_1);
-} elif (opcode_hole_local == 13) {
-  return (pkt_0 < immediate_operand_hole_local);
-} elif (opcode_hole_local == 14) {
+} elif (opcode == 13) {
+  return (pkt_0 < immediate_operand);
+} elif (opcode == 14) {
   if ( pkt_0 != 0 ){
     return pkt_1;
   }
@@ -44,6 +44,6 @@ if (opcode_hole_local == 0) {
     return pkt_1;
   }
   else {
-    return immediate_operand_hole_local;
+    return immediate_operand;
   }
 }

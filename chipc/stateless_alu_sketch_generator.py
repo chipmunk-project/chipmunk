@@ -9,9 +9,11 @@ from chipc.aluVisitor import aluVisitor
 
 
 class StatelessAluSketchGenerator (aluVisitor):
-    def __init__(self, stateless_alu_file, stateless_alu_name):
+    def __init__(self, stateless_alu_file, stateless_alu_name,
+                 potential_operands):
         self.stateless_alu_name = stateless_alu_name
         self.stateless_alu_file = stateless_alu_file
+        self.potential_operands = potential_operands
         self.mux3Count = 0
         self.mux2Count = 0
         self.relopCount = 0
@@ -27,11 +29,23 @@ class StatelessAluSketchGenerator (aluVisitor):
         self.parse_header = False
 
     def add_hole(self, hole_name, hole_width):
-        prefixed_hole = self.stateless_alu_name + '_' + hole_name
-        assert (prefixed_hole + '_global' not in self.globalholes)
-        self.globalholes[prefixed_hole + '_global'] = hole_width
+        # immediate_operand forced down to immediate
+        # for global name.
+        if 'immediate_operand' in hole_name:
+            prefixed_hole = self.stateless_alu_name + '_' + \
+                hole_name[:hole_name.index('_')]
+        else:
+            prefixed_hole = self.stateless_alu_name + '_' + hole_name
+#        assert (prefixed_hole not in self.globalholes)
+        try:
+            assert prefixed_hole not in self.globalholes, prefixed_hole + \
+                ' already in global holes'
+        except AssertionError:
+            raise
+        self.globalholes[prefixed_hole] = hole_width
+
         assert (hole_name not in self.stateless_alu_args)
-        self.stateless_alu_args[hole_name] = hole_width
+        self.stateless_alu_args[hole_name+'_hole_local'] = hole_width
 
     def find_opcode_bits(self):
         with open(self.stateless_alu_file) as f:
@@ -40,6 +54,36 @@ class StatelessAluSketchGenerator (aluVisitor):
             result = int(prog.match(first_line).groups(0)[0])
             return math.ceil(math.log2(result))
 
+    # TODO: Currently adding third mux input to match jinja2.
+    # Change to allow variable number to muxes/inputs?
+    def write_mux_inputs(self):
+        mux_index = 1
+#        for i in range ((self.num_packet_fields) ):
+        for i in range(3):
+            self.mainFunction += '\tint ' + 'mux' + str(mux_index) + \
+                '_ctrl_hole_local,'
+            mux_index += 1
+        self.mainFunction = self.mainFunction[:-1]
+
+    def write_temp_hole_vars(self):
+        for arg in self.stateless_alu_args:
+            temp_var = arg[:arg.index('_hole_local')]
+            self.mainFunction += '\tint ' + temp_var + ' = ' + arg + ';\n'
+
+    def write_mux_call(self):
+        mux_index = 1
+        mux_input_str = ''
+        for operand in self.potential_operands:
+            mux_input_str += operand+','
+
+        for p in self.packet_fields:
+            mux_ctrl = 'mux' + str(mux_index) + '_ctrl_hole_local'
+            self.mainFunction += '\tint ' + p + ' = ' + \
+                self.stateless_alu_name + '_' + 'mux' + \
+                str(mux_index) + '(' + mux_input_str + \
+                mux_ctrl + ');\n'
+            mux_index += 1
+
     @overrides
     def visitAlu(self, ctx):
 
@@ -47,24 +91,30 @@ class StatelessAluSketchGenerator (aluVisitor):
         self.visit(ctx.getChild(0, aluParser.State_varsContext))
 
         self.mainFunction += 'int ' + self.stateless_alu_name + '('
+        # Takes in all phv_containers as parameters
+        for p in self.potential_operands:
+            self.mainFunction += 'int ' + p + ','
+        # Records packet fields being used (results from the muxes)
         self.visit(ctx.getChild(0, aluParser.Packet_fieldsContext))
+
+        # Adds hole variables to parameters
         self.visit(ctx.getChild(0, aluParser.Hole_varsContext))
-        if self.mainFunction[-1] == ',':
-            self.mainFunction = self.mainFunction[:-1]
-        self.parse_header = True
+        self.write_mux_inputs()
         self.mainFunction += ' %s){\n'
+        self.write_temp_hole_vars()
+        self.write_mux_call()
         self.visit(ctx.getChild(0, aluParser.Alu_bodyContext))
         self.mainFunction += '\n}'
+
+        # For additional hole variables (relops, opts, etc)
         argument_string = ''
-        if len(self.stateless_alu_args) > 0:
-            self.mainFunction += ','
-            argument_string = ','.join(
+        if len(self.stateless_alu_args) > 2:
+
+            argument_string = ',' + ','.join(
                 ['int ' + hole for hole in sorted(self.stateless_alu_args)])
 
-        if argument_string[0] != ',' and len(self.stateless_alu_args) > 0:
-            argument_string = ',' + argument_string
-
         self.mainFunction = self.mainFunction % argument_string
+
         if self.mainFunction[-1] == ',':
             self.mainFunction = self.mainFunction[:-1]
 
@@ -106,16 +156,22 @@ class StatelessAluSketchGenerator (aluVisitor):
         if 'opcode' in ctx.getChild(4).getText():
             num_bits = self.find_opcode_bits()
         self.add_hole(ctx.getChild(4).getText(), num_bits)
-
+        self.mainFunction += 'int ' + ctx.getChild(4).getText() + (
+            '_hole_local,')
         if (ctx.getChildCount() > 5):
             for i in range(5, ctx.getChildCount()-1):
-                self.visit(ctx.getChild(i))
 
+                self.visit(ctx.getChild(i))
                 num_bits = 2
                 if 'opcode' in ctx.getChild(i).getText():
                     num_bits = self.find_opcode_bits()
 
-                self.add_hole(ctx.getChild(i).getText()[1:], num_bits)
+                self.add_hole(ctx.getChild(i).getText()[1:].strip(), (
+                    num_bits))
+
+                self.mainFunction += 'int ' + \
+                    ctx.getChild(i).getText()[1:].strip() + \
+                    '_hole_local,'
 
     def visitHole_var_with_comma(self, ctx):
         assert (ctx.getChild(0).getText() == ',')
@@ -125,12 +181,10 @@ class StatelessAluSketchGenerator (aluVisitor):
         # Empty set of packet fields
         if (ctx.getChildCount() == 5):
             return
-        self.mainFunction += 'int ' + ctx.getChild(4).getText() + ','
         self.packet_fields.append(ctx.getChild(4).getText())
         self.num_packet_fields += 1
         if (ctx.getChildCount() > 5):
             for i in range(5, ctx.getChildCount()-1):
-                self.visit(ctx.getChild(i))
                 self.packet_fields.append(ctx.getChild(i).getText()[1:])
                 self.num_packet_fields += 1
 
