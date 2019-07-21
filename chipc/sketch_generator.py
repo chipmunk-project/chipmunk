@@ -74,19 +74,18 @@ class SketchGenerator:
             self.add_hole(hole, new_holes[hole])
 
     def add_assert(self, assert_predicate):
-        #        print ('assert pred: ' , assert_predicate)
         self.asserts_ += 'assert(' + assert_predicate + ');\n'
         self.constraints_ += [assert_predicate]
 
     # Generate Sketch code for a simple stateless alu (+,-,*,/)
     def generate_stateless_alu(self, alu_name, potential_operands):
         # Grab the stateless alu file name by using
-        mux_op_1 = self.generate_mux(
-            len(potential_operands), alu_name + '_mux1')
-        mux_op_2 = self.generate_mux(
-            len(potential_operands), alu_name + '_mux2')
-        mux_op_3 = self.generate_mux(
-            len(potential_operands), alu_name + '_mux3')
+        #        mux_op_1 = self.generate_mux(
+        #            len(potential_operands), alu_name + '_mux1')
+        #        mux_op_2 = self.generate_mux(
+        #            len(potential_operands), alu_name + '_mux2')
+        #        mux_op_3 = self.generate_mux(
+        #            len(potential_operands), alu_name + '_mux3')
         input_stream = FileStream(self.stateless_alu_file_)
         lexer = aluLexer(input_stream)
         stream = CommonTokenStream(lexer)
@@ -96,25 +95,25 @@ class SketchGenerator:
         stateless_alu_sketch_generator = \
             StatelessAluSketchGenerator(
                 self.stateless_alu_file_, self.sketch_name_ + '_' +
-                alu_name, potential_operands)
+                alu_name, alu_name, potential_operands, self.generate_mux)
         stateless_alu_sketch_generator.visit(tree)
         self.add_holes(stateless_alu_sketch_generator.globalholes)
         self.stateless_alu_hole_arguments_ = [
             x for x in sorted(
                 stateless_alu_sketch_generator.stateless_alu_args
             )]
-        self.num_operands_to_stateless_alu_ = (
-            stateless_alu_sketch_generator.num_packet_fields)
+#        self.num_operands_to_stateless_alu_ = (
+#            stateless_alu_sketch_generator.num_packet_fields)
+
+        self.num_stateless_muxes_ = \
+            stateless_alu_sketch_generator.num_packet_fields
         self.add_assert(
             '(' + self.sketch_name_ + '_' + alu_name + '_opcode == 1)' + '|| ('
             + self.sketch_name_ + '_' + alu_name + '_mux1_ctrl <= ' +
             self.sketch_name_ + '_' + alu_name +
             '_mux2_ctrl)')
 
-        return (mux_op_1 +
-                mux_op_2 +
-                mux_op_3 +
-                stateless_alu_sketch_generator.helperFunctionStrings +
+        return (stateless_alu_sketch_generator.helperFunctionStrings +
                 stateless_alu_sketch_generator.mainFunction)
 
     # Generate Sketch code for a simple stateful alu (+,-,*,/)
@@ -290,6 +289,7 @@ class SketchGenerator:
             num_phv_containers=self.num_phv_containers_,
             hole_definitions=self.hole_preamble_,
             stateful_operand_mux_definitions=stateful_operand_mux_definitions,
+            num_stateless_muxes=self.num_stateless_muxes_,
             output_mux_definitions=output_mux_definitions,
             alu_definitions=alu_definitions,
             num_fields_in_prog=self.num_fields_in_prog_,

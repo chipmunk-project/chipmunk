@@ -10,10 +10,14 @@ from chipc.aluVisitor import aluVisitor
 
 class StatelessAluSketchGenerator (aluVisitor):
     def __init__(self, stateless_alu_file, stateless_alu_name,
-                 potential_operands):
+                 alu_name,
+                 potential_operands,
+                 generate_stateless_mux):
         self.stateless_alu_name = stateless_alu_name
         self.stateless_alu_file = stateless_alu_file
+        self.alu_name = alu_name
         self.potential_operands = potential_operands
+        self.generate_stateless_mux = generate_stateless_mux
         self.mux3Count = 0
         self.mux2Count = 0
         self.relopCount = 0
@@ -26,7 +30,6 @@ class StatelessAluSketchGenerator (aluVisitor):
         self.mainFunction = ''
         self.num_packet_fields = 0
         self.packet_fields = []
-        self.parse_header = False
 
     def add_hole(self, hole_name, hole_width):
         # immediate_operand forced down to immediate
@@ -36,7 +39,7 @@ class StatelessAluSketchGenerator (aluVisitor):
                 hole_name[:hole_name.index('_')]
         else:
             prefixed_hole = self.stateless_alu_name + '_' + hole_name
-#        assert (prefixed_hole not in self.globalholes)
+        assert (prefixed_hole not in self.globalholes)
         try:
             assert prefixed_hole not in self.globalholes, prefixed_hole + \
                 ' already in global holes'
@@ -47,6 +50,7 @@ class StatelessAluSketchGenerator (aluVisitor):
         assert (hole_name not in self.stateless_alu_args)
         self.stateless_alu_args[hole_name+'_hole_local'] = hole_width
 
+    # Calculates number of bits to set opcode hole to
     def find_opcode_bits(self):
         with open(self.stateless_alu_file) as f:
             first_line = f.readline()
@@ -54,34 +58,39 @@ class StatelessAluSketchGenerator (aluVisitor):
             result = int(prog.match(first_line).groups(0)[0])
             return math.ceil(math.log2(result))
 
-    # TODO: Currently adding third mux input to match jinja2.
-    # Change to allow variable number to muxes/inputs?
+    # Generates the mux ctrl paremeters
     def write_mux_inputs(self):
         mux_index = 1
-#        for i in range ((self.num_packet_fields) ):
-        for i in range(3):
+        for i in range((self.num_packet_fields)):
             self.mainFunction += '\tint ' + 'mux' + str(mux_index) + \
                 '_ctrl_hole_local,'
             mux_index += 1
         self.mainFunction = self.mainFunction[:-1]
 
+    # Reassigns hole variable parameters to inputs specified
+    # in ALU file
     def write_temp_hole_vars(self):
         for arg in self.stateless_alu_args:
             temp_var = arg[:arg.index('_hole_local')]
             self.mainFunction += '\tint ' + temp_var + ' = ' + arg + ';\n'
 
+    # Generates code that calls muxes from within stateless ALU
     def write_mux_call(self):
         mux_index = 1
         mux_input_str = ''
         for operand in self.potential_operands:
             mux_input_str += operand+','
-
         for p in self.packet_fields:
             mux_ctrl = 'mux' + str(mux_index) + '_ctrl_hole_local'
             self.mainFunction += '\tint ' + p + ' = ' + \
                 self.stateless_alu_name + '_' + 'mux' + \
                 str(mux_index) + '(' + mux_input_str + \
                 mux_ctrl + ');\n'
+            full_name = self.alu_name + '_' + 'mux' + str(mux_index)
+            self.helperFunctionStrings += \
+                self.generate_stateless_mux(
+                    len(self.potential_operands), full_name)
+
             mux_index += 1
 
     @overrides
