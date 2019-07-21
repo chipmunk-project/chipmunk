@@ -1,4 +1,4 @@
-// Max value of opcode is 4
+// Max value of opcode is 5
 type :  stateless
 state variables : {}
 hole variables : {opcode, immediate_operand}

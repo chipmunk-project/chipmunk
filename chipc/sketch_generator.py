@@ -74,6 +74,7 @@ class SketchGenerator:
             self.add_hole(hole, new_holes[hole])
 
     def add_assert(self, assert_predicate):
+        #        print ('assert pred: ' , assert_predicate)
         self.asserts_ += 'assert(' + assert_predicate + ');\n'
         self.constraints_ += [assert_predicate]
 
@@ -104,6 +105,11 @@ class SketchGenerator:
             )]
         self.num_operands_to_stateless_alu_ = (
             stateless_alu_sketch_generator.num_packet_fields)
+        self.add_assert(
+            '(' + self.sketch_name_ + '_' + alu_name + '_opcode == 1)' + '|| ('
+            + self.sketch_name_ + '_' + alu_name + '_mux1_ctrl <= ' +
+            self.sketch_name_ + '_' + alu_name +
+            '_mux2_ctrl)')
 
         return (mux_op_1 +
                 mux_op_2 +
@@ -114,7 +120,6 @@ class SketchGenerator:
     # Generate Sketch code for a simple stateful alu (+,-,*,/)
     # Takes one state and one packet operand (or immediate operand) as inputs
     # Updates the state in place and returns the old value of the state
-
     def generate_stateful_alu(self, alu_name):
         input_stream = FileStream(self.stateful_alu_file_)
         lexer = aluLexer(input_stream)
@@ -131,6 +136,7 @@ class SketchGenerator:
         self.num_operands_to_stateful_alu_ = (
             stateful_alu_sketch_generator.num_packet_fields)
         self.num_state_slots_ = stateful_alu_sketch_generator.num_state_slots
+
         return (stateful_alu_sketch_generator.helper_function_strings +
                 stateful_alu_sketch_generator.main_function)
 
@@ -283,7 +289,6 @@ class SketchGenerator:
             num_alus_per_stage=self.num_alus_per_stage_,
             num_phv_containers=self.num_phv_containers_,
             hole_definitions=self.hole_preamble_,
-
             stateful_operand_mux_definitions=stateful_operand_mux_definitions,
             output_mux_definitions=output_mux_definitions,
             alu_definitions=alu_definitions,

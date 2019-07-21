@@ -35,7 +35,11 @@
     {% if stage_number == 0 %}
       // Read each PHV container from corresponding packet field.
       {% for field_number in range(num_fields_in_prog) %}
-        input_0_{{field_number}} = state_and_packet.pkt_{{field_number}};
+        {% for container_number in range(num_phv_containers) %}
+          if (phv_config_{{field_number}}_{{container_number}} == 1){
+            input_0_{{container_number}} = state_and_packet.pkt_{{field_number}};
+          }
+        {% endfor %}
       {% endfor %}
 
     {% else %}
@@ -148,7 +152,11 @@
 
   {% for field_number in range(num_fields_in_prog) %}
     // Write pkt_{{field_number}}
-    state_and_packet.pkt_{{field_number}} = output_{{num_pipeline_stages - 1}}_{{field_number}};
+    {% for container_number in range(num_phv_containers) %}
+      if (phv_config_{{field_number}}_{{container_number}} == 1){
+        state_and_packet.pkt_{{field_number}} = output_{{num_pipeline_stages - 1}}_{{container_number}};
+      }
+    {% endfor %}
   {% endfor %}
 
   // Return updated packet fields and state vars
