@@ -1,5 +1,7 @@
 from textwrap import dedent
 
+from overrides import overrides
+
 from chipc.aluParser import aluParser
 from chipc.aluVisitor import aluVisitor
 
@@ -29,6 +31,7 @@ class StatefulALUSketchGenerator(aluVisitor):
         assert (hole_name not in self.alu_args)
         self.alu_args[hole_name] = hole_width
 
+    @overrides
     def visitAlu(self, ctx):
         self.main_function += ('|StateGroup| ' + self.alu_name +
                                '(ref |StateGroup| state_group, ')
@@ -54,6 +57,7 @@ class StatefulALUSketchGenerator(aluVisitor):
             ['int ' + hole for hole in sorted(self.alu_args)])
         self.main_function = self.main_function % argument_string
 
+    @overrides
     def visitPacket_fields(self, ctx):
         self.main_function += 'int '
         self.main_function += ctx.getChild(
@@ -65,24 +69,30 @@ class StatefulALUSketchGenerator(aluVisitor):
                 self.num_packet_fields += 1
         self.main_function = self.main_function[:-1]  # Trim out the last comma
 
+    @overrides
     def visitPacket_field_with_comma(self, ctx):
         self.main_function += 'int '
         assert (ctx.getChild(0).getText() == ',')
         self.main_function += ctx.getChild(1).getText() + ','
 
+    @overrides
     def visitVar(self, ctx):
         self.main_function += ctx.getText()
 
+    @overrides
     def visitState_vars(self, ctx):
         self.num_state_slots = ctx.getChildCount() - 5
 
+    @overrides
     def visitState_indicator(self, ctx):
         pass
 
+    @overrides
     def visitReturn_statement(self, ctx):
         # Stateful ALU's dont have return statements
         assert(ctx.getChildCount() == 0)
 
+    @overrides
     def visitAlu_body(self, ctx):
         if (ctx.getChildCount() == 1):  # simple update
             self.visit(ctx.getChild(0))
@@ -111,9 +121,11 @@ class StatefulALUSketchGenerator(aluVisitor):
                 self.visit(ctx.else_body)
                 self.main_function += '}'
 
+    @overrides
     def visitUpdates(self, ctx):
         self.visitChildren(ctx)
 
+    @overrides
     def visitUpdate(self, ctx):
         assert ctx.getChild(ctx.getChildCount() - 1).getText() == ';', \
             'Every update must end with a semicolon.'
@@ -123,14 +135,17 @@ class StatefulALUSketchGenerator(aluVisitor):
         self.visit(ctx.getChild(2))
         self.main_function += ';'
 
+    @overrides
     def visitExprWithOp(self, ctx):
         self.visit(ctx.getChild(0, aluParser.ExprContext))
         self.main_function += ctx.getChild(1).getText()
         self.visit(ctx.getChild(1, aluParser.ExprContext))
 
+    @overrides
     def visitState_var(self, ctx):
         self.main_function += ctx.getChild(0).getText()
 
+    @overrides
     def visitMux3(self, ctx):
         self.main_function += self.alu_name + '_' + 'Mux3_' + str(
             self.mux3_count) + '('
@@ -143,6 +158,7 @@ class StatefulALUSketchGenerator(aluVisitor):
         self.generateMux3()
         self.mux3_count += 1
 
+    @overrides
     def visitMux3WithNum(self, ctx):
         self.main_function += self.alu_name + '_Mux3_' + str(
             self.mux3_count) + '('
@@ -158,6 +174,7 @@ class StatefulALUSketchGenerator(aluVisitor):
         self.generateMux3WithNum(ctx.getChild(6).getText())
         self.mux3_count += 1
 
+    @overrides
     def visitMux2(self, ctx):
         self.main_function += self.alu_name + '_' + 'Mux2_' + str(
             self.mux2_count) + '('
@@ -168,6 +185,7 @@ class StatefulALUSketchGenerator(aluVisitor):
         self.generateMux2()
         self.mux2_count += 1
 
+    @overrides
     def visitRelOp(self, ctx):
         self.main_function += self.alu_name + '_' + 'rel_op_' + str(
             self.relop_count) + '('
@@ -179,6 +197,7 @@ class StatefulALUSketchGenerator(aluVisitor):
         self.generateRelOp()
         self.relop_count += 1
 
+    @overrides
     def visitArithOp(self, ctx):
         self.main_function += self.alu_name + '_' + 'arith_op_' + str(
             self.arithop_count) + '('
@@ -189,6 +208,7 @@ class StatefulALUSketchGenerator(aluVisitor):
         self.generateArithOp()
         self.arithop_count += 1
 
+    @overrides
     def visitOpt(self, ctx):
         self.main_function += self.alu_name + '_' + 'Opt_' + str(
             self.opt_count) + '('
@@ -197,6 +217,7 @@ class StatefulALUSketchGenerator(aluVisitor):
         self.generateOpt()
         self.opt_count += 1
 
+    @overrides
     def visitConstant(self, ctx):
         self.main_function += self.alu_name + '_' + 'C_' + str(
             self.constant_count) + '('

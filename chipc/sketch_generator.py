@@ -80,12 +80,6 @@ class SketchGenerator:
     # Generate Sketch code for a simple stateless alu (+,-,*,/)
     def generate_stateless_alu(self, alu_name, potential_operands):
         # Grab the stateless alu file name by using
-        #        mux_op_1 = self.generate_mux(
-        #            len(potential_operands), alu_name + '_mux1')
-        #        mux_op_2 = self.generate_mux(
-        #            len(potential_operands), alu_name + '_mux2')
-        #        mux_op_3 = self.generate_mux(
-        #            len(potential_operands), alu_name + '_mux3')
         input_stream = FileStream(self.stateless_alu_file_)
         lexer = aluLexer(input_stream)
         stream = CommonTokenStream(lexer)
