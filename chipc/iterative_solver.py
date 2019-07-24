@@ -90,6 +90,15 @@ def main(argv):
         'num_alus_per_stage',
         type=int,
         help='Number of stateless/stateful ALUs per stage')
+    # TODO: Try to force constant_set become a necessary input
+    parser.add_argument(
+        '--constant_set',
+        type=str,
+        help='The content in the constant_set')
+    parser.add_argument(
+        'constant_set_size',
+        type=int,
+        help='Log 2 of the size of constant set')
     parser.add_argument(
         'max_input_bit',
         type=int,
@@ -142,6 +151,8 @@ def main(argv):
                         args.stateless_alu_file,
                         args.num_pipeline_stages, args.num_alus_per_stage,
                         sketch_name, args.parallel_sketch,
+                        args.constant_set,
+                        args.constant_set_size,
                         args.synthesized_allocation, args.pkt_fields)
 
     # Repeatedly run synthesis at 2 bits and verification using all valid ints

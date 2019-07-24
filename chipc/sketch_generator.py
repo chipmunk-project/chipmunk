@@ -26,7 +26,8 @@ class SketchGenerator:
     def __init__(self, sketch_name, num_phv_containers, num_state_groups,
                  num_alus_per_stage, num_pipeline_stages, num_fields_in_prog,
                  pkt_fields_to_check, jinja2_env, stateful_alu_file,
-                 stateless_alu_file, synthesized_allocation):
+                 stateless_alu_file, constant_set, constant_set_size,
+                 synthesized_allocation):
         self.sketch_name_ = sketch_name
         self.total_hole_bits_ = 0
         self.hole_names_ = []
@@ -45,6 +46,11 @@ class SketchGenerator:
         self.jinja2_env_.filters['add_prefix_suffix'] = add_prefix_suffix
         self.stateful_alu_file_ = stateful_alu_file
         self.stateless_alu_file_ = stateless_alu_file
+        self.constant_set = 'int constant_vector[' + \
+            str(2**int(constant_set_size)) + \
+            '] = ' + constant_set + \
+            ';\n'
+        self.constant_set_size = constant_set_size
         self.num_operands_to_stateful_alu_ = 0
         self.num_state_slots_ = 0
         self.synthesized_allocation_ = synthesized_allocation
