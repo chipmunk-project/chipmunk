@@ -126,7 +126,8 @@ class SketchGenerator:
         parser = aluParser(stream)
         tree = parser.alu()
         stateful_alu_sketch_generator = StatefulALUSketchGenerator(
-            self.stateful_alu_file_, self.sketch_name_ + '_' + alu_name)
+            self.stateful_alu_file_, self.sketch_name_ + '_' + alu_name,
+            self.constant_set_size)
         stateful_alu_sketch_generator.visit(tree)
         self.add_holes(stateful_alu_sketch_generator.global_holes)
         self.stateful_alu_hole_arguments_ = [
