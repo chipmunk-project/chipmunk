@@ -489,6 +489,7 @@ class StatelessAluSketchGenerator (aluVisitor):
     }
     }\n\n"""
         self.add_hole('arith_op_' + str(self.arithopCount), 1)
+    # TODO: return the member of the vector of constant
 
     def generateConstant(self):
         self.helperFunctionStrings += 'int ' + self.stateless_alu_name + \

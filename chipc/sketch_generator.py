@@ -46,10 +46,13 @@ class SketchGenerator:
         self.jinja2_env_.filters['add_prefix_suffix'] = add_prefix_suffix
         self.stateful_alu_file_ = stateful_alu_file
         self.stateless_alu_file_ = stateless_alu_file
-        self.constant_set = 'int constant_vector[' + \
-            str(2**int(constant_set_size)) + \
-            '] = ' + constant_set + \
-            ';\n'
+        # self.constant_set will be the form like
+        # int constant_vector[4] = {0,1,2,3};
+
+        self.constant_set = 'int[' + \
+            str(constant_set.count(',')+1) + \
+            '] constant_vector = ' + constant_set + \
+            ';\n\n'
         self.constant_set_size = constant_set_size
         self.num_operands_to_stateful_alu_ = 0
         self.num_state_slots_ = 0
@@ -288,7 +291,7 @@ class SketchGenerator:
             num_pipeline_stages=self.num_pipeline_stages_,
             num_alus_per_stage=self.num_alus_per_stage_,
             num_phv_containers=self.num_phv_containers_,
-            hole_definitions=self.hole_preamble_,
+            hole_definitions=self.constant_set + self.hole_preamble_,
             stateful_operand_mux_definitions=stateful_operand_mux_definitions,
             num_stateless_muxes=self.num_stateless_muxes_,
             output_mux_definitions=output_mux_definitions,

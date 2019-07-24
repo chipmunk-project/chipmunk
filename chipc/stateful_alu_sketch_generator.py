@@ -261,6 +261,7 @@ class StatefulALUSketchGenerator(aluVisitor):
     else return op2;
     } \n\n"""
         self.add_hole('Mux2_' + str(self.mux2_count), 1)
+    # TODO: return the member of the vector
 
     def generateConstant(self):
         self.helper_function_strings += 'int ' + self.alu_name + '_' + \
