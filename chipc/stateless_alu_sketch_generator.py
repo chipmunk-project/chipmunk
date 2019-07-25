@@ -171,12 +171,11 @@ class StatelessAluSketchGenerator (aluVisitor):
             '_hole_local,')
         if (ctx.getChildCount() > 5):
             for i in range(5, ctx.getChildCount()-1):
-
                 self.visit(ctx.getChild(i))
-                num_bits = 2
+                # Set num_bits for immediate
+                num_bits = self.constant_set_size
                 if 'opcode' in ctx.getChild(i).getText():
                     num_bits = self.find_opcode_bits()
-
                 self.add_hole(ctx.getChild(i).getText()[1:].strip(), (
                     num_bits))
 
