@@ -39,6 +39,8 @@ class StatelessAluSketchGenerator (aluVisitor):
         if 'immediate_operand' in hole_name:
             prefixed_hole = self.stateless_alu_name + '_' + \
                 hole_name[:hole_name.index('_')]
+            # Set num_bits for immediate
+            hole_width = self.constant_set_size
         else:
             prefixed_hole = self.stateless_alu_name + '_' + hole_name
         assert (prefixed_hole not in self.globalholes)
@@ -172,8 +174,6 @@ class StatelessAluSketchGenerator (aluVisitor):
         if (ctx.getChildCount() > 5):
             for i in range(5, ctx.getChildCount()-1):
                 self.visit(ctx.getChild(i))
-                # Set num_bits for immediate
-                num_bits = self.constant_set_size
                 if 'opcode' in ctx.getChild(i).getText():
                     num_bits = self.find_opcode_bits()
                 self.add_hole(ctx.getChild(i).getText()[1:].strip(), (
