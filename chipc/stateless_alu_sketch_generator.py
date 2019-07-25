@@ -12,12 +12,14 @@ class StatelessAluSketchGenerator (aluVisitor):
     def __init__(self, stateless_alu_file, stateless_alu_name,
                  alu_name,
                  potential_operands,
-                 generate_stateless_mux):
+                 generate_stateless_mux,
+                 constant_set_size):
         self.stateless_alu_name = stateless_alu_name
         self.stateless_alu_file = stateless_alu_file
         self.alu_name = alu_name
         self.potential_operands = potential_operands
         self.generate_stateless_mux = generate_stateless_mux
+        self.constant_set_size = constant_set_size
         self.mux3Count = 0
         self.mux2Count = 0
         self.relopCount = 0
@@ -489,14 +491,13 @@ class StatelessAluSketchGenerator (aluVisitor):
     }
     }\n\n"""
         self.add_hole('arith_op_' + str(self.arithopCount), 1)
-    # TODO: return the member of the vector of constant
 
     def generateConstant(self):
         self.helperFunctionStrings += 'int ' + self.stateless_alu_name + \
             '_' + 'C_' + str(self.constCount) + """(int const) {
-    return const;
+    return constant_vector[const];
     }\n\n"""
-        self.add_hole('const_' + str(self.constCount), 2)
+        self.add_hole('const_' + str(self.constCount), self.constant_set_size)
 
     def generateOpt(self):
         self.helperFunctionStrings += 'int ' + self.stateless_alu_name + \

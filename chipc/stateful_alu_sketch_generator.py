@@ -266,7 +266,7 @@ class StatefulALUSketchGenerator(aluVisitor):
     def generateConstant(self):
         self.helper_function_strings += 'int ' + self.alu_name + '_' + \
             'C_' + str(self.constant_count) + """(int const) {
-    return const;
+    return constant_vector[const];
     }\n\n"""
         self.add_hole('const_' + str(self.constant_count),
                       self.constant_set_size)

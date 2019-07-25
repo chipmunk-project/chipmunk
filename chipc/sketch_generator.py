@@ -98,7 +98,8 @@ class SketchGenerator:
         stateless_alu_sketch_generator = \
             StatelessAluSketchGenerator(
                 self.stateless_alu_file_, self.sketch_name_ + '_' +
-                alu_name, alu_name, potential_operands, self.generate_mux)
+                alu_name, alu_name, potential_operands, self.generate_mux,
+                self.constant_set_size)
         stateless_alu_sketch_generator.visit(tree)
         self.add_holes(stateless_alu_sketch_generator.globalholes)
         self.stateless_alu_hole_arguments_ = [
