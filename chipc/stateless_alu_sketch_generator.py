@@ -76,7 +76,15 @@ class StatelessAluSketchGenerator (aluVisitor):
     def write_temp_hole_vars(self):
         for arg in self.stateless_alu_args:
             temp_var = arg[:arg.index('_hole_local')]
-            self.mainFunction += '\tint ' + temp_var + ' = ' + arg + ';\n'
+            # Follow the format like this
+            # int opcode = opcode_hole_local;
+            # int immediate_operand = \
+            # constant_vector[immediate_operand_hole_local];
+            if 'immediate_operand' in temp_var:
+                self.mainFunction += '\tint ' + temp_var + \
+                    ' = ' + 'constant_vector[' + arg + '];\n'
+            else:
+                self.mainFunction += '\tint ' + temp_var + ' = ' + arg + ';\n'
 
     # Generates code that calls muxes from within stateless ALU
     def write_mux_call(self):
