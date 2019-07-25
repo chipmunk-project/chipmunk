@@ -23,7 +23,7 @@ def main(argv):
         help='Number of stateless/stateful ALUs per stage')
     # TODO: Try to force constant_set become a necessary input
     parser.add_argument(
-        '--constant_set',
+        '--constant-set',
         type=str,
         help='The content in the constant_set')
     parser.add_argument(
