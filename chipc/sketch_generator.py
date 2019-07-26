@@ -293,7 +293,7 @@ class SketchGenerator:
             num_alus_per_stage=self.num_alus_per_stage_,
             num_phv_containers=self.num_phv_containers_,
             # Pass constant_set to constant_vector for optverify
-            # constant_vector=self.constant_set_,
+            constant_vector=self.constant_set_,
             # Add constant_set to hole_definitions
             hole_definitions=self.constant_set_ + self.hole_preamble_,
             stateful_operand_mux_definitions=stateful_operand_mux_definitions,
