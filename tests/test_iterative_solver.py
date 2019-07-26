@@ -113,6 +113,8 @@ class IterativeSolverTest(unittest.TestCase):
                 '--constant-set={0,1,2,3}']),
         )
 
+    # Add --parallel-sketch because it will get timeout without parallel
+    # TODO: try to think up a better way to deal with this part
     def test_blue_decrease_4_3_sub_cex_mode_synthesized_alloc(self):
         self.assertEqual(
             0,
@@ -123,7 +125,8 @@ class IterativeSolverTest(unittest.TestCase):
                 path.join(STATELESS_ALU_DIR, 'stateless_alu.alu'),
                 '4', '3', '2', '10',
                 '--constant-set={0,1,2,3}',
-                '--synthesized-allocation']),
+                '--synthesized-allocation',
+                '--parallel-sketch']),
         )
 
     def test_marple_tcp_nmo_3_2_pred_raw_cex_mode(self):
