@@ -1,5 +1,6 @@
 """Chipmunk Compiler"""
 import argparse
+import math
 import sys
 
 from chipc.compiler import Compiler
@@ -27,10 +28,6 @@ def main(argv):
         type=str,
         help='The content in the constant_set')
     parser.add_argument(
-        'constant_set_size',
-        type=int,
-        help='Log 2 of the size of constant set')
-    parser.add_argument(
         '--pkt-fields',
         type=int,
         nargs='+',
@@ -53,6 +50,9 @@ def main(argv):
     )
 
     args = parser.parse_args(argv[1:])
+    # calculate the constant_set_size
+    constant_set_size = math.ceil(math.log2(args.constant_set.count(',')+1))
+
     sketch_name = args.program_file.split('/')[-1].split('.')[0] + \
         '_' + args.stateful_alu_file.split('/')[-1].split('.')[0] + \
         '_' + args.stateless_alu_file.split('/')[-1].split('.')[0] + \
@@ -63,7 +63,7 @@ def main(argv):
                         args.num_pipeline_stages, args.num_alus_per_stage,
                         sketch_name, args.parallel_sketch,
                         args.constant_set,
-                        args.constant_set_size,
+                        constant_set_size,
                         args.synthesized_allocation, args.pkt_fields)
 
     if args.parallel:
