@@ -26,7 +26,7 @@ class SketchGenerator:
     def __init__(self, sketch_name, num_phv_containers, num_state_groups,
                  num_alus_per_stage, num_pipeline_stages, num_fields_in_prog,
                  pkt_fields_to_check, jinja2_env, stateful_alu_file,
-                 stateless_alu_file, constant_set, constant_set_size,
+                 stateless_alu_file, constant_set,
                  synthesized_allocation):
         self.sketch_name_ = sketch_name
         self.total_hole_bits_ = 0
@@ -53,7 +53,8 @@ class SketchGenerator:
             str(constant_set.count(',')+1) + \
             '] constant_vector = ' + constant_set + \
             ';\n\n'
-        self.constant_set_size_ = constant_set_size
+        self.constant_set_size_ = math.ceil(
+            math.log2(constant_set.count(',')+1))
         self.num_operands_to_stateful_alu_ = 0
         self.num_state_slots_ = 0
         self.synthesized_allocation_ = synthesized_allocation
