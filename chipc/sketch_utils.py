@@ -27,7 +27,7 @@ def synthesize(sketch_file_name, bnd_inbits, slv_seed, slv_parallel=False):
                                                        ' --slv-seed=' +
                                                        str(slv_seed) +
                                                        par_string +
-                                                       ' --slv-timeout=30')
+                                                       ' --slv-timeout=60')
     assert(output.rfind('Program Parse Error:') == -1)
     return (return_code, output)
 
