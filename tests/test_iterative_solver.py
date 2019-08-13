@@ -137,7 +137,7 @@ class IterativeSolverTest(unittest.TestCase):
                 path.join(SPEC_DIR, 'learn_filter.sk'),
                 path.join(STATEFUL_ALU_DIR, 'raw.alu'),
                 path.join(STATELESS_ALU_DIR, 'stateless_alu.alu'),
-                '2', '2', '{0,1,2,3}', '10'
+                '2', '2', '{0,1,2,3}', '10',
                 '--synthesized-allocation']),
         )
 
