@@ -7,13 +7,13 @@ from re import findall
 def get_state_group_info(program):
     """Returns a dictionary from state group indices to set of state variables
     indices.
-    For state_group_0_state_1, the dict will have an entry {0: set(1)}"""
+    For state_group_0_state_1, the dict will have an entry {0: set(1)}
+    len(state_group_info) will output the num of groups"""
 
     state_group_info = defaultdict(set)
     for i, j in findall(
             r'state_and_packet.state_group_(\d+)_state_(\d+)', program):
         state_group_info[i].add(j)
-
     return state_group_info
 
 

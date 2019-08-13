@@ -181,7 +181,7 @@ class SketchGenerator:
             for l in range(self.num_state_groups_):
                 assert_predicate += self.sketch_name_ + '_' + \
                     'salu_config_' + str(i) + '_' + str(l) + ' + '
-            assert_predicate += '0) <= ' + str(self.num_alus_per_stage_)
+            assert_predicate += '0) <= ' + str(self.num_state_groups_)
             self.add_assert(assert_predicate)
 
         for l in range(self.num_state_groups_):
