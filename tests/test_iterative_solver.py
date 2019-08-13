@@ -72,7 +72,7 @@ class IterativeSolverTest(unittest.TestCase):
                 '--synthesized-allocation']),
         )
 
-    def test_blue_increase_4_3_pred_raw_cex_mode(self):
+    def test_blue_increase_4_2_pred_raw_cex_mode(self):
         self.assertEqual(
             0,
             iterative_solver.main([
@@ -80,10 +80,10 @@ class IterativeSolverTest(unittest.TestCase):
                 path.join(SPEC_DIR, 'blue_increase.sk'),
                 path.join(STATEFUL_ALU_DIR, 'pred_raw.alu'),
                 path.join(STATELESS_ALU_DIR, 'stateless_alu.alu'),
-                '4', '3', '{0,1,2,3}', '10']),
+                '4', '2', '{0,1,2,3}', '10']),
         )
 
-    def test_blue_increase_4_3_pred_raw_cex_mode_synthesized_alloc(self):
+    def test_blue_increase_4_2_pred_raw_cex_mode_synthesized_alloc(self):
         self.assertEqual(
             0,
             iterative_solver.main([
@@ -91,7 +91,7 @@ class IterativeSolverTest(unittest.TestCase):
                 path.join(SPEC_DIR, 'blue_increase.sk'),
                 path.join(STATEFUL_ALU_DIR, 'pred_raw.alu'),
                 path.join(STATELESS_ALU_DIR, 'stateless_alu.alu'),
-                '4', '3', '{0,1,2,3}', '10',
+                '4', '2', '{0,1,2,3}', '10',
                 '--synthesized-allocation']),
         )
 
