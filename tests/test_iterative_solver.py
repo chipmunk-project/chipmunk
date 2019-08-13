@@ -95,6 +95,52 @@ class IterativeSolverTest(unittest.TestCase):
                 '--synthesized-allocation']),
         )
 
+    def test_learn_filter_1_3_raw_cex_mode(self):
+        self.assertEqual(
+            0,
+            iterative_solver.main([
+                'iterative_solver',
+                path.join(SPEC_DIR, 'learn_filter.sk'),
+                path.join(STATEFUL_ALU_DIR, 'raw.alu'),
+                path.join(STATELESS_ALU_DIR, 'stateless_alu.alu'),
+                '1', '3', '{0,1,2,3}', '10']),
+        )
+
+    def test_learn_filter_1_3_raw_cex_mode_synthesized_alloc(self):
+        self.assertEqual(
+            0,
+            iterative_solver.main([
+                'iterative_solver',
+                path.join(SPEC_DIR, 'learn_filter.sk'),
+                path.join(STATEFUL_ALU_DIR, 'raw.alu'),
+                path.join(STATELESS_ALU_DIR, 'stateless_alu.alu'),
+                '1', '3', '{0,1,2,3}', '10',
+                '--synthesized-allocation']),
+        )
+
+    def test_learn_filter_2_2_raw_cex_mode(self):
+        self.assertEqual(
+            0,
+            iterative_solver.main([
+                'iterative_solver',
+                path.join(SPEC_DIR, 'blue_decrease.sk'),
+                path.join(STATEFUL_ALU_DIR, 'raw.alu'),
+                path.join(STATELESS_ALU_DIR, 'stateless_alu.alu'),
+                '2', '2', '{0,1,2,3}', '10']),
+        )
+
+    def test_learn_filter_2_2_raw_cex_mode_synthesized_alloc(self):
+        self.assertEqual(
+            0,
+            iterative_solver.main([
+                'iterative_solver',
+                path.join(SPEC_DIR, 'blue_decrease.sk'),
+                path.join(STATEFUL_ALU_DIR, 'raw.alu'),
+                path.join(STATELESS_ALU_DIR, 'stateless_alu.alu'),
+                '2', '2', '{0,1,2,3}', '10'
+                '--synthesized-allocation']),
+        )
+
     def test_blue_decrease_4_2_sub_cex_mode(self):
         self.assertEqual(
             0,
