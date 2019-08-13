@@ -123,7 +123,7 @@ class IterativeSolverTest(unittest.TestCase):
             0,
             iterative_solver.main([
                 'iterative_solver',
-                path.join(SPEC_DIR, 'blue_decrease.sk'),
+                path.join(SPEC_DIR, 'learn_filter.sk'),
                 path.join(STATEFUL_ALU_DIR, 'raw.alu'),
                 path.join(STATELESS_ALU_DIR, 'stateless_alu.alu'),
                 '2', '2', '{0,1,2,3}', '10']),
@@ -134,7 +134,7 @@ class IterativeSolverTest(unittest.TestCase):
             0,
             iterative_solver.main([
                 'iterative_solver',
-                path.join(SPEC_DIR, 'blue_decrease.sk'),
+                path.join(SPEC_DIR, 'learn_filter.sk'),
                 path.join(STATEFUL_ALU_DIR, 'raw.alu'),
                 path.join(STATELESS_ALU_DIR, 'stateless_alu.alu'),
                 '2', '2', '{0,1,2,3}', '10'
