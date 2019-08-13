@@ -34,10 +34,12 @@ def synthesize(sketch_file_name, bnd_inbits, slv_seed, slv_parallel=False):
 
 def generate_smt2_formula(sketch_file_name, smt_file_name, bit_range):
     check_syntax(sketch_file_name)
+    # TODO: set the slv-timeout to 0.1 for now but need to think up
+    # a better way to deal with it
     (return_code, output) = subprocess.getstatusoutput('sketch ' +
                                                        sketch_file_name +
                                                        ' --bnd-inbits=' +
                                                        str(bit_range) +
-                                                       ' --slv-timeout=0.001' +
+                                                       ' --slv-timeout=0.1' +
                                                        ' --beopt:writeSMT ' +
                                                        smt_file_name)
