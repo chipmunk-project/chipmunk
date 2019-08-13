@@ -213,6 +213,31 @@ class IterativeSolverTest(unittest.TestCase):
                 '--synthesized-allocation']),
         )
 
+    # This test is to guarantee >1 stateful_ALU can be active 
+    # per stage
+    def test_learn_filter_1_1_raw_cex_mode(self):
+        self.assertEqual(
+            0,
+            iterative_solver.main([
+                'iterative_solver',
+                path.join(SPEC_DIR, 'learn_filter.sk'),
+                path.join(STATEFUL_ALU_DIR, 'raw.alu'),
+                path.join(STATELESS_ALU_DIR, 'stateless_alu.alu'),
+                '1', '1', '{0,1,2,3}', '10']),
+        )
+
+    def test_learn_filter_1_1_raw_cex_mode_synthesized_alloc(self):
+        self.assertEqual(
+            0,
+            iterative_solver.main([
+                'iterative_solver',
+                path.join(SPEC_DIR, 'learn_filter.sk'),
+                path.join(STATEFUL_ALU_DIR, 'raw.alu'),
+                path.join(STATELESS_ALU_DIR, 'stateless_alu.alu'),
+                '1', '1', '{0,1,2,3}', '10',
+                '--synthesized-allocation']),
+        )
+
     # NOTE(taegyunkim): As long as we synthesize initially with 2 bits, and try
     # to verify with a larger input bits, times_two.sk will always trigger the
     # code paths to add counterexamples and additional asserts for hole value
