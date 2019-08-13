@@ -103,7 +103,8 @@ class IterativeSolverTest(unittest.TestCase):
                 path.join(SPEC_DIR, 'blue_decrease.sk'),
                 path.join(STATEFUL_ALU_DIR, 'sub.alu'),
                 path.join(STATELESS_ALU_DIR, 'stateless_alu.alu'),
-                '4', '3', '{0,1,2,3}', '10']),
+                '4', '3', '{0,1,2,3}', '10',
+                '--parallel-sketch']),
         )
 
     # Add --parallel-sketch because it will get timeout without parallel
@@ -213,7 +214,7 @@ class IterativeSolverTest(unittest.TestCase):
                 '--synthesized-allocation']),
         )
 
-    # This test is to guarantee >1 stateful_ALU can be active 
+    # This test is to guarantee >1 stateful_ALU can be active
     # per stage
     def test_learn_filter_1_1_raw_cex_mode(self):
         self.assertEqual(
