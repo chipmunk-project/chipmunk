@@ -56,6 +56,23 @@ class Const:
     def __repr__(self):
         return self.__str__()
 
+
+class Source:
+    # _type instead of type to avoid conflict with python internal type()
+    # function. The name is needed to keep track of original source variable
+    # and provide counterexamples.
+    def __init__(self, output, _type, name):
+        self.output = output
+        self._type = _type
+        self.name = name
+
+    def __str__(self):
+        return self.output + ' = ' + self.name
+
+    def __repr__(self):
+        return self.__str__()
+
+
 # borrowed from getSMTnode in BooleanNodes.h
 # bool to int conversion routines
 
@@ -86,7 +103,7 @@ for line in sys.stdin.readlines():
         if operation == 'ASSERT':
             asserts += ['_n' + records[3]]
         elif operation == 'S':
-            src_nodes += ['_n' + output_var]
+            src_nodes += [Source('_n' + output_var, records[3], records[4])]
         elif operation in ['NEG']:
             unaryop_nodes += [UnaryOp(output_var, records[4], operation)]
         elif operation in ['AND', 'OR', 'XOR', 'PLUS',
@@ -111,3 +128,5 @@ print('unaryop_nodes:\n', unaryop_nodes)
 print('binop_nodes:\n', binop_nodes)
 print('cond_nodes:\n', cond_nodes)
 print('const_nodes:\n', const_nodes)
+
+
