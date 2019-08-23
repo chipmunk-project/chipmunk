@@ -72,7 +72,7 @@ for line in sys.stdin.readlines():
         if operation == 'ASSERT':
             asserts += ['_n' + records[3]]
         elif operation == 'S':
-            src_nodes += [output_var]
+            src_nodes += ['_n' + output_var]
         elif operation in ['AND', 'OR', 'XOR', 'PLUS',
                            'TIMES', 'DIV', 'MOD', 'LT', 'EQ']:
             binop_nodes += [BinOp(output_var, records[4],
