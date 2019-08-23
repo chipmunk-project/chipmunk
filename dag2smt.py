@@ -2,6 +2,19 @@
 import sys
 
 
+class UnaryOp:
+    def __init__(self, output, operand, operation):
+        self.output = '_n' + output
+        self.operand = '_n' + operand
+        self.operation = operation
+
+    def __str__(self):
+        return self.output + ' = ' + self.operation + '(' + self.operand + ')'
+
+    def __repr__(self):
+        return self.__str__()
+
+
 class BinOp:
     def __init__(self, output, operand1, operand2, operation):
         self.output = '_n' + output
@@ -57,6 +70,7 @@ def int_to_bool(variable):
 
 asserts = []
 src_nodes = []
+unaryop_nodes = []
 binop_nodes = []
 cond_nodes = []
 const_nodes = []
@@ -73,6 +87,8 @@ for line in sys.stdin.readlines():
             asserts += ['_n' + records[3]]
         elif operation == 'S':
             src_nodes += ['_n' + output_var]
+        elif operation in ['NEG']:
+            unaryop_nodes += [UnaryOp(output_var, records[4], operation)]
         elif operation in ['AND', 'OR', 'XOR', 'PLUS',
                            'TIMES', 'DIV', 'MOD', 'LT', 'EQ']:
             binop_nodes += [BinOp(output_var, records[4],
@@ -91,6 +107,7 @@ for line in sys.stdin.readlines():
 
 print('asserts:\n', asserts)
 print('src_nodes:\n', src_nodes)
+print('unaryop_nodes:\n', unaryop_nodes)
 print('binop_nodes:\n', binop_nodes)
 print('cond_nodes:\n', cond_nodes)
 print('const_nodes:\n', const_nodes)
