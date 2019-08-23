@@ -78,7 +78,7 @@ for line in sys.stdin.readlines():
             binop_nodes += [BinOp(output_var, records[4],
                                   records[5], operation)]
         elif operation in ['ARRACC']:
-            cond_nodes += [CondOp(output_var, records[4],
+            cond_nodes += [CondOp(output_var, '_n' + records[4],
                                   records[7], records[6])]
         elif operation in ['ARRASS']:
             cond_nodes += [CondOp(output_var, '_n' + records[4] +
