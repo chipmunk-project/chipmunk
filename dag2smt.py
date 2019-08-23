@@ -85,7 +85,7 @@ for line in sys.stdin.readlines():
                                   ' == ' + records[6], records[8],
                                   records[7])]
         elif operation in ['CONST']:
-            const_nodes += [Const(output_var, '_n' + records[4])]
+            const_nodes += [Const(output_var, records[4])]
         else:
             print('unknown operation: ', line)
 
