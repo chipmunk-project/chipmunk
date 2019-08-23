@@ -39,6 +39,7 @@ def negated_body(formula):
     # variables using indices in the order they appear instead of its names,
     # Var(0), Var(1), Var(2). Thus, we have to re-bind the variables using
     # substitute_vars. It is also necessary to reverse the list of variables.
+    # See https://github.com/Z3Prover/z3/issues/402 for more details.
     return z3.Not(z3.substitute_vars(formula.body(), *reversed(vs)))
 
 
