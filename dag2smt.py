@@ -70,7 +70,7 @@ for line in sys.stdin.readlines():
         operation = records[2]
         output_var = records[0]
         if operation == 'ASSERT':
-            asserts += [output_var]
+            asserts += [records[3]]
         elif operation == 'S':
             src_nodes += [output_var]
         elif operation in ['AND', 'OR', 'XOR', 'PLUS',
