@@ -70,7 +70,7 @@ for line in sys.stdin.readlines():
         operation = records[2]
         output_var = records[0]
         if operation == 'ASSERT':
-            asserts += [records[3]]
+            asserts += ['_n' + records[3]]
         elif operation == 'S':
             src_nodes += [output_var]
         elif operation in ['AND', 'OR', 'XOR', 'PLUS',
@@ -85,7 +85,7 @@ for line in sys.stdin.readlines():
                                   ' == ' + records[6], records[8],
                                   records[7])]
         elif operation in ['CONST']:
-            const_nodes += [Const(output_var, records[4])]
+            const_nodes += [Const(output_var, '_n' + records[4])]
         else:
             print('unknown operation: ', line)
 
