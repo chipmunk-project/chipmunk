@@ -1,6 +1,8 @@
 #! /opt/local/bin/python3
 import sys
 
+import z3
+
 
 class UnaryOp:
     def __init__(self, output, operand, operation):
@@ -46,9 +48,10 @@ class CondOp:
 
 
 class Const:
-    def __init__(self, output, constant):
+    def __init__(self, output, constant, var_type):
         self.output = '_n' + output
         self.constant = constant
+        self.var_type = var_type
 
     def __str__(self):
         return self.output + ' = ' + self.constant + '\n'
@@ -61,9 +64,10 @@ class Source:
     # _type instead of type to avoid conflict with python internal type()
     # function. The name is needed to keep track of original source variable
     # and provide counterexamples.
-    def __init__(self, output, _type, name):
+    def __init__(self, output, var_type, name):
         self.output = output
-        self._type = _type
+        self.var_type = var_type
+        assert(var_type == 'INT')
         self.name = name
 
     def __str__(self):
@@ -92,18 +96,23 @@ binop_nodes = []
 cond_nodes = []
 const_nodes = []
 
+# Data structures to create z3 formula
+z3_vars = []
+z3_asserts = []
+
 for line in sys.stdin.readlines():
     records = line.split()
     start = records[0]
     if (start in ['dag', 'TUPLE_DEF']):
         continue
     else:
-        operation = records[2]
         output_var = records[0]
+        operation = records[2]
+        var_type = records[3]
         if operation == 'ASSERT':
             asserts += ['_n' + records[3]]
         elif operation == 'S':
-            src_nodes += [Source('_n' + output_var, records[3], records[4])]
+            src_nodes += [Source('_n' + output_var, var_type, records[4])]
         elif operation in ['NEG']:
             unaryop_nodes += [UnaryOp(output_var, records[4], operation)]
         elif operation in ['AND', 'OR', 'XOR', 'PLUS',
@@ -118,9 +127,32 @@ for line in sys.stdin.readlines():
                                   ' == ' + records[6], records[8],
                                   records[7])]
         elif operation in ['CONST']:
-            const_nodes += [Const(output_var, records[4])]
+            const_nodes += [Const(output_var, records[4], var_type)]
         else:
             print('unknown operation: ', line)
+
+# Now create z3 formula
+# First create z3_vars
+for node in src_nodes:
+    z3_vars += [z3.Int(node.output)]
+for node in binop_nodes:
+    if (node.operation in ['PLUS', 'TIMES', 'DIV', 'MOD']):
+        z3_vars += [z3.Int(node.output)]
+    elif (node.operation in ['AND', 'OR', 'XOR', 'LT', 'EQ']):
+        z3_vars += [z3.Bool(node.output)]
+    else:
+        assert(False), 'unknown binop node ' + node.operation
+for node in unaryop_nodes:
+    if (node.operation in ['NEG']):
+        z3_vars += [z3.Int(node.output)]
+    else:
+        assert(False), "can't handle " + node.operation
+for node in const_nodes:
+    if (node.var_type == 'INT'):
+        z3_vars += [z3.Int(node.output)]
+    else:
+        assert(node.var_type == 'BOOL')
+        z3_vars += [z3.Bool(node.output)]
 
 print('asserts:\n', asserts)
 print('src_nodes:\n', src_nodes)
@@ -128,5 +160,4 @@ print('unaryop_nodes:\n', unaryop_nodes)
 print('binop_nodes:\n', binop_nodes)
 print('cond_nodes:\n', cond_nodes)
 print('const_nodes:\n', const_nodes)
-
-
+print('z3_vars:\n', z3_vars)
