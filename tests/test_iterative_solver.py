@@ -235,6 +235,17 @@ class IterativeSolverTest(unittest.TestCase):
                 '--synthesized-allocation']),
         )
 
+    def test_snap_heavy_hitter_2_2_raw_cex_mode(self):
+        self.assertEqual(
+            0,
+            iterative_solver.main([
+                'iterative_solver',
+                path.join(SPEC_DIR, 'snap_heavy_hitter.sk'),
+                path.join(STATEFUL_ALU_DIR, 'pair.alu'),
+                path.join(STATELESS_ALU_DIR, 'stateless_alu.alu'),
+                '1', '1', '0,1,2,3', '10']),
+        )
+
     def test_sampling_revised_2_2_raw_cex_mode(self):
         self.assertEqual(
             1,
