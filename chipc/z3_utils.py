@@ -1,4 +1,5 @@
 import re
+import sys
 
 import z3
 
@@ -75,6 +76,103 @@ def generate_counter_examples(smt2_filename):
             state_vars[var_name] = value
 
     return (pkt_fields, state_vars)
+
+
+def get_z3_formula(sketch_ir, verify_bit_width):
+    """Given an intermediate representation of a sketch file, returns a z3
+    formula corresponding to that."""
+
+    z3_vars = dict()
+    z3_asserts = []
+    z3_srcs = []
+
+    for line in sketch_ir.splitlines():
+        records = line.split()
+        start = records[0]
+        if (start in ['dag', 'TUPLE_DEF']):
+            continue
+        else:
+            output_var = '_n' + records[0]
+            operation = records[2]
+            if operation == 'ASSERT':
+                z3_asserts += ['_n' + records[3]]
+            elif operation == 'S':
+                var_type = records[3]
+                assert var_type == 'INT', ('Unexpected variable type found in \
+                        sketch IR', line)
+                z3_vars[output_var] = z3.Int(output_var)
+                z3_srcs += [output_var]
+            elif operation in ['NEG']:
+                z3_vars[output_var] = - z3_vars['_n' + records[4]]
+            elif operation in ['NOT']:
+                z3_vars[output_var] = z3.Not(z3_vars['_n' + records[4]])
+            elif operation in ['AND', 'OR', 'XOR', 'PLUS',
+                               'TIMES', 'DIV', 'MOD', 'LT', 'EQ']:
+                op1 = '_n' + records[4]
+                op2 = '_n' + records[5]
+                if operation == 'AND':
+                    z3_vars[output_var] = z3.And(op1, op2)
+                elif operation == 'OR':
+                    z3_vars[output_var] = z3.Or(op1, op2)
+                elif operation == 'XOR':
+                    z3_vars[output_var] = z3.Xor(op1, op2)
+                elif operation == 'PLUS':
+                    z3_vars[output_var] = z3_vars[op1] + z3_vars[op2]
+                elif operation == 'TIMES':
+                    z3_vars[output_var] = z3_vars[op1] * z3_vars[op2]
+                elif operation == 'DIV':
+                    z3_vars[output_var] = z3_vars[op1] / z3_vars[op2]
+                elif operation == 'MOD':
+                    z3_vars[output_var] = z3_vars[op1] % z3_vars[op2]
+                elif operation == 'LT':
+                    z3_vars[output_var] = z3_vars[op1] < z3_vars[op2]
+                elif operation == 'EQ':
+                    z3_vars[output_var] = z3_vars[op1] == z3_vars[op2]
+                else:
+                    assert(False)
+            elif operation in ['ARRACC']:
+                z3_vars[output_var] = z3.If(z3_vars['_n' + records[4]],
+                                            z3_vars['_n' + records[7]],
+                                            z3_vars['_n' + records[6]])
+            elif operation in ['ARRASS']:
+                if type(z3_vars['_n' + records[4]]) == z3.BoolRef:
+                    assert(records[6] in ['0', '1'])
+                    cmp_constant = records[6] == '1'
+                elif type(z3_vars['_n' + records[4]]) == z3.ArithRef:
+                    cmp_constant = int(records[6])
+                else:
+                    assert(False)
+                z3_vars[output_var] = z3.If(z3_vars['_n' + records[4]] ==
+                                            cmp_constant,
+                                            z3_vars['_n' + records[8]],
+                                            z3_vars['_n' + records[7]])
+            elif operation in ['CONST']:
+                var_type = records[3]
+                if var_type == 'INT':
+                    z3_vars[output_var] = z3.IntVal(int(records[4]))
+                elif var_type == 'BOOL':
+                    assert(records[4] in ['0', '1'])
+                    z3_vars[output_var] = z3.BoolVal(records[4] == '1')
+                else:
+                    assert(False)
+            else:
+                print('unknown operation: ', line)
+                sys.exit(1)
+
+    # for var in z3_vars:
+    #     print(var, ' = ', z3_vars[var])
+
+    constraints = z3.BoolVal(True)
+    for var in z3_asserts:
+        constraints = z3.And(constraints, z3_vars[var])
+
+    variable_range = z3.BoolVal(True)
+    for var in z3_srcs:
+        variable_range = z3.And(variable_range, z3.And(
+            0 <= z3_vars[var], z3_vars[var] < 2**verify_bit_width))
+    final_assert = z3.ForAll([z3_vars[x] for x in z3_srcs],
+                             z3.Implies(variable_range, constraints))
+    return z3.simplify(final_assert)
 
 
 def simple_check(smt2_filename):
