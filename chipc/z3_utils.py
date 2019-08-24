@@ -99,7 +99,7 @@ def get_z3_formula(sketch_ir, verify_bit_width):
             elif operation == 'S':
                 var_type = records[3]
                 assert var_type == 'INT', ('Unexpected variable type found in \
-                        sketch IR', line)
+                        sketch IR:', line)
                 z3_vars[output_var] = z3.Int(output_var)
                 z3_srcs += [output_var]
             elif operation in ['NEG']:
@@ -128,20 +128,20 @@ def get_z3_formula(sketch_ir, verify_bit_width):
                     z3_vars[output_var] = z3_vars[op1] < z3_vars[op2]
                 elif operation == 'EQ':
                     z3_vars[output_var] = z3_vars[op1] == z3_vars[op2]
-                else:
-                    assert(False)
             elif operation in ['ARRACC']:
                 z3_vars[output_var] = z3.If(z3_vars['_n' + records[4]],
                                             z3_vars['_n' + records[7]],
                                             z3_vars['_n' + records[6]])
             elif operation in ['ARRASS']:
-                if type(z3_vars['_n' + records[4]]) == z3.BoolRef:
+                var_type = z3_vars['_n' + records[4]]
+                if var_type == z3.BoolRef:
                     assert(records[6] in ['0', '1'])
                     cmp_constant = records[6] == '1'
-                elif type(z3_vars['_n' + records[4]]) == z3.ArithRef:
+                elif var_type == z3.ArithRef:
                     cmp_constant = int(records[6])
                 else:
-                    assert(False)
+                    print('Unsupporte variable type', var_type)
+                    sys.exit(1)
                 z3_vars[output_var] = z3.If(z3_vars['_n' + records[4]] ==
                                             cmp_constant,
                                             z3_vars['_n' + records[8]],
