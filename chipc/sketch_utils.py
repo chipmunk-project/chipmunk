@@ -1,3 +1,5 @@
+from pathlib import Path
+import re
 import subprocess
 
 SYN_TIME_MINS = 30
@@ -46,3 +48,18 @@ def generate_smt2_formula(sketch_file_name, smt_file_name, bit_range):
                                                        str(SMT_GEN_TIME_MINS) +
                                                        ' --beopt:writeSMT ' +
                                                        smt_file_name)
+
+
+def generate_ir(sketch_file_name):
+    """Given a sketch file, returns its IR (intermediate representation)."""
+    dag_file_name = re.sub('sk$', 'dag', sketch_file_name)
+    check_syntax(sketch_file_name)
+    subprocess.run([
+        'sketch',
+        '-V', '3',
+        sketch_file_name,
+        '--debug-output-dag', dag_file_name,
+        '--slv-timeout', str(SMT_GEN_TIME_MINS)
+    ])
+
+    return Path(dag_file_name).read_text()
