@@ -76,7 +76,8 @@ for line in sys.stdin.readlines():
             if var_type == 'INT':
                 z3_vars[output_var] = IntVal(int(records[4]))
             elif var_type == 'BOOL':
-                z3_vars[output_var] = BoolVal(bool(records[4]))
+                assert(records[4] in ['0', '1'])
+                z3_vars[output_var] = BoolVal(records[4] == '1')
             else:
                 assert(False)
         else:
