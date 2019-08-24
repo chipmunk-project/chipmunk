@@ -9,6 +9,7 @@ from z3 import Implies
 from z3 import Int
 from z3 import IntVal
 from z3 import Or
+from z3 import simplify
 from z3 import Solver
 from z3 import Xor
 
@@ -83,17 +84,16 @@ for line in sys.stdin.readlines():
 
 constraints = BoolVal(True)
 for var in z3_asserts:
-    print('adding constraint ', var)
     constraints = And(constraints, z3_vars[var])
 
 variable_range = BoolVal(True)
 for var in z3_srcs:
-    print('adding src ', var)
     variable_range = And(variable_range, And(
         0 <= z3_vars[var], z3_vars[var] < 2**verify_bit_width))
-print(variable_range)
 solver = Solver()
-solver.add(ForAll([z3_vars[x] for x in z3_srcs],
-                  Implies(variable_range, constraints)))
+final_assert = ForAll([z3_vars[x] for x in z3_srcs],
+                      Implies(variable_range, constraints))
+print(simplify(final_assert))
+solver.add(final_assert)
 print(solver.to_smt2())
 print(solver.check())
