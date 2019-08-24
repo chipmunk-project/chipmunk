@@ -128,6 +128,9 @@ def get_z3_formula(sketch_ir, verify_bit_width):
                     z3_vars[output_var] = z3_vars[op1] < z3_vars[op2]
                 elif operation == 'EQ':
                     z3_vars[output_var] = z3_vars[op1] == z3_vars[op2]
+                else:
+                    assert False, ('Invalid operation', operation)
+
             elif operation in ['ARRACC']:
                 z3_vars[output_var] = z3.If(z3_vars['_n' + records[4]],
                                             z3_vars['_n' + records[7]],
@@ -140,8 +143,7 @@ def get_z3_formula(sketch_ir, verify_bit_width):
                 elif var_type == z3.ArithRef:
                     cmp_constant = int(records[6])
                 else:
-                    print('Unsupporte variable type', var_type)
-                    sys.exit(1)
+                    assert False, ('Variable type', var_type, 'not supported')
                 z3_vars[output_var] = z3.If(z3_vars['_n' + records[4]] ==
                                             cmp_constant,
                                             z3_vars['_n' + records[8]],
@@ -154,10 +156,9 @@ def get_z3_formula(sketch_ir, verify_bit_width):
                     assert(records[4] in ['0', '1'])
                     z3_vars[output_var] = z3.BoolVal(records[4] == '1')
                 else:
-                    assert(False)
+                    assert False, ('Constant type', var_type, 'not supported')
             else:
-                print('unknown operation: ', line)
-                sys.exit(1)
+                assert False, ('Unknown operation:', line)
 
     # for var in z3_vars:
     #     print(var, ' = ', z3_vars[var])
