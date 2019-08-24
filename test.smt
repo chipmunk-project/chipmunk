@@ -12,7 +12,7 @@
 (let ((_n11 (ite  _n7   _n10   _n9  ) ))
 (let ((_n12 state_group_0_state_0_5_5_0 ))
 (let ((_n13 (ite  _n7   _n12   (ite  _n10  1 0)  ) ))
-(let ((_n14 (+   _n13   _n11 ) ))
+(let ((_n14 (+   _n13   (ite _n11 1 0) ) ))
 (let ((_n15 (ite  _n7   (ite  _n10  1 0)   _n12  ) ))
 (let ((_n16 (ite (=  (ite  _n7  1 0)  1)  _n15   _n14  ) ))
 (let ((_n17 (=   _n16   (ite  _n4  1 0) ) ))
