@@ -5,6 +5,7 @@ from z3 import And
 from z3 import BoolVal
 from z3 import ForAll
 from z3 import If
+from z3 import Implies
 from z3 import Int
 from z3 import IntVal
 from z3 import Or
@@ -15,6 +16,9 @@ from z3 import Xor
 z3_vars = dict()
 z3_asserts = []
 z3_srcs = []
+
+verify_bit_width = int(sys.argv[1])
+print('verifying for bit width ', verify_bit_width)
 
 for line in sys.stdin.readlines():
     records = line.split()
@@ -77,10 +81,19 @@ for line in sys.stdin.readlines():
         else:
             print('unknown operation: ', line)
 
-z3_vars['constraints'] = True
+constraints = BoolVal(True)
 for var in z3_asserts:
-    z3_vars['constraints'] = And(z3_vars['constraints'], z3_vars[var])
+    print('adding constraint ', var)
+    constraints = And(constraints, z3_vars[var])
 
+variable_range = BoolVal(True)
+for var in z3_srcs:
+    print('adding src ', var)
+    variable_range = And(variable_range, And(
+        0 <= z3_vars[var], z3_vars[var] < 2**verify_bit_width))
+print(variable_range)
 solver = Solver()
-solver.add(ForAll([z3_vars[x] for x in z3_srcs], z3_vars['constraints']))
+solver.add(ForAll([z3_vars[x] for x in z3_srcs],
+                  Implies(variable_range, constraints)))
+print(solver.to_smt2())
 print(solver.check())
