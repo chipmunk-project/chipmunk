@@ -2,6 +2,8 @@
 import sys
 
 from z3 import And
+from z3 import ArithRef
+from z3 import BoolRef
 from z3 import BoolVal
 from z3 import ForAll
 from z3 import If
@@ -67,8 +69,15 @@ for line in sys.stdin.readlines():
                                      z3_vars['_n' + records[7]],
                                      z3_vars['_n' + records[6]])
         elif operation in ['ARRASS']:
+            if type(z3_vars['_n' + records[4]]) == BoolRef:
+                assert(records[6] in ['0', '1'])
+                cmp_constant = records[6] == '1'
+            elif type(z3_vars['_n' + records[4]]) == ArithRef:
+                cmp_constant = int(records[6])
+            else:
+                assert(False)
             z3_vars[output_var] = If(z3_vars['_n' + records[4]] ==
-                                     z3_vars['_n' + records[6]],
+                                     cmp_constant,
                                      z3_vars['_n' + records[8]],
                                      z3_vars['_n' + records[7]])
         elif operation in ['CONST']:
