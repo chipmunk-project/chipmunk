@@ -3,6 +3,7 @@ import sys
 
 from z3 import And
 from z3 import BoolVal
+from z3 import ForAll
 from z3 import If
 from z3 import Int
 from z3 import IntVal
@@ -13,6 +14,7 @@ from z3 import Xor
 # Data structures to hold z3 variables and asserts
 z3_vars = dict()
 z3_asserts = []
+z3_srcs = []
 
 for line in sys.stdin.readlines():
     records = line.split()
@@ -28,6 +30,7 @@ for line in sys.stdin.readlines():
             var_type = records[3]
             assert(var_type == 'INT')
             z3_vars[output_var] = Int(output_var)
+            z3_srcs += [output_var]
         elif operation in ['NEG']:
             z3_vars[output_var] = - z3_vars['_n' + records[4]]
         elif operation in ['AND', 'OR', 'XOR', 'PLUS',
@@ -74,7 +77,10 @@ for line in sys.stdin.readlines():
         else:
             print('unknown operation: ', line)
 
+z3_vars['constraints'] = True
+for var in z3_asserts:
+    z3_vars['constraints'] = And(z3_vars['constraints'], z3_vars[var])
+
 solver = Solver()
-for constraint in z3_asserts:
-    solver.add(z3_vars[constraint])
+solver.add(ForAll([z3_vars[x] for x in z3_srcs], z3_vars['constraints']))
 print(solver.check())
