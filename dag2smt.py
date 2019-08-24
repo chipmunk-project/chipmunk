@@ -82,6 +82,9 @@ for line in sys.stdin.readlines():
         else:
             print('unknown operation: ', line)
 
+for var in z3_vars:
+    print(var, ' = ', z3_vars[var])
+
 constraints = BoolVal(True)
 for var in z3_asserts:
     constraints = And(constraints, z3_vars[var])
