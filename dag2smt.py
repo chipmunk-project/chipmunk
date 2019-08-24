@@ -10,6 +10,7 @@ from z3 import If
 from z3 import Implies
 from z3 import Int
 from z3 import IntVal
+from z3 import Not
 from z3 import Or
 from z3 import simplify
 from z3 import Solver
@@ -40,6 +41,8 @@ for line in sys.stdin.readlines():
             z3_srcs += [output_var]
         elif operation in ['NEG']:
             z3_vars[output_var] = - z3_vars['_n' + records[4]]
+        elif operation in ['NOT']:
+            z3_vars[output_var] = Not(z3_vars['_n' + records[4]])
         elif operation in ['AND', 'OR', 'XOR', 'PLUS',
                            'TIMES', 'DIV', 'MOD', 'LT', 'EQ']:
             op1 = '_n' + records[4]
@@ -91,6 +94,7 @@ for line in sys.stdin.readlines():
                 assert(False)
         else:
             print('unknown operation: ', line)
+            sys.exit(1)
 
 for var in z3_vars:
     print(var, ' = ', z3_vars[var])
