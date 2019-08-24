@@ -13,7 +13,7 @@
 (let ((_n13 (=   _n10   (ite  _n3  1 0) ) ))
 (let ((_n14 (not  _n13 ) ))
 (let ((_n15 (ite (=  (ite  _n14  1 0)  1)  _n3   _n13  ) ))
-(let ((_n16 (=   _n15   (ite  _n6  1 0) ) ))
+(let ((_n16 (=   (ite _n15 1 0)   (ite  _n6  1 0) ) ))
 (let ((_n18 pkt_0_3_5_0 ))
 (implies  (and (and (>= state_group_0_state_0_4_6_0 0) (< state_group_0_state_0_4_6_0 32 ))  (and (>= pkt_0_3_5_0 0) (< pkt_0_3_5_0 32 )) )   (and  _n11  _n16 )  ))))))))))))))))))))
 (check-sat)
