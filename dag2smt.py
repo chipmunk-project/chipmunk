@@ -95,5 +95,5 @@ final_assert = ForAll([z3_vars[x] for x in z3_srcs],
                       Implies(variable_range, constraints))
 print(simplify(final_assert))
 solver.add(final_assert)
-print(solver.to_smt2())
+# print(solver.to_smt2())
 print(solver.check())
