@@ -37,8 +37,10 @@ for line in sys.stdin.readlines():
         elif operation == 'S':
             var_type = records[3]
             assert(var_type == 'INT')
-            z3_vars[output_var] = Int(output_var)
-            z3_srcs += [output_var]
+            source_name = records[4]
+            z3_vars[source_name] = Int(source_name)
+            z3_vars[output_var] = Int(source_name)
+            z3_srcs += [source_name]
         elif operation in ['NEG']:
             z3_vars[output_var] = - z3_vars['_n' + records[4]]
         elif operation in ['NOT']:
@@ -96,8 +98,8 @@ for line in sys.stdin.readlines():
             print('unknown operation: ', line)
             sys.exit(1)
 
-for var in z3_vars:
-    print(var, ' = ', z3_vars[var])
+# for var in z3_vars:
+#     print(var, ' = ', z3_vars[var])
 
 constraints = BoolVal(True)
 for var in z3_asserts:
