@@ -52,14 +52,15 @@ def generate_smt2_formula(sketch_file_name, smt_file_name, bit_range):
 
 def generate_ir(sketch_file_name):
     """Given a sketch file, returns its IR (intermediate representation)."""
-    dag_file_name = re.sub('sk$', 'dag', sketch_file_name)
     check_syntax(sketch_file_name)
+    # Generate the dag filename by replacing sk extension with dag.
+    dag_file_name = re.sub('sk$', 'dag', sketch_file_name)
     subprocess.run([
         'sketch',
         '-V', '3',
         sketch_file_name,
         '--debug-output-dag', dag_file_name,
-        '--slv-timeout', str(SMT_GEN_TIME_MINS)
+        '--debug-fake-solver'
     ],
         stdout=subprocess.DEVNULL)
 
