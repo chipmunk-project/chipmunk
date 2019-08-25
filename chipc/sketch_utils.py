@@ -60,6 +60,7 @@ def generate_ir(sketch_file_name):
         sketch_file_name,
         '--debug-output-dag', dag_file_name,
         '--slv-timeout', str(SMT_GEN_TIME_MINS)
-    ])
+    ],
+        stdout=subprocess.DEVNULL)
 
     return Path(dag_file_name).read_text()
