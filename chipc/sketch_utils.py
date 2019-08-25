@@ -69,4 +69,8 @@ def generate_ir(sketch_file_name):
         stdout=subprocess.DEVNULL,
         stderr=subprocess.DEVNULL)
 
+    import os
+    print(os.getcwd())
+    print(os.listdir(os.getcwd()))
+
     return Path(dag_file_name).read_text()
