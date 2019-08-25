@@ -173,7 +173,10 @@ def get_z3_formula(sketch_ir, verify_bit_width):
             0 <= z3_vars[var], z3_vars[var] < 2**verify_bit_width))
     final_assert = z3.ForAll([z3_vars[x] for x in z3_srcs],
                              z3.Implies(variable_range, constraints))
-    return z3.simplify(final_assert)
+    # We could use z3.simplify on the final assert, however that could result
+    # in a formula that is oversimplified and doesn't have a QuantfierRef which
+    # is expected from the negated_body() function above.
+    return final_assert
 
 
 def simple_check(smt2_filename):
