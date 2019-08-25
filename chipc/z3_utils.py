@@ -111,11 +111,11 @@ def get_z3_formula(sketch_ir, verify_bit_width):
                 op1 = '_n' + records[4]
                 op2 = '_n' + records[5]
                 if operation == 'AND':
-                    z3_vars[output_var] = z3.And(op1, op2)
+                    z3_vars[output_var] = z3.And(z3_vars[op1], z3_vars[op2])
                 elif operation == 'OR':
-                    z3_vars[output_var] = z3.Or(op1, op2)
+                    z3_vars[output_var] = z3.Or(z3_vars[op1], z3_vars[op2])
                 elif operation == 'XOR':
-                    z3_vars[output_var] = z3.Xor(op1, op2)
+                    z3_vars[output_var] = z3.Xor(z3_vars[op1], z3_vars[op2])
                 elif operation == 'PLUS':
                     z3_vars[output_var] = z3_vars[op1] + z3_vars[op2]
                 elif operation == 'TIMES':
