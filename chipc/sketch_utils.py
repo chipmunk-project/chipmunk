@@ -1,6 +1,6 @@
-from pathlib import Path
 import re
 import subprocess
+from pathlib import Path
 
 SYN_TIME_MINS = 30
 SMT_GEN_TIME_MINS = 0.1
@@ -59,7 +59,8 @@ def generate_ir(sketch_file_name):
         '-V', '3',
         sketch_file_name,
         '--debug-output-dag', dag_file_name,
-        '--slv-timeout', str(SMT_GEN_TIME_MINS)
+        # We only need to output IR dag file.
+        '--debug-fake-solver'
     ])
 
     return Path(dag_file_name).read_text()

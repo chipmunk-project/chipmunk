@@ -1,5 +1,4 @@
 import re
-import sys
 
 import z3
 
@@ -98,10 +97,12 @@ def get_z3_formula(sketch_ir, verify_bit_width):
                 z3_asserts += ['_n' + records[3]]
             elif operation == 'S':
                 var_type = records[3]
+                source_name = records[4]
                 assert var_type == 'INT', ('Unexpected variable type found in \
                         sketch IR:', line)
-                z3_vars[output_var] = z3.Int(output_var)
-                z3_srcs += [output_var]
+                z3_vars[source_name] = z3.Int(source_name)
+                z3_vars[output_var] = z3.Int(source_name)
+                z3_srcs += [source_name]
             elif operation in ['NEG']:
                 z3_vars[output_var] = - z3_vars['_n' + records[4]]
             elif operation in ['NOT']:
