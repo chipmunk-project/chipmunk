@@ -136,7 +136,7 @@ def get_z3_formula(sketch_ir, verify_bit_width):
                                             z3_vars['_n' + records[7]],
                                             z3_vars['_n' + records[6]])
             elif operation in ['ARRASS']:
-                var_type = z3_vars['_n' + records[4]]
+                var_type = type(z3_vars['_n' + records[4]])
                 if var_type == z3.BoolRef:
                     assert(records[6] in ['0', '1'])
                     cmp_constant = records[6] == '1'
