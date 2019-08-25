@@ -65,9 +65,7 @@ def generate_ir(sketch_file_name):
         sketch_file_name,
         '--debug-output-dag', dag_file_name,
         '--debug-fake-solver'
-    ],
-        stdout=subprocess.DEVNULL,
-        stderr=subprocess.DEVNULL)
+    ])
 
     import os
     print(os.getcwd())
