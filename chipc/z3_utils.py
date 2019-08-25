@@ -36,7 +36,7 @@ def negated_body(formula):
     return z3.Not(z3.substitute_vars(formula.body(), *reversed(vs)))
 
 
-def generate_counter_examples(smt2_filename):
+def generate_counter_examples(formula):
     """Given a smt2 file that was generated from sketch, returns counterexample
     values for input packet fields and state group variables.
 
@@ -45,7 +45,6 @@ def generate_counter_examples(smt2_filename):
         represents counterexamples for packet variables and the second for
         state group variables.
     """
-    formula = parse_smt2_file(smt2_filename)
     new_formula = negated_body(formula)
 
     z3_slv = z3.Solver()
