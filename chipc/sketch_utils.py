@@ -66,6 +66,7 @@ def generate_ir(sketch_file_name):
         '--debug-output-dag', dag_file_name,
         '--debug-fake-solver'
     ],
-        stdout=subprocess.DEVNULL)
+        stdout=subprocess.DEVNULL,
+        stderr=subprocess.DEVNULL)
 
     return Path(dag_file_name).read_text()
