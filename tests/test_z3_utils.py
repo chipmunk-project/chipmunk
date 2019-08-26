@@ -86,3 +86,7 @@ class SimpleCheckTest(unittest.TestCase):
         input_formula = z3.ForAll([a], z3.Implies(a > 0, a + 1 > a))
         with patch('z3.parse_smt2_file', return_value=[input_formula]):
             self.assertTrue(z3_utils.simple_check('foobar'))
+
+
+if __name__ == '__main__':
+    unittest.main()
