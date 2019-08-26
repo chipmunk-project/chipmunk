@@ -37,14 +37,18 @@ def negated_body(formula):
 
 
 def generate_counter_examples(formula):
-    """Given a smt2 file that was generated from sketch, returns counterexample
-    values for input packet fields and state group variables.
+    """Given a z3 formula generated from a sketch, returns counterexample values
+    for the formula.
 
     Returns:
         A tuple of two dicts from string to ints, where the first one
         represents counterexamples for packet variables and the second for
         state group variables.
     """
+    # We negate the body of formula, and check whether the new formula is
+    # satisfiable. If so, we extract the input values and they are
+    # counterexamples for the original formula. Otherwise, the original formula
+    # is satisfiable and there is no counterexample.
     new_formula = negated_body(formula)
 
     z3_slv = z3.Solver()

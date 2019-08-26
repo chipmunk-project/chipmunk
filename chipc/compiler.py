@@ -240,6 +240,7 @@ class Compiler:
             hole_assignments=hole_assignments
         )
 
+        # Write sketch to a file.
         file_basename = self.sketch_name + '_verify_iter_' + str(iter_cnt)
         sketch_filename = file_basename + '.sk'
         Path(sketch_filename).write_text(sketch_to_verify)
