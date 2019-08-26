@@ -70,7 +70,6 @@ setup(
     },
     entry_points={
         'console_scripts': [
-            'direct_solver=' + _PACKAGE_NAME + '.direct_solver:run_main',
             'iterative_solver=' + _PACKAGE_NAME + '.iterative_solver:run_main'
         ]
     })

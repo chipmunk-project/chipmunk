@@ -38,24 +38,6 @@ Also consider using [venv](https://docs.python.org/3/library/venv.html),
 [pipenv](https://pipenv.readthedocs.io/en/latest/) to create an isolated Python
 development environment.
 
-
-### Codegen
-
-```shell
-direct_solver example_specs/simple.sk example_alus/stateful_alus/raw.alu example_alus/stateless_alus/stateless_alu.alu 2 2 "{0,1,2,3}"
-```
-
-or
-```shell
-direct_solver example_specs/simple.sk example_alus/stateful_alus/raw.alu example_alus/stateless_alus/stateless_alu.alu 2 2 "{0,1,2,3}" --parallel-sketch
-```
-
-### Parallel codegen
-
-```shell
-direct_solver example_specs/simple.sk example_alus/stateful_alus/raw.alu example_alus/stateless_alus/stateless_alu.alu 2 2 "{0,1,2,3}" --parallel --parallel-sketch
-```
-
 ### Iterative solver
 ```shell
 iterative_solver example_specs/simple.sk example_alus/stateful_alus/raw.alu example_alus/stateless_alus/stateless_alu.alu 2 2 "{0,1,2,3}" 10 --hole-elimination
