@@ -80,9 +80,10 @@ def generate_counter_examples(formula):
     return (pkt_fields, state_vars)
 
 
-def get_z3_formula(sketch_ir, input_bits):
-    """Given an intermediate representation of a sketch file, returns a z3
-    formula corresponding to that."""
+def get_z3_formula(sketch_ir: str, input_bits: int) -> z3.QuantifierRef:
+    """Given an intermediate representation of a sketch file and returns a z3
+    formula corresponding to that IR with the specified input bits for source
+    variables."""
 
     z3_vars = dict()
     z3_asserts = []
