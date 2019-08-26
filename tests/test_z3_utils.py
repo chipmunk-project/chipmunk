@@ -1,4 +1,5 @@
 import unittest
+from pathlib import Path
 from unittest.mock import patch
 
 import z3
@@ -66,6 +67,23 @@ class GenerateCounterexamplesTest(unittest.TestCase):
         _, state_vars = z3_utils.generate_counterexamples(
             simple_formula)
         self.assertDictEqual(state_vars, {'state_group_1_state_0': 0})
+
+
+class GetZ3FormulaTest(unittest.TestCase):
+    def test_against_original_smt(self):
+        base_path = Path(__file__).parent
+        sketch_ir = Path(base_path / './data/hello.dag').resolve().read_text()
+        formula_from_ir = z3_utils.get_z3_formula(sketch_ir, input_bits=2)
+        ir_pkt_fields, ir_state_vars = z3_utils.generate_counterexamples(
+            formula_from_ir)
+
+        formula_from_smt = z3_utils.parse_smt2_file(
+            str(Path(base_path / './data/hello.smt').resolve()))
+        smt_pkt_fields, smt_state_vars = z3_utils.generate_counterexamples(
+            formula_from_smt)
+
+        self.assertDictEqual(ir_pkt_fields, smt_pkt_fields)
+        self.assertDictEqual(ir_state_vars, smt_state_vars)
 
 
 class SimpleCheckTest(unittest.TestCase):
