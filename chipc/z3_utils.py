@@ -80,7 +80,7 @@ def generate_counter_examples(formula):
     return (pkt_fields, state_vars)
 
 
-def get_z3_formula(sketch_ir, verify_bit_width):
+def get_z3_formula(sketch_ir, input_bits):
     """Given an intermediate representation of a sketch file, returns a z3
     formula corresponding to that."""
 
@@ -164,9 +164,8 @@ def get_z3_formula(sketch_ir, verify_bit_width):
             else:
                 assert False, ('Unknown operation:', line)
 
-    # for var in z3_vars:
-    #     print(var, ' = ', z3_vars[var])
-
+    # To handle cases where we don't have any assert or source variable, add
+    # a dummy bool variable.
     constraints = z3.BoolVal(True)
     for var in z3_asserts:
         constraints = z3.And(constraints, z3_vars[var])
@@ -174,7 +173,8 @@ def get_z3_formula(sketch_ir, verify_bit_width):
     variable_range = z3.BoolVal(True)
     for var in z3_srcs:
         variable_range = z3.And(variable_range, z3.And(
-            0 <= z3_vars[var], z3_vars[var] < 2**verify_bit_width))
+            0 <= z3_vars[var], z3_vars[var] < 2**input_bits))
+
     final_assert = z3.ForAll([z3_vars[x] for x in z3_srcs],
                              z3.Implies(variable_range, constraints))
     # We could use z3.simplify on the final assert, however that could result
