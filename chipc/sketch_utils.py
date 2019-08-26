@@ -53,7 +53,6 @@ def generate_smt2_formula(sketch_file_name, smt_file_name, bit_range):
 def generate_ir(sketch_file_name):
     """Given a sketch file, returns its IR (intermediate representation).
 
-
     This function calls sketch and generates a .dag file having IR for the
     sketch file. Then reads the .dag file and returns its content."""
     check_syntax(sketch_file_name)
