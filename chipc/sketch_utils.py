@@ -64,7 +64,7 @@ def generate_ir(sketch_file_name):
         '-V', '3',
         sketch_file_name,
         '--debug-output-dag', dag_file_name,
-        '--debug-fake-solver'
+        '--slv-timeout', str(SMT_GEN_TIME_MINS)
     ])
 
     import os
