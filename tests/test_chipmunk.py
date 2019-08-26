@@ -6,7 +6,6 @@ from os import path
 from pathlib import Path
 
 from chipc.compiler import Compiler
-from chipc.optverify import optverify
 from chipc.utils import get_hole_dicts
 
 BASE_PATH = path.abspath(path.dirname(__file__))
@@ -114,32 +113,6 @@ class TestDirectSolver(unittest.TestCase):
         self.assertEqual(
             ret_code, 0,
             'Compiling ' + spec_filename + ' failed for ' + alu_filename)
-
-
-class OptverifyTest(unittest.TestCase):
-    def test_simple_sketch_same_config(self):
-        spec_filename = 'simple.sk'
-        alu_filename = 'raw.alu'
-
-        compiler = Compiler(
-            path.join(SPEC_DIR, spec_filename), path.join(
-                STATEFUL_ALU_DIR, alu_filename),
-            path.join(STATELESS_ALU_DIR, 'stateless_alu.alu'),
-            1, 1, 'sample1', False, '{0,1,2,3}')
-
-        compiler.optverify()
-
-        compiler = Compiler(
-            path.join(SPEC_DIR, spec_filename), path.join(
-                STATEFUL_ALU_DIR, alu_filename),
-            path.join(STATELESS_ALU_DIR, 'stateless_alu.alu'),
-            1, 1, 'sample2', False, '{0,1,2,3}')
-
-        compiler.optverify()
-        self.assertEqual(
-            0,
-            optverify('sample1', 'sample2',
-                      path.join(TRANSFORM_DIR, 'very_simple.transform')))
 
 
 if __name__ == '__main__':
