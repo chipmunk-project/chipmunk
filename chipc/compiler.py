@@ -249,4 +249,4 @@ class Compiler:
 
         z3_formula = z3_utils.get_z3_formula(sketch_ir, input_bits)
 
-        return z3_utils.generate_counter_examples(z3_formula)
+        return z3_utils.generate_counterexamples(z3_formula)
