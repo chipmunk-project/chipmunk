@@ -29,8 +29,8 @@ def negated_body(formula):
     Returns:
         A z3.BoolRef which is the negation of the formula body.
     """
-    assert z3.is_quantifier(
-        formula), ('Formula is not a quantifier:\n', formula)
+    assert z3.is_quantifier(formula), ('Formula is not a quantifier:\n',
+                                       formula)
     var_names = [formula.var_name(i) for i in range(formula.num_vars())]
     vs = [z3.Int(n) for n in var_names]
     return z3.Not(z3.substitute_vars(formula.body(), *reversed(vs)))
@@ -107,11 +107,13 @@ def get_z3_formula(sketch_ir, input_bits):
                 z3_vars[output_var] = z3.Int(source_name)
                 z3_srcs += [source_name]
             elif operation in ['NEG']:
-                z3_vars[output_var] = - z3_vars['_n' + records[4]]
+                z3_vars[output_var] = -z3_vars['_n' + records[4]]
             elif operation in ['NOT']:
                 z3_vars[output_var] = z3.Not(z3_vars['_n' + records[4]])
-            elif operation in ['AND', 'OR', 'XOR', 'PLUS',
-                               'TIMES', 'DIV', 'MOD', 'LT', 'EQ']:
+            elif operation in [
+                    'AND', 'OR', 'XOR', 'PLUS', 'TIMES', 'DIV', 'MOD', 'LT',
+                    'EQ'
+            ]:
                 op1 = '_n' + records[4]
                 op2 = '_n' + records[5]
                 if operation == 'AND':
@@ -142,22 +144,21 @@ def get_z3_formula(sketch_ir, input_bits):
             elif operation in ['ARRASS']:
                 var_type = type(z3_vars['_n' + records[4]])
                 if var_type == z3.BoolRef:
-                    assert(records[6] in ['0', '1'])
+                    assert records[6] in ['0', '1']
                     cmp_constant = records[6] == '1'
                 elif var_type == z3.ArithRef:
                     cmp_constant = int(records[6])
                 else:
                     assert False, ('Variable type', var_type, 'not supported')
-                z3_vars[output_var] = z3.If(z3_vars['_n' + records[4]] ==
-                                            cmp_constant,
-                                            z3_vars['_n' + records[8]],
-                                            z3_vars['_n' + records[7]])
+                z3_vars[output_var] = z3.If(
+                    z3_vars['_n' + records[4]] == cmp_constant,
+                    z3_vars['_n' + records[8]], z3_vars['_n' + records[7]])
             elif operation in ['CONST']:
                 var_type = records[3]
                 if var_type == 'INT':
                     z3_vars[output_var] = z3.IntVal(int(records[4]))
                 elif var_type == 'BOOL':
-                    assert(records[4] in ['0', '1'])
+                    assert records[4] in ['0', '1']
                     z3_vars[output_var] = z3.BoolVal(records[4] == '1')
                 else:
                     assert False, ('Constant type', var_type, 'not supported')
@@ -172,8 +173,9 @@ def get_z3_formula(sketch_ir, input_bits):
 
     variable_range = z3.BoolVal(True)
     for var in z3_srcs:
-        variable_range = z3.And(variable_range, z3.And(
-            0 <= z3_vars[var], z3_vars[var] < 2**input_bits))
+        variable_range = z3.And(
+            variable_range,
+            z3.And(0 <= z3_vars[var], z3_vars[var] < 2**input_bits))
 
     final_assert = z3.ForAll([z3_vars[x] for x in z3_srcs],
                              z3.Implies(variable_range, constraints))
