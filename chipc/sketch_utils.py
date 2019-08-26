@@ -24,6 +24,9 @@ def synthesize(sketch_file_name, bnd_inbits, slv_seed, slv_parallel=False):
     assert(slv_parallel in [True, False])
     check_syntax(sketch_file_name)
     par_string = ' --slv-parallel' if slv_parallel else ''
+    # Consider switching to subprocess.run as subprocess.getstatusoutput is
+    # considered legacy.
+    # https://docs.python.org/3.5/library/subprocess.html#legacy-shell-invocation-functions
     (return_code, output) = subprocess.getstatusoutput('time sketch -V 12 ' +
                                                        '--slv-nativeints ' +
                                                        sketch_file_name +
