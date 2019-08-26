@@ -36,7 +36,7 @@ def negated_body(formula):
     return z3.Not(z3.substitute_vars(formula.body(), *reversed(vs)))
 
 
-def generate_counter_examples(formula):
+def generate_counterexamples(formula):
     """Given a z3 formula generated from a sketch, returns counterexample
     values for the formula.
 
