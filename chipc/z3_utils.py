@@ -137,7 +137,10 @@ def get_z3_formula(sketch_ir: str, input_bits: int) -> z3.QuantifierRef:
                     z3_vars[output_var] = z3_vars[op1] == z3_vars[op2]
                 else:
                     assert False, ('Invalid operation', operation)
-
+            # One can consider ARRACC and ARRASS as array access and
+            # assignment. For more details please refer this sketchusers
+            # mailing list thread.
+            # https://lists.csail.mit.edu/pipermail/sketchusers/2019-August/000104.html
             elif operation in ['ARRACC']:
                 z3_vars[output_var] = z3.If(z3_vars['_n' + records[4]],
                                             z3_vars['_n' + records[7]],
