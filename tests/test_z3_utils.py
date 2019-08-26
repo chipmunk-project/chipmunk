@@ -1,5 +1,4 @@
 import unittest
-from pathlib import Path
 from unittest.mock import patch
 
 import z3
@@ -46,38 +45,27 @@ class NegatedBodyTest(unittest.TestCase):
             z3_utils.negated_body(formula)
 
 
-class GenerateCounterExampleTest(unittest.TestCase):
+class GenerateCounterexamplesTest(unittest.TestCase):
     def test_successs_with_mock(self):
         x = z3.Int('pkt_0_0_0_0')
         simple_formula = z3.ForAll([x], z3.And(x > 3, x < 2))
-        with patch('z3.parse_smt2_file', return_value=[simple_formula]):
-            pkt_fields, _ = z3_utils.generate_counterexamples(
-                'foobar')
-            self.assertDictEqual(pkt_fields, {'pkt_0': 0})
-
-    def test_with_real_file(self):
-        test_filepath = Path(__file__).parent.joinpath(
-            './data/counterexample.smt2').resolve()
-        pkt_fields, state_vars = z3_utils.generate_counterexamples(
-            str(test_filepath))
+        pkt_fields, _ = z3_utils.generate_counterexamples(
+            simple_formula)
         self.assertDictEqual(pkt_fields, {'pkt_0': 0})
-        self.assertDictEqual(state_vars, {'state_group_0_state_0': 13})
 
     def test_unsat_formula(self):
         x = z3.Int('x')
         equality = z3.ForAll([x], x == x)
-        with patch('z3.parse_smt2_file', return_value=[equality]):
-            pkt_fields, state_vars = z3_utils.generate_counterexamples('foo')
-            self.assertDictEqual(pkt_fields, {})
-            self.assertDictEqual(state_vars, {})
+        pkt_fields, state_vars = z3_utils.generate_counterexamples(equality)
+        self.assertDictEqual(pkt_fields, {})
+        self.assertDictEqual(state_vars, {})
 
     def test_state_group_with_alphabets(self):
         x = z3.Int('state_group_1_state_0_b_b_0')
         simple_formula = z3.ForAll([x], z3.And(x > 3, x < 2))
-        with patch('z3.parse_smt2_file', return_value=[simple_formula]):
-            _, state_vars = z3_utils.generate_counterexamples(
-                'foobar')
-            self.assertDictEqual(state_vars, {'state_group_1_state_0': 0})
+        _, state_vars = z3_utils.generate_counterexamples(
+            simple_formula)
+        self.assertDictEqual(state_vars, {'state_group_1_state_0': 0})
 
 
 class SimpleCheckTest(unittest.TestCase):
