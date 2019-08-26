@@ -3,7 +3,7 @@ import subprocess
 from pathlib import Path
 
 SYN_TIME_MINS = 30
-SMT_GEN_TIME_MINS = 0.1
+SLV_TIMEOUT_MINS = 0.1
 
 
 def check_syntax(sketch_file_name):
@@ -45,7 +45,7 @@ def generate_smt2_formula(sketch_file_name, smt_file_name, bit_range):
                                                        ' --bnd-inbits=' +
                                                        str(bit_range) +
                                                        ' --slv-timeout=' +
-                                                       str(SMT_GEN_TIME_MINS) +
+                                                       str(SLV_TIMEOUT_MINS) +
                                                        ' --beopt:writeSMT ' +
                                                        smt_file_name)
 
@@ -64,7 +64,7 @@ def generate_ir(sketch_file_name):
         '-V', '3',
         sketch_file_name,
         '--debug-output-dag', dag_file_name,
-        '--slv-timeout', str(SMT_GEN_TIME_MINS)
+        '--slv-timeout', str(SLV_TIMEOUT_MINS)
     ],
         stdout=subprocess.DEVNULL,
         stderr=subprocess.DEVNULL)
