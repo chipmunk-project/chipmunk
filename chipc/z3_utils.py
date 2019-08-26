@@ -37,8 +37,8 @@ def negated_body(formula):
 
 
 def generate_counter_examples(formula):
-    """Given a z3 formula generated from a sketch, returns counterexample values
-    for the formula.
+    """Given a z3 formula generated from a sketch, returns counterexample
+    values for the formula.
 
     Returns:
         A tuple of two dicts from string to ints, where the first one
