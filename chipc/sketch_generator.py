@@ -112,11 +112,6 @@ class SketchGenerator:
 
         self.num_stateless_muxes_ = \
             stateless_alu_sketch_generator.num_packet_fields
-        self.add_assert(
-            '(' + self.sketch_name_ + '_' + alu_name + '_opcode == 1)' + '|| ('
-            + self.sketch_name_ + '_' + alu_name + '_mux1_ctrl <= ' +
-            self.sketch_name_ + '_' + alu_name +
-            '_mux2_ctrl)')
 
         return (stateless_alu_sketch_generator.helperFunctionStrings +
                 stateless_alu_sketch_generator.mainFunction)
@@ -256,22 +251,13 @@ class SketchGenerator:
     def generate_sketch(self, program_file, mode, additional_constraints=[],
                         hole_assignments=dict(), additional_testcases=''):
         self.reset_holes_and_asserts()
-        if mode == Mode.CODEGEN or mode == Mode.SOL_VERIFY or \
-                mode == Mode.VERIFY:
-            # TODO: Need better name for j2 file.
-            if (self.synthesized_allocation_):
-                template = self.jinja2_env_.get_template(
-                    'code_generator_synthesized_allocation.j2')
-            else:
-                template = self.jinja2_env_.get_template('code_generator.j2')
+        assert(mode in [Mode.CODEGEN, Mode.VERIFY])
+        # TODO: Need better name for j2 file.
+        if (self.synthesized_allocation_):
+            template = self.jinja2_env_.get_template(
+                'code_generator_synthesized_allocation.j2')
         else:
-            assert(mode == Mode.OPTVERIFY), 'Found mode ' + mode
-            # TODO: Need better name for j2 file.
-            if (self.synthesized_allocation_):
-                template = self.jinja2_env_.get_template(
-                    'sketch_functions_synthesized_allocation.j2')
-            else:
-                template = self.jinja2_env_.get_template('sketch_functions.j2')
+            template = self.jinja2_env_.get_template('code_generator.j2')
 
         # Create stateless and stateful ALUs, operand muxes for stateful ALUs,
         # and output muxes.
@@ -293,8 +279,6 @@ class SketchGenerator:
             num_pipeline_stages=self.num_pipeline_stages_,
             num_alus_per_stage=self.num_alus_per_stage_,
             num_phv_containers=self.num_phv_containers_,
-            # Pass constant_set to constant_vector for optverify
-            constant_vector=self.constant_set_,
             # Add constant_set to hole_definitions
             hole_definitions=self.constant_set_ + self.hole_preamble_,
             stateful_operand_mux_definitions=stateful_operand_mux_definitions,

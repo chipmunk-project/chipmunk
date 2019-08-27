@@ -1,7 +1,6 @@
 import concurrent.futures as cf
 import itertools
 import os
-import pickle
 import signal
 from os import path
 from pathlib import Path
@@ -13,7 +12,6 @@ from jinja2 import StrictUndefined
 
 from chipc import sketch_utils
 from chipc import z3_utils
-from chipc.chipmunk_pickle import ChipmunkPickle
 from chipc.mode import Mode
 from chipc.sketch_generator import SketchGenerator
 from chipc.utils import get_hole_value_assignments
@@ -188,35 +186,6 @@ class Compiler:
                     print('One run failed, waiting for others.')
         return compiler_output
 
-    def optverify(self):
-        """Opt Verify"""
-        optverify_code = self.sketch_generator.generate_sketch(
-            program_file=self.program_file,
-            mode=Mode.OPTVERIFY,
-            additional_constraints=[])
-
-        # Create file and write sketch_function into it
-        with open(self.sketch_name + '_optverify.sk', 'w') as sketch_file:
-            sketch_file.write(optverify_code)
-            print('Sketch file is', sketch_file.name)
-
-        # Put the rest (holes, hole arguments, constraints, etc.) into a
-        # .pickle file.
-        with open(self.sketch_name + '.pickle', 'wb') as pickle_file:
-            pickle.dump(
-                ChipmunkPickle(
-                    holes=self.sketch_generator.holes_,
-                    hole_arguments=self.sketch_generator.hole_arguments_,
-                    constraints=self.sketch_generator.constraints_,
-                    num_fields_in_prog=self.num_fields_in_prog,
-                    num_state_groups=self.num_state_groups,
-                    num_state_slots=self.sketch_generator.num_state_slots_),
-                pickle_file)
-            print('Pickle file is ', pickle_file.name)
-
-        print('Total number of hole bits is',
-              self.sketch_generator.total_hole_bits_)
-
     def verify(self, hole_assignments, input_bits, iter_cnt=1):
         """Verify hole value assignments for the sketch with a specific input
         bit lengths with z3.
@@ -232,21 +201,21 @@ class Compiler:
         for hole in self.sketch_generator.hole_names_:
             assert hole in hole_assignments
 
-        # Generate and run sketch that verifies these holes on the specific
-        # input bit length.
+        # Generate a sketch file to verify the hole value assignments with
+        # the specified input bit lengths.
         sketch_to_verify = self.sketch_generator.generate_sketch(
             program_file=self.program_file,
             mode=Mode.VERIFY,
             hole_assignments=hole_assignments
         )
 
+        # Write sketch to a file.
         file_basename = self.sketch_name + '_verify_iter_' + str(iter_cnt)
         sketch_filename = file_basename + '.sk'
-        smt2_filename = file_basename + '.smt2'
         Path(sketch_filename).write_text(sketch_to_verify)
 
-        sketch_utils.generate_smt2_formula(
-            sketch_filename, smt2_filename, input_bits
-        )
+        sketch_ir = sketch_utils.generate_ir(sketch_filename)
 
-        return z3_utils.generate_counter_examples(smt2_filename)
+        z3_formula = z3_utils.get_z3_formula(sketch_ir, input_bits)
+
+        return z3_utils.generate_counterexamples(z3_formula)
