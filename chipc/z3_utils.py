@@ -59,7 +59,9 @@ def generate_counterexamples(formula):
     new_formula = negated_body(formula)
 
     z3_slv = z3.Solver()
-    z3_slv.set(proof=True, unsat_core=True)
+    # To get counterexamples we need to set proof and unsat_core. Random seed
+    # is set for determinism.
+    z3_slv.set(proof=True, unsat_core=True, random_seed=1)
     z3_slv.add(new_formula)
 
     pkt_fields = {}
