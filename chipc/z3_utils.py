@@ -1,3 +1,4 @@
+import collections
 import re
 
 import z3
@@ -64,8 +65,8 @@ def generate_counterexamples(formula):
     z3_slv.set(proof=True, unsat_core=True, random_seed=1)
     z3_slv.add(new_formula)
 
-    pkt_fields = {}
-    state_vars = {}
+    pkt_fields = collections.OrderedDict()
+    state_vars = collections.OrderedDict()
 
     result = z3_slv.check()
     if result != z3.sat:
