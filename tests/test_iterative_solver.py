@@ -83,6 +83,7 @@ class IterativeSolverTest(unittest.TestCase):
                 '4', '2', '0,1,2,3', '10']),
         )
 
+    @unittest.skip('Takes too long on AppVeyor')
     def test_blue_increase_4_2_pred_raw_cex_mode_synthesized_alloc(self):
         self.assertEqual(
             0,
