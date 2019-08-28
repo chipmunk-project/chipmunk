@@ -65,6 +65,9 @@ def generate_counterexamples(formula):
     z3_slv.set(proof=True, unsat_core=True, random_seed=1)
     z3_slv.add(new_formula)
 
+    # Use OrderedDict here for deterministic compilation results. We can also
+    # use built-in dict() for Python versions 3.6 and later, as it's inherently
+    # ordered.
     pkt_fields = collections.OrderedDict()
     state_vars = collections.OrderedDict()
 
