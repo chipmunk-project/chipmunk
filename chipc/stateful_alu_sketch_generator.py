@@ -1,3 +1,4 @@
+from collections import OrderedDict
 from textwrap import dedent
 
 from overrides import overrides
@@ -8,10 +9,10 @@ from chipc.aluVisitor import aluVisitor
 
 class StatefulALUSketchGenerator(aluVisitor):
     def __init__(self, alu_file, alu_name,
-                 constant_set_size):
+                 constant_arr_size):
         self.instruction_file = alu_file
         self.alu_name = alu_name
-        self.constant_set_size = constant_set_size
+        self.constant_arr_size = constant_arr_size
         self.num_state_slots = 0
         self.num_packet_fields = 0
         self.mux3_count = 0
@@ -21,8 +22,8 @@ class StatefulALUSketchGenerator(aluVisitor):
         self.opt_count = 0
         self.constant_count = 0
         self.helper_function_strings = '\n\n\n'
-        self.alu_args = dict()
-        self.global_holes = dict()
+        self.alu_args = OrderedDict()
+        self.global_holes = OrderedDict()
         self.main_function = ''
 
     # Copied From Taegyun's code
@@ -273,7 +274,7 @@ class StatefulALUSketchGenerator(aluVisitor):
     return constant_vector[const];
     }\n\n"""
         self.add_hole('const_' + str(self.constant_count),
-                      self.constant_set_size)
+                      self.constant_arr_size)
 
     def generateRelOp(self):
         self.helper_function_strings += 'int ' + self.alu_name + '_' + \

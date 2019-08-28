@@ -3,6 +3,8 @@ import argparse
 import sys
 from pathlib import Path
 
+from ordered_set import OrderedSet
+
 from chipc.compiler import Compiler
 from chipc.utils import compilation_failure
 from chipc.utils import compilation_success
@@ -94,7 +96,7 @@ def main(argv):
         'constant_set',
         type=str,
         help='The content in the constant_set\
-              and the format will be like {0,1,2,3}\
+              and the format will be like 0,1,2,3\
               and we will calculate the number of\
               comma to get the size of it')
     parser.add_argument(
@@ -145,13 +147,17 @@ def main(argv):
         '_' + str(args.num_pipeline_stages) + \
         '_' + str(args.num_alus_per_stage)
 
+    # Use OrderedSet here for deterministic compilation results. We can also
+    # use built-in dict() for Python versions 3.6 and later, as it's inherently
+    # ordered.
+    constant_set = OrderedSet(args.constant_set.split(','))
+
     compiler = Compiler(args.program_file, args.stateful_alu_file,
                         args.stateless_alu_file,
                         args.num_pipeline_stages, args.num_alus_per_stage,
                         sketch_name, args.parallel_sketch,
-                        args.constant_set,
+                        constant_set,
                         args.synthesized_allocation, args.pkt_fields)
-
     # Repeatedly run synthesis at 2 bits and verification using all valid ints
     # until either verification succeeds or synthesis fails at 2 bits. Note
     # that the verification with all ints, might not work because sketch only
@@ -198,6 +204,22 @@ def main(argv):
             print(hole_elimination_assert)
         else:
             print('Use returned counterexamples', pkt_fields, state_vars)
+
+            # compiler.constant_set will be in the form "0,1,2,3"
+
+            # Get the value of counterexample and add them into constant_set
+            for _, value in pkt_fields.items():
+                value_str = str(value)
+                constant_set.add(value_str)
+            for _, value in state_vars.items():
+                value_str = str(value)
+                constant_set.add(value_str)
+
+            # Print the updated constant_array just for debugging
+            print('updated constant array', constant_set)
+
+            # Add constant set to compiler for next synthesis.
+            compiler.update_constants_for_synthesis(constant_set)
 
             pkt_fields, state_vars = set_default_values(
                 pkt_fields, state_vars, num_fields_in_prog, state_group_info

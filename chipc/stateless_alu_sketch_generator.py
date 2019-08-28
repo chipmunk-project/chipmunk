@@ -1,5 +1,6 @@
 import math
 import re
+from collections import OrderedDict
 from textwrap import dedent
 
 from overrides import overrides
@@ -13,13 +14,13 @@ class StatelessAluSketchGenerator (aluVisitor):
                  alu_name,
                  potential_operands,
                  generate_stateless_mux,
-                 constant_set_size):
+                 constant_arr_size):
         self.stateless_alu_name = stateless_alu_name
         self.stateless_alu_file = stateless_alu_file
         self.alu_name = alu_name
         self.potential_operands = potential_operands
         self.generate_stateless_mux = generate_stateless_mux
-        self.constant_set_size = constant_set_size
+        self.constant_arr_size = constant_arr_size
         self.mux3Count = 0
         self.mux2Count = 0
         self.relopCount = 0
@@ -27,8 +28,8 @@ class StatelessAluSketchGenerator (aluVisitor):
         self.optCount = 0
         self.constCount = 0
         self.helperFunctionStrings = '\n\n\n'
-        self.globalholes = dict()
-        self.stateless_alu_args = dict()
+        self.globalholes = OrderedDict()
+        self.stateless_alu_args = OrderedDict()
         self.mainFunction = ''
         self.num_packet_fields = 0
         self.packet_fields = []
@@ -40,7 +41,7 @@ class StatelessAluSketchGenerator (aluVisitor):
             prefixed_hole = self.stateless_alu_name + '_' + \
                 hole_name[:hole_name.index('_')]
             # Set num_bits for immediate
-            hole_width = self.constant_set_size
+            hole_width = self.constant_arr_size
         else:
             prefixed_hole = self.stateless_alu_name + '_' + hole_name
         assert (prefixed_hole not in self.globalholes)
@@ -504,7 +505,7 @@ class StatelessAluSketchGenerator (aluVisitor):
             '_' + 'C_' + str(self.constCount) + """(int const) {
     return constant_vector[const];
     }\n\n"""
-        self.add_hole('const_' + str(self.constCount), self.constant_set_size)
+        self.add_hole('const_' + str(self.constCount), self.constant_arr_size)
 
     def generateOpt(self):
         self.helperFunctionStrings += 'int ' + self.stateless_alu_name + \
