@@ -133,7 +133,7 @@ class StatelessAluSketchGenerator (aluVisitor):
         if len(self.stateless_alu_args) > 2:
 
             argument_string = ',' + ','.join(
-                ['int ' + hole for hole in self.stateless_alu_args])
+                ['int ' + hole for hole in sorted(self.stateless_alu_args)])
 
         self.mainFunction = self.mainFunction % argument_string
 

@@ -61,7 +61,7 @@ class StatefulALUSketchGenerator(aluVisitor):
                               'return old_state_group;\n}else{\n' +\
                               'return state_group;\n}\n\n}'
         argument_string = ','.join(
-            ['int ' + hole for hole in self.alu_args])
+            ['int ' + hole for hole in sorted(self.alu_args)])
         self.main_function = self.main_function % argument_string
 
     @overrides
