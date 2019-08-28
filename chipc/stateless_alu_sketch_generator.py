@@ -1,5 +1,6 @@
 import math
 import re
+from collections import OrderedDict
 from textwrap import dedent
 
 from overrides import overrides
@@ -27,8 +28,8 @@ class StatelessAluSketchGenerator (aluVisitor):
         self.optCount = 0
         self.constCount = 0
         self.helperFunctionStrings = '\n\n\n'
-        self.globalholes = dict()
-        self.stateless_alu_args = dict()
+        self.globalholes = OrderedDict()
+        self.stateless_alu_args = OrderedDict()
         self.mainFunction = ''
         self.num_packet_fields = 0
         self.packet_fields = []
@@ -132,7 +133,7 @@ class StatelessAluSketchGenerator (aluVisitor):
         if len(self.stateless_alu_args) > 2:
 
             argument_string = ',' + ','.join(
-                ['int ' + hole for hole in sorted(self.stateless_alu_args)])
+                ['int ' + hole for hole in self.stateless_alu_args])
 
         self.mainFunction = self.mainFunction % argument_string
 

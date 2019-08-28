@@ -1,3 +1,4 @@
+from collections import OrderedDict
 from textwrap import dedent
 
 from overrides import overrides
@@ -21,8 +22,8 @@ class StatefulALUSketchGenerator(aluVisitor):
         self.opt_count = 0
         self.constant_count = 0
         self.helper_function_strings = '\n\n\n'
-        self.alu_args = dict()
-        self.global_holes = dict()
+        self.alu_args = OrderedDict()
+        self.global_holes = OrderedDict()
         self.main_function = ''
 
     # Copied From Taegyun's code
@@ -60,7 +61,7 @@ class StatefulALUSketchGenerator(aluVisitor):
                               'return old_state_group;\n}else{\n' +\
                               'return state_group;\n}\n\n}'
         argument_string = ','.join(
-            ['int ' + hole for hole in sorted(self.alu_args)])
+            ['int ' + hole for hole in self.alu_args])
         self.main_function = self.main_function % argument_string
 
     @overrides

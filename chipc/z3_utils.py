@@ -119,7 +119,7 @@ def get_z3_formula(sketch_ir: str, input_bits: int) -> z3.QuantifierRef:
     formula corresponding to that IR with the specified input bits for source
     variables."""
 
-    z3_vars = dict()
+    z3_vars = collections.OrderedDict()
     z3_asserts = []
     z3_srcs = []
     for line in sketch_ir.splitlines():
