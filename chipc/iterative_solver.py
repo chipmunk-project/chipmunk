@@ -109,6 +109,11 @@ def main(argv):
         nargs='+',
         help='Packet fields to check correctness')
     parser.add_argument(
+        '--state-groups',
+        type=int,
+        nargs='+',
+        help='State groups to check correctness')
+    parser.add_argument(
         '-p',
         '--parallel',
         action='store_true',
@@ -157,7 +162,8 @@ def main(argv):
                         args.num_pipeline_stages, args.num_alus_per_stage,
                         sketch_name, args.parallel_sketch,
                         constant_set,
-                        args.synthesized_allocation, args.pkt_fields)
+                        args.synthesized_allocation, args.pkt_fields,
+                        args.state_groups)
     # Repeatedly run synthesis at 2 bits and verification using all valid ints
     # until either verification succeeds or synthesis fails at 2 bits. Note
     # that the verification with all ints, might not work because sketch only

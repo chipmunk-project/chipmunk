@@ -162,7 +162,7 @@
   |StateAndPacket| pipeline_result = pipeline(x);
   |StateAndPacket| program_result = program(x);
 
-  {% for state_group_number in range(num_state_groups) %}
+  {% for state_group_number in state_groups_to_check %}
     {% for slot_number in range(num_state_slots) %}
       assert(pipeline_result.state_group_{{state_group_number}}_state_{{slot_number}}
       == program_result.state_group_{{state_group_number}}_state_{{slot_number}});

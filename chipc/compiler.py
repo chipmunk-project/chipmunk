@@ -42,7 +42,8 @@ class Compiler:
                  num_pipeline_stages, num_alus_per_stage, sketch_name,
                  parallel_sketch, constant_set,
                  synthesized_allocation=False,
-                 pkt_fields_to_check=[]):
+                 pkt_fields_to_check=[],
+                 state_groups_to_check=[]):
         self.program_file = program_file
         self.stateful_alu_file = stateful_alu_file
         self.stateless_alu_file = stateless_alu_file
@@ -73,8 +74,13 @@ class Compiler:
             trim_blocks=True,
             lstrip_blocks=True)
 
-        if not pkt_fields_to_check:
+        if not pkt_fields_to_check and not state_groups_to_check:
             pkt_fields_to_check = list(range(self.num_fields_in_prog))
+            state_groups_to_check = list(range(self.num_state_groups))
+        elif not pkt_fields_to_check and state_groups_to_check:
+            pkt_fields_to_check = []
+        elif pkt_fields_to_check and not state_groups_to_check:
+            state_groups_to_check = []
 
         # Create an object for sketch generation
         self.sketch_generator = SketchGenerator(
@@ -85,6 +91,7 @@ class Compiler:
             num_state_groups=self.num_state_groups,
             num_fields_in_prog=self.num_fields_in_prog,
             pkt_fields_to_check=pkt_fields_to_check,
+            state_groups_to_check=state_groups_to_check,
             jinja2_env=self.jinja2_env,
             stateful_alu_file=stateful_alu_file,
             stateless_alu_file=stateless_alu_file,
