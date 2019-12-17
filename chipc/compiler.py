@@ -43,7 +43,8 @@ class Compiler:
                  parallel_sketch, constant_set,
                  synthesized_allocation=False,
                  pkt_fields_to_check=[],
-                 state_groups_to_check=[]):
+                 state_groups_to_check=[],
+                 state_dependency=[]):
         self.program_file = program_file
         self.stateful_alu_file = stateful_alu_file
         self.stateless_alu_file = stateless_alu_file
@@ -91,6 +92,7 @@ class Compiler:
             num_state_groups=self.num_state_groups,
             num_fields_in_prog=self.num_fields_in_prog,
             pkt_fields_to_check=pkt_fields_to_check,
+            state_dependency=state_dependency,
             state_groups_to_check=state_groups_to_check,
             jinja2_env=self.jinja2_env,
             stateful_alu_file=stateful_alu_file,

@@ -114,6 +114,14 @@ def main(argv):
         nargs='+',
         help='State groups to check correctness')
     parser.add_argument(
+        '--state-dependency',
+        type=int,
+        nargs='+',
+        help='Show the dependency relation between different state groups\
+              the format will be 0 1 2 3 which means state_group0 happens\
+              before state_group1 and state_group2 happens before\
+              state_group3')
+    parser.add_argument(
         '-p',
         '--parallel',
         action='store_true',
@@ -138,6 +146,9 @@ def main(argv):
     )
 
     args = parser.parse_args(argv[1:])
+    if args.state_dependency is not None:
+        assert len(
+            args.state_dependency) % 2 == 0, 'dependency list len must be even'
     # Use program_content to store the program file text rather than using it
     # twice
     program_content = Path(args.program_file).read_text()
@@ -163,7 +174,7 @@ def main(argv):
                         sketch_name, args.parallel_sketch,
                         constant_set,
                         args.synthesized_allocation, args.pkt_fields,
-                        args.state_groups)
+                        args.state_groups, args.state_dependency)
     # Repeatedly run synthesis at 2 bits and verification using all valid ints
     # until either verification succeeds or synthesis fails at 2 bits. Note
     # that the verification with all ints, might not work because sketch only

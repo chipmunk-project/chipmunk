@@ -21,12 +21,13 @@ class Hole:
 def add_prefix_suffix(text, prefix_string, suffix_string):
     return prefix_string + str(text) + suffix_string
 
-
 # Sketch Generator class
+
+
 class SketchGenerator:
     def __init__(self, sketch_name, num_phv_containers, num_state_groups,
                  num_alus_per_stage, num_pipeline_stages, num_fields_in_prog,
-                 pkt_fields_to_check, state_groups_to_check,
+                 pkt_fields_to_check, state_groups_to_check, state_dependency,
                  jinja2_env, stateful_alu_file,
                  stateless_alu_file, constant_set,
                  synthesized_allocation):
@@ -45,6 +46,7 @@ class SketchGenerator:
         self.num_fields_in_prog_ = num_fields_in_prog
         self.pkt_fields_to_check_ = pkt_fields_to_check
         self.state_groups_to_check_ = state_groups_to_check
+        self.state_dependency_ = state_dependency
         self.jinja2_env_ = jinja2_env
         self.jinja2_env_.filters['add_prefix_suffix'] = add_prefix_suffix
         self.stateful_alu_file_ = stateful_alu_file
@@ -191,6 +193,33 @@ class SketchGenerator:
                     'salu_config_' + str(i) + '_' + str(l) + ' + '
             assert_predicate += '0) <= 1'
             self.add_assert(assert_predicate)
+
+        num_list = []
+        val = 1
+        for i in range(self.num_pipeline_stages_):
+            num_list.insert(0, val)
+            val = val*10
+        # TODO: generate assert_predicate for state_dependency groups
+        if self.state_dependency_ is not None:
+            for i in range(int(len(self.state_dependency_)/2)):
+                assert_predicate = self.generate_assert_for_state_dependency(
+                    self.state_dependency_[i*2],
+                    self.state_dependency_[i*2+1], num_list)
+                self.add_assert(assert_predicate)
+
+    def generate_assert_for_state_dependency(self, state_1, state_2, num_list):
+        assert_predicate = '('
+        for i in range(self.num_pipeline_stages_):
+            assert_predicate += self.sketch_name_ + '_' + \
+                'salu_config_' + str(i) + '_' + str(state_1) + ' * ' +\
+                str(num_list[i]) + ' + '
+        assert_predicate += '0 > '
+        for i in range(self.num_pipeline_stages_):
+            assert_predicate += self.sketch_name_ + '_' + \
+                'salu_config_' + str(i) + '_' + str(state_2) + ' * ' +\
+                str(num_list[i]) + ' + '
+        assert_predicate += '0)'
+        return assert_predicate
 
     # Sketch code for an n-to-1 mux
     def generate_mux(self, n, mux_name):
