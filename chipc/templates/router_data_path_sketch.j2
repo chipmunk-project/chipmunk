@@ -31,7 +31,8 @@
     {% if stage_number == 0 %}
       // Read each PHV container from corresponding packet field.
       {% for field_number in input_packet %}
-        input_0_{{field_number}} = state_and_packet.pkt_{{field_number}};
+        // loop.index starts from 1 that's why we need to -1
+        input_0_{{loop.index - 1}} = state_and_packet.pkt_{{field_number}};
       {% endfor %}
 
     {% else %}
@@ -128,9 +129,9 @@
 
   {% endfor %}
 
-  {% for field_number in range(num_fields_in_prog) %}
+  {% for field_number in pkt_fields_to_check %}
     // Write pkt_{{field_number}}
-    state_and_packet.pkt_{{field_number}} = output_{{num_pipeline_stages - 1}}_{{field_number}};
+    state_and_packet.pkt_{{field_number}} = output_{{num_pipeline_stages - 1}}_{{loop.index - 1}};
   {% endfor %}
 
   // Return updated packet fields and state vars
