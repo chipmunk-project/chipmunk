@@ -122,6 +122,11 @@ def main(argv):
               before state_group1 and state_group2 happens before\
               state_group3')
     parser.add_argument(
+        '--input-packet',
+        type=int,
+        nargs='+',
+        help='Show the actual packet fields used as the input of spec.')
+    parser.add_argument(
         '-p',
         '--parallel',
         action='store_true',
@@ -174,7 +179,8 @@ def main(argv):
                         sketch_name, args.parallel_sketch,
                         constant_set,
                         args.synthesized_allocation, args.pkt_fields,
-                        args.state_groups, args.state_dependency)
+                        args.state_groups, args.state_dependency,
+                        args.input_packet)
     # Repeatedly run synthesis at 2 bits and verification using all valid ints
     # until either verification succeeds or synthesis fails at 2 bits. Note
     # that the verification with all ints, might not work because sketch only

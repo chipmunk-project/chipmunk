@@ -30,7 +30,7 @@
     // Inputs
     {% if stage_number == 0 %}
       // Read each PHV container from corresponding packet field.
-      {% for field_number in range(num_fields_in_prog) %}
+      {% for field_number in input_packet %}
         input_0_{{field_number}} = state_and_packet.pkt_{{field_number}};
       {% endfor %}
 

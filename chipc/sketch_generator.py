@@ -30,7 +30,7 @@ class SketchGenerator:
                  pkt_fields_to_check, state_groups_to_check, state_dependency,
                  jinja2_env, stateful_alu_file,
                  stateless_alu_file, constant_set,
-                 synthesized_allocation):
+                 synthesized_allocation, input_packet):
         self.sketch_name_ = sketch_name
         self.total_hole_bits_ = 0
         self.hole_names_ = []
@@ -65,6 +65,7 @@ class SketchGenerator:
         self.num_operands_to_stateful_alu_ = 0
         self.num_state_slots_ = 0
         self.synthesized_allocation_ = synthesized_allocation
+        self.input_packet_ = input_packet
 
     def reset_holes_and_asserts(self):
         self.total_hole_bits_ = 0
@@ -335,4 +336,5 @@ class SketchGenerator:
             hole_assignments=self.constant_arr_def_ + '\n'.join(
                 ['int ' + str(hole) + ' = ' + str(value) + ';'
                     for hole, value in hole_assignments.items()]),
-            additional_testcases=additional_testcases)
+            additional_testcases=additional_testcases,
+            input_packet=self.input_packet_)

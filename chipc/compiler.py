@@ -44,7 +44,8 @@ class Compiler:
                  synthesized_allocation=False,
                  pkt_fields_to_check=[],
                  state_groups_to_check=[],
-                 state_dependency=[]):
+                 state_dependency=[],
+                 input_packet=[]):
         self.program_file = program_file
         self.stateful_alu_file = stateful_alu_file
         self.stateless_alu_file = stateless_alu_file
@@ -83,6 +84,10 @@ class Compiler:
         elif pkt_fields_to_check and not state_groups_to_check:
             state_groups_to_check = []
 
+        # Differentiate between using default pkt input vs. specify pkt input
+        if not input_packet:
+            input_packet = list(range(self.num_fields_in_prog))
+
         # Create an object for sketch generation
         self.sketch_generator = SketchGenerator(
             sketch_name=sketch_name,
@@ -98,7 +103,8 @@ class Compiler:
             stateful_alu_file=stateful_alu_file,
             stateless_alu_file=stateless_alu_file,
             constant_set=constant_set,
-            synthesized_allocation=synthesized_allocation)
+            synthesized_allocation=synthesized_allocation,
+            input_packet=input_packet)
 
     def update_constants_for_synthesis(self, constant_set):
         # Join the values in constant_set to get constant_array in sketch.
