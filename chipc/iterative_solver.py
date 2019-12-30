@@ -55,7 +55,9 @@ def set_default_values(pkt_fields, state_vars, num_fields_in_prog,
 
 
 def generate_counterexample_asserts(pkt_fields, state_vars, num_fields_in_prog,
-                                    state_group_info, count):
+                                    state_group_info, count,
+                                    pkt_fields_to_check,
+                                    state_group_to_check):
     counterexample_defs = ''
     counterexample_asserts = ''
 
@@ -73,9 +75,28 @@ def generate_counterexample_asserts(pkt_fields, state_vars, num_fields_in_prog,
         else:
             counterexample_defs += ');\n'
 
-    counterexample_asserts += 'assert (pipeline(' + 'x_' + str(
-        count) + ')' + ' == ' + 'program(' + 'x_' + str(
-            count) + '));\n'
+    # TODO: add pointwise assert
+    if pkt_fields_to_check is None and state_group_to_check is None:
+        counterexample_asserts += 'assert (pipeline(' + 'x_' + str(
+            count) + ')' + ' == ' + 'program(' + 'x_' + str(
+                count) + '));\n'
+    elif pkt_fields_to_check is not None and state_group_to_check is None:
+        for i in range(len(pkt_fields_to_check)):
+            counterexample_asserts += 'assert (pipeline(' + 'x_' + str(
+                count) + ').pkt_' + str(pkt_fields_to_check[i]) + \
+                ' == ' + 'program(' + 'x_' + str(
+                count) + ').pkt_' + str(pkt_fields_to_check[i]) + ');\n'
+    else:
+        assert pkt_fields_to_check is None and state_group_to_check is not None
+        # TODO: deal with state_vars with group size = 2
+        # Now only assume there is one state_var in each state group
+        for i in range(len(state_group_to_check)):
+            counterexample_asserts += 'assert (pipeline(' + 'x_' + str(
+                count) + ').state_group_' + str(state_group_to_check[i]) + \
+                '_state_0' + ' == ' + 'program(' + 'x_' + str(
+                count) + ').state_group_' + str(state_group_to_check[i]) +\
+                '_state_0);\n'
+
     return counterexample_defs + counterexample_asserts
 
 
@@ -250,7 +271,7 @@ def main(argv):
 
             additional_testcases += generate_counterexample_asserts(
                 pkt_fields, state_vars, num_fields_in_prog, state_group_info,
-                count)
+                count, args.pkt_fields, args.state_groups)
 
         count += 1
 
