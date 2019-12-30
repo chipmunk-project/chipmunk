@@ -57,7 +57,7 @@ def set_default_values(pkt_fields, state_vars, num_fields_in_prog,
 def generate_counterexample_asserts(pkt_fields, state_vars, num_fields_in_prog,
                                     state_group_info, count,
                                     pkt_fields_to_check,
-                                    state_group_to_check):
+                                    state_group_to_check, group_size):
     counterexample_defs = ''
     counterexample_asserts = ''
 
@@ -86,16 +86,31 @@ def generate_counterexample_asserts(pkt_fields, state_vars, num_fields_in_prog,
                 count) + ').pkt_' + str(pkt_fields_to_check[i]) + \
                 ' == ' + 'program(' + 'x_' + str(
                 count) + ').pkt_' + str(pkt_fields_to_check[i]) + ');\n'
+    elif pkt_fields_to_check is not None and state_group_to_check is not None:
+        for i in range(len(pkt_fields_to_check)):
+            counterexample_asserts += 'assert (pipeline(' + 'x_' + str(
+                count) + ').pkt_' + str(pkt_fields_to_check[i]) + \
+                ' == ' + 'program(' + 'x_' + str(
+                count) + ').pkt_' + str(pkt_fields_to_check[i]) + ');\n'
+
+        for i in range(len(state_group_to_check)):
+            for j in range(group_size):
+                counterexample_asserts += 'assert (pipeline(' + 'x_' + str(
+                    count) + ').state_group_' + \
+                    str(state_group_to_check[i]) + \
+                    '_state_' + str(j) + ' == ' + 'program(' + 'x_' + str(
+                    count) + ').state_group_' + \
+                    str(state_group_to_check[i]) + '_state_' + str(j) + ');\n'
     else:
         assert pkt_fields_to_check is None and state_group_to_check is not None
-        # TODO: deal with state_vars with group size = 2
-        # Now only assume there is one state_var in each state group
         for i in range(len(state_group_to_check)):
-            counterexample_asserts += 'assert (pipeline(' + 'x_' + str(
-                count) + ').state_group_' + str(state_group_to_check[i]) + \
-                '_state_0' + ' == ' + 'program(' + 'x_' + str(
-                count) + ').state_group_' + str(state_group_to_check[i]) +\
-                '_state_0);\n'
+            for j in range(group_size):
+                counterexample_asserts += 'assert (pipeline(' + 'x_' + str(
+                    count) + ').state_group_' + \
+                    str(state_group_to_check[i]) + \
+                    '_state_' + str(j) + ' == ' + 'program(' + 'x_' + str(
+                    count) + ').state_group_' + str(state_group_to_check[i]) +\
+                    '_state_' + str(j) + ');\n'
 
     return counterexample_defs + counterexample_asserts
 
@@ -183,6 +198,10 @@ def main(argv):
     # Get the state vars information
     # TODO: add the max_input_bit into sketch_name
     state_group_info = get_state_group_info(program_content)
+
+    # Get how many members in each state group
+    group_size = len(list(state_group_info.items())[0][1])
+
     sketch_name = args.program_file.split('/')[-1].split('.')[0] + \
         '_' + args.stateful_alu_file.split('/')[-1].split('.')[0] + \
         '_' + args.stateless_alu_file.split('/')[-1].split('.')[0] + \
@@ -271,7 +290,7 @@ def main(argv):
 
             additional_testcases += generate_counterexample_asserts(
                 pkt_fields, state_vars, num_fields_in_prog, state_group_info,
-                count, args.pkt_fields, args.state_groups)
+                count, args.pkt_fields, args.state_groups, group_size)
 
         count += 1
 
