@@ -83,6 +83,70 @@ class IterativeSolverTest(unittest.TestCase):
                 '4', '2', '0,1,2,3', '10']),
         )
 
+    def test_blue_increase_4_2_pred_raw_cex_mode_with_dependency(self):
+        self.assertEqual(
+            0,
+            iterative_solver.main([
+                'iterative_solver',
+                path.join(SPEC_DIR, 'blue_increase.sk'),
+                path.join(STATEFUL_ALU_DIR, 'pred_raw.alu'),
+                path.join(STATELESS_ALU_DIR, 'stateless_alu.alu'),
+                '4', '2', '0,1,2,3', '10',
+                '--state-dependency', '1', '0']),
+        )
+
+    def test_blue_increase_1_1_pred_raw_cex_mode_pkt0(self):
+        self.assertEqual(
+            0,
+            iterative_solver.main([
+                'iterative_solver',
+                path.join(SPEC_DIR, 'blue_increase.sk'),
+                path.join(STATEFUL_ALU_DIR, 'pred_raw.alu'),
+                path.join(STATELESS_ALU_DIR, 'stateless_alu.alu'),
+                '1', '1', '0,1,2,3', '10',
+                '--pkt-fields=0',
+                '--input-packet', '0']),
+        )
+
+    def test_blue_increase_1_1_pred_raw_cex_mode_pkt1(self):
+        self.assertEqual(
+            0,
+            iterative_solver.main([
+                'iterative_solver',
+                path.join(SPEC_DIR, 'blue_increase.sk'),
+                path.join(STATEFUL_ALU_DIR, 'pred_raw.alu'),
+                path.join(STATELESS_ALU_DIR, 'stateless_alu.alu'),
+                '4', '2', '0,1,2,3', '10',
+                '--pkt-fields=1',
+                '--input-packet', '0']),
+        )
+
+    def test_blue_increase_3_2_pred_raw_cex_mode_s0(self):
+        self.assertEqual(
+            0,
+            iterative_solver.main([
+                'iterative_solver',
+                path.join(SPEC_DIR, 'blue_increase.sk'),
+                path.join(STATEFUL_ALU_DIR, 'pred_raw.alu'),
+                path.join(STATELESS_ALU_DIR, 'stateless_alu.alu'),
+                '3', '2', '0,1,2,3', '10',
+                '--state-groups', '0',
+                '--input-packet', '0', '1']),
+        )
+
+    def test_blue_increase_2_2_pred_raw_cex_mode_s1(self):
+        self.assertEqual(
+            0,
+            iterative_solver.main([
+                'iterative_solver',
+                path.join(SPEC_DIR, 'blue_increase.sk'),
+                path.join(STATEFUL_ALU_DIR, 'pred_raw.alu'),
+                path.join(STATELESS_ALU_DIR, 'stateless_alu.alu'),
+                '2', '2', '0,1,2,3', '10',
+                '--state-groups', '1',
+                '--input-packet', '0', '1']),
+        )
+
     @unittest.skip('Takes too long on AppVeyor')
     def test_blue_increase_4_2_pred_raw_cex_mode_synthesized_alloc(self):
         self.assertEqual(
@@ -165,6 +229,58 @@ class IterativeSolverTest(unittest.TestCase):
                 path.join(STATELESS_ALU_DIR, 'stateless_alu.alu'),
                 '4', '2', '0,1,2,3', '10',
                 '--synthesized-allocation']),
+        )
+
+    def test_blue_decrease_1_1_sub_cex_mode_pkt0(self):
+        self.assertEqual(
+            0,
+            iterative_solver.main([
+                'iterative_solver',
+                path.join(SPEC_DIR, 'blue_decrease.sk'),
+                path.join(STATEFUL_ALU_DIR, 'sub.alu'),
+                path.join(STATELESS_ALU_DIR, 'stateless_alu.alu'),
+                '1', '1', '0,1,2,3', '10',
+                '--pkt-fields=0',
+                '--input-packet', '0']),
+        )
+
+    def test_blue_decrease_1_1_sub_cex_mode_pkt1(self):
+        self.assertEqual(
+            0,
+            iterative_solver.main([
+                'iterative_solver',
+                path.join(SPEC_DIR, 'blue_decrease.sk'),
+                path.join(STATEFUL_ALU_DIR, 'sub.alu'),
+                path.join(STATELESS_ALU_DIR, 'stateless_alu.alu'),
+                '1', '1', '0,1,2,3', '10',
+                '--pkt-fields=1',
+                '--input-packet', '0']),
+        )
+
+    def test_blue_decrease_2_2_sub_cex_mode_s0(self):
+        self.assertEqual(
+            0,
+            iterative_solver.main([
+                'iterative_solver',
+                path.join(SPEC_DIR, 'blue_decrease.sk'),
+                path.join(STATEFUL_ALU_DIR, 'sub.alu'),
+                path.join(STATELESS_ALU_DIR, 'stateless_alu.alu'),
+                '2', '2', '0,1,2,3', '10',
+                '--state-groups=0',
+                '--input-packet', '0', '1']),
+        )
+
+    def test_blue_decrease_2_2_sub_cex_mode_s1(self):
+        self.assertEqual(
+            0,
+            iterative_solver.main([
+                'iterative_solver',
+                path.join(SPEC_DIR, 'blue_decrease.sk'),
+                path.join(STATEFUL_ALU_DIR, 'sub.alu'),
+                path.join(STATELESS_ALU_DIR, 'stateless_alu.alu'),
+                '2', '2', '0,1,2,3', '10',
+                '--state-groups=1',
+                '--input-packet', '0', '1']),
         )
 
     def test_marple_tcp_nmo_3_2_pred_raw_cex_mode(self):
