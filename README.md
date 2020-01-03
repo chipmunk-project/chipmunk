@@ -31,10 +31,16 @@ This way you don't have to keep installing and uninstalling whenever you make a
 change and test. However, still you have to run via `python3 chipc/chipmunk.py`
 instead of using the installed binary.
 
-Also consider using [venv](https://docs.python.org/3/library/venv.html),
-[virtualenv](https://virtualenv.pypa.io/en/latest/) or
-[pipenv](https://pipenv.readthedocs.io/en/latest/) to create an isolated Python
-development environment.
+For development, we strongly recommend you to use [pyenv](https://github.com/pyenv/pyenv). It lets
+you have an isolated environment only specific to this repository. This
+repository is configured with a .python-version file, with a Python version
+specified. After installing pyenv, do following.
+```shell
+pyenv install <python version specified in .python-version>
+pyenv virtualenv <python-version> chipmunk
+```
+Then, whenever you cd into project repository, it should activate the specified
+python virtual environment for you.
 
 ### Iterative solver
 ```shell
