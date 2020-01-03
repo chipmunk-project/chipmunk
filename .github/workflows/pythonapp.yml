@@ -41,10 +41,6 @@ jobs:
         python -m pip install --upgrade pip
         pip install .
         $antlr4 chipc/alu.g4 -Dlanguage=Python3 -visitor -package chipc
-    - name: Run iterative solver command line
-      run: |
         iterative_solver example_specs/simple.sk example_alus/stateful_alus/raw.alu example_alus/stateless_alus/stateless_alu.alu 2 2 "0,1,2,3" 10 --hole-elimination
         iterative_solver example_specs/simple.sk example_alus/stateful_alus/raw.alu example_alus/stateless_alus/stateless_alu.alu 2 2 "0,1,2,3" 10 --parallel-sketch --hole-elimination
-    - name: Run python unit tests
-      run: |
         python3 -m unittest
