@@ -1,6 +1,5 @@
 import concurrent.futures as cf
 import itertools
-import math
 import os
 import signal
 from collections import OrderedDict
@@ -15,7 +14,8 @@ from jinja2 import StrictUndefined
 from chipc import sketch_utils
 from chipc import z3_utils
 from chipc.mode import Mode
-from chipc.sketch_generator import SketchGenerator
+from chipc.sketch_code_generator import SketchCodeGenerator
+from chipc.utils import get_hole_bit_width
 from chipc.utils import get_hole_value_assignments
 from chipc.utils import get_num_pkt_fields
 from chipc.utils import get_state_group_info
@@ -38,14 +38,14 @@ def kill_child_processes(parent_pid, sig=signal.SIGTERM):
 
 
 class Compiler:
-    def __init__(self, program_file, stateful_alu_file, stateless_alu_file,
-                 num_pipeline_stages, num_alus_per_stage, sketch_name,
-                 parallel_sketch, constant_set,
-                 synthesized_allocation=False,
+    def __init__(self, spec_filename, stateful_alu_filename,
+                 stateless_alu_filename, num_pipeline_stages,
+                 num_alus_per_stage, sketch_name, parallel_sketch,
+                 constant_set, synthesized_allocation=False,
                  pkt_fields_to_check=[]):
-        self.program_file = program_file
-        self.stateful_alu_file = stateful_alu_file
-        self.stateless_alu_file = stateless_alu_file
+        self.spec_filename = spec_filename
+        self.stateful_alu_filename = stateful_alu_filename
+        self.stateless_alu_filename = stateless_alu_filename
         self.num_pipeline_stages = num_pipeline_stages
         self.num_alus_per_stage = num_alus_per_stage
         self.sketch_name = sketch_name
@@ -53,7 +53,7 @@ class Compiler:
         self.constant_set = constant_set
         self.synthesized_allocation = synthesized_allocation
 
-        program_content = Path(program_file).read_text()
+        program_content = Path(spec_filename).read_text()
         self.num_fields_in_prog = get_num_pkt_fields(program_content)
         self.num_state_groups = len(get_state_group_info(program_content))
 
@@ -67,7 +67,8 @@ class Compiler:
             loader=FileSystemLoader(
                 [path.join(path.dirname(__file__), './templates'),
                  path.join(os.getcwd(),
-                           stateless_alu_file[:stateless_alu_file.rfind('/')]),
+                           stateless_alu_filename[
+                               :stateless_alu_filename.rfind('/')]),
                  '.', '/']),
             undefined=StrictUndefined,
             trim_blocks=True,
@@ -77,7 +78,7 @@ class Compiler:
             pkt_fields_to_check = list(range(self.num_fields_in_prog))
 
         # Create an object for sketch generation
-        self.sketch_generator = SketchGenerator(
+        self.sketch_code_generator = SketchCodeGenerator(
             sketch_name=sketch_name,
             num_pipeline_stages=num_pipeline_stages,
             num_alus_per_stage=num_alus_per_stage,
@@ -86,8 +87,8 @@ class Compiler:
             num_fields_in_prog=self.num_fields_in_prog,
             pkt_fields_to_check=pkt_fields_to_check,
             jinja2_env=self.jinja2_env,
-            stateful_alu_file=stateful_alu_file,
-            stateless_alu_file=stateless_alu_file,
+            stateful_alu_filename=stateful_alu_filename,
+            stateless_alu_filename=stateless_alu_filename,
             constant_set=constant_set,
             synthesized_allocation=synthesized_allocation)
 
@@ -96,11 +97,11 @@ class Compiler:
         new_constant_set_str = '{' + ','.join(constant_set) + '}'
 
         # Use string format to create constant_arr_def_
-        self.sketch_generator.constant_arr_def_ = \
+        self.sketch_code_generator.constant_arr_def_ = \
             'int[{}]'.format(str(len(constant_set))) + \
             'constant_vector = {};\n\n'.format(new_constant_set_str)
-        self.sketch_generator.constant_arr_size_ = math.ceil(
-            math.log2(len(constant_set)))
+        self.sketch_code_generator.constant_arr_size_ = get_hole_bit_width(
+            len(constant_set))
 
     def single_codegen_run(self, compiler_input):
         additional_constraints = compiler_input[0]
@@ -108,9 +109,10 @@ class Compiler:
         sketch_file_name = compiler_input[2]
 
         """Codegeneration"""
-        codegen_code = self.sketch_generator.generate_sketch(
-            program_file=self.program_file,
+        codegen_code = self.sketch_code_generator.generate_sketch(
+            spec_filename=self.spec_filename,
             mode=Mode.CODEGEN,
+            synthesized_allocation=self.synthesized_allocation,
             additional_constraints=additional_constraints,
             additional_testcases=additional_testcases)
 
@@ -120,7 +122,7 @@ class Compiler:
 
         # Call sketch on it
         print('Total number of hole bits is',
-              self.sketch_generator.total_hole_bits_)
+              self.sketch_code_generator.total_hole_bits_)
         print('Sketch file is', sketch_file_name)
         assert (self.parallel_sketch in [True, False])
         (ret_code, output) = sketch_utils.synthesize(
@@ -135,7 +137,7 @@ class Compiler:
             output_file.write(output)
         if (ret_code == 0):
             holes_to_values = get_hole_value_assignments(
-                self.sketch_generator.hole_names_, output)
+                self.sketch_code_generator.hole_names_, output)
         else:
             holes_to_values = OrderedDict()
         return (ret_code, output, holes_to_values)
@@ -211,14 +213,15 @@ class Compiler:
             a tuple of two empty dicts.
         """
         # Check all holes have values.
-        for hole in self.sketch_generator.hole_names_:
+        for hole in self.sketch_code_generator.hole_names_:
             assert hole in hole_assignments
 
         # Generate a sketch file to verify the hole value assignments with
         # the specified input bit lengths.
-        sketch_to_verify = self.sketch_generator.generate_sketch(
-            program_file=self.program_file,
+        sketch_to_verify = self.sketch_code_generator.generate_sketch(
+            spec_filename=self.spec_filename,
             mode=Mode.VERIFY,
+            synthesized_allocation=self.synthesized_allocation,
             hole_assignments=hole_assignments
         )
 

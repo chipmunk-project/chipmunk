@@ -4,8 +4,14 @@ grammar alu;
 WS : [ \n\t\r]+ -> channel(HIDDEN);
 LINE_COMMENT : '//' ~[\r\n]* -> skip;
 // Keywords
-RELOP            : 'rel_op'; // <, >, <=, >=, ==, !=
-ARITHOP          : 'arith_op'; // +,-
+RELOP            : 'rel_op'; // <, >, <=, >=, ==, != Captures everything from slide 14 of salu.pdf
+BOOLOP           : 'bool_op'; // !, &&, || and combinations of these (best guess for how update_lo/hi_1/2_predicate works
+ARITHOP          : 'arith_op'; // Captures +/- used in slide 14 of salu.pdf
+COMPUTEALU       : 'compute_alu'; // Captures everything from slide 15 of salu.pdf
+// TODO: Instead of having numbered MUX, maybe implement a support one mux that
+// can take variable number of arguments.
+MUX5             : 'Mux5';      // 5-to-1 mux
+MUX4             : 'Mux4';
 MUX3             : 'Mux3';   // 3-to-1 mux
 MUX2             : 'Mux2';   // 2-to-1 mux
 OPT              : 'Opt';    // Pick either the argument or 0
@@ -23,6 +29,9 @@ LESS_OR_EQUAL    : '<=';
 NOT_EQUAL        : '!=';
 OR               : '||';
 AND              : '&&';
+NOT              : '!';
+QUESTION         : '?';
+ASSERT_FALSE      : 'assert(false);';
 
 // Identifiers
 ID : ('a'..'z' | 'A'..'Z') ('a'..'z' | 'A'..'Z' | '_' | '0'..'9')*;
@@ -33,6 +42,7 @@ NUM : ('0'..'9') | (('1'..'9')('0'..'9')+);
 
 // alias id to state_var and packet_field
 state_var    : ID;
+temp_var     : ID;
 packet_field : ID;
 // alias id to hole variables
 hole_var : ID;
@@ -43,35 +53,61 @@ stateful  : 'stateful';
 state_indicator : 'type' ':' stateless
                 | 'type' ':' stateful;
 
-// list of state_var
-state_var_with_comma : ',' state_var;
-state_vars : 'state' 'variables' ':' '{' '}'
-           | 'state' 'variables' ':' '{' state_var '}'
-           | 'state' 'variables' ':' '{' state_var state_var_with_comma+ '}';
+state_var_def : 'state' 'variables' ':' '{' state_var_seq '}';
 
-hole_var_with_comma : ',' hole_var;
-hole_vars : 'hole' 'variables' ':' '{' '}'
-          | 'hole' 'variables' ':' '{' hole_var '}'
-          | 'hole' 'variables' ':' '{' hole_var hole_var_with_comma+ '}'
+state_var_seq : /* epsilon */
+              | state_vars
+              ;
+
+state_vars : state_var                  #SingleStateVar
+           | state_var ',' state_vars   #MultipleStateVars
+           ;
+
+hole_def : 'hole' 'variables' ':' '{' hole_seq '}';
+
+hole_seq : /* epsilon */
+         | hole_vars
+         ;
+
+hole_vars : hole_var                 #SingleHoleVar
+          | hole_var ',' hole_vars   #MultipleHoleVars
           ;
 
-// list of packet_field
-packet_field_with_comma : ',' packet_field;
-packet_fields : 'packet' 'fields' ':' '{' packet_field '}'
-              | 'packet' 'fields' ':' '{' packet_field packet_field_with_comma+ '}';
+packet_field_def : 'packet' 'fields' ':' '{' packet_field_seq '}';
 
+packet_field_seq : /* epsilon */
+                 | packet_fields
+                 ;
 
-// guard for if and elif statements
-guard  : guard (EQUAL
-              | GREATER
-              | GREATER_OR_EQUAL
-              | LESS
-              | LESS_OR_EQUAL
-              | NOT_EQUAL
-              | AND
-              | OR) guard #Nested
-       | '(' guard ')' #Paren
-       | RELOP '(' expr ',' expr ')' #RelOp
+packet_fields : packet_field                    #SinglePacketField
+              | packet_field ',' packet_fields  #MultiplePacketFields
+              ;
+
+// alu_body
+alu_body : statement+;
+
+condition_block : '(' expr ')' '{' alu_body '}';
+
+statement : variable '=' expr ';'        #StmtUpdateExpr
+          | 'int ' temp_var '=' expr ';' #StmtUpdateTempInt
+          | 'bit ' temp_var '=' expr ';' #StmtUpdateTempBit
+          // NOTE: Having multiple return statements between a pair of curly
+          // braces is syntactically correct, but such program might not make
+          // sense for us.
+          // TODO: Modify the generator to catch multiple return statements
+          // and output errors early on.
+          | return_statement #StmtReturn
+          | IF condition_block (ELIF condition_block)* (ELSE  '{' else_body = alu_body '}')? #StmtIfElseIfElse
+          | ASSERT_FALSE #AssertFalse
+          ;
+
+return_statement : RETURN expr ';';
+
+variable : ID ;
+expr   : variable #Var
+       | expr op=('+'|'-'|'*'|'/') expr #ExprWithOp
+       | '(' expr ')' #ExprWithParen
+       | NUM #Num
        | expr EQUAL expr #Equals
        | expr GREATER expr #Greater
        | expr GREATER_OR_EQUAL expr #GreaterEqual
@@ -80,35 +116,21 @@ guard  : guard (EQUAL
        | expr NOT_EQUAL expr #NotEqual
        | expr AND expr #And
        | expr OR expr #Or
+       | NOT expr #NOT
        | TRUE #True
-       ;
-
-
-// alu_body
-alu_body : alu_update = updates
-         | return_update = return_statement
-         | IF '(' if_guard = guard ')' '{' if_body =  alu_body '}' (ELIF '(' elif_guard = guard ')' '{' elif_body = alu_body '}')* (ELSE  '{' else_body = alu_body '}')?
-         ;
-
-return_statement : RETURN expr ';'
-                 | RETURN guard ';';
-
-
-updates: update+;
-update : state_var '=' expr ';'
-       | state_var '=' guard ';';
-
-variable : ID ;
-expr   : variable #Var
-       | expr op=('+'|'-'|'*'|'/') expr #ExprWithOp
-       | '(' expr ')' #ExprWithParen
+       | expr '?' expr ':' expr #Ternary
+       // Currently, we use below rules only from stateful ALUs.
+       | MUX2 '(' expr ',' expr ')' #Mux2
        | MUX3 '(' expr ',' expr ',' NUM ')' #Mux3WithNum
        | MUX3 '(' expr ',' expr ',' expr ')' #Mux3
-       | MUX2 '(' expr ',' expr ')' #Mux2
+       | MUX4 '(' expr ',' expr ',' expr ',' expr ')' #Mux4
+       | MUX5 '(' expr ',' expr ',' expr ',' expr ',' expr ')' #Mux5
        | OPT '(' expr ')' #Opt
        | CONSTANT #Constant
        | ARITHOP '(' expr ',' expr ')' # ArithOp
-       | NUM #Value
+       | COMPUTEALU '(' expr ',' expr ')' # ComputeAlu
+       | RELOP '(' expr ',' expr ')' #RelOp
+       | BOOLOP '(' expr ',' expr ')' #BoolOp
        ;
 
-alu: state_indicator state_vars hole_vars packet_fields alu_body;
+alu: state_indicator state_var_def hole_def packet_field_def alu_body;
