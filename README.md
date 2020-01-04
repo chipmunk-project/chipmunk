@@ -51,6 +51,8 @@ iterative_solver example_specs/simple.sk example_alus/stateful_alus/raw.alu exam
 
 Run:
 
+You need to run setup in editable mode (with -e) to generate lexer and parser
+in this directory.
 ```shell
 pip3 install -r requirements-dev.txt -e .
 python3 -m unittest
