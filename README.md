@@ -4,6 +4,8 @@
 
 ## Installation
 - Install [sketch](https://people.csail.mit.edu/asolar/sketch-1.7.5.tar.gz)
+- Install Java. This repo uses [antlr](https://www.antlr.org/) to generate
+  parser and lexer.
 - `pip3 install -r requirements-dev.txt -e . && pre-commit install` (if you want to make changes to
   this repo),
 - `pip3 install .` (if you want to simply use chipmunk.).
