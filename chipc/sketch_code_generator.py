@@ -1,4 +1,3 @@
-import math
 from collections import OrderedDict
 from pathlib import Path
 
@@ -8,8 +7,9 @@ from antlr4 import FileStream
 from chipc.aluLexer import aluLexer
 from chipc.aluParser import aluParser
 from chipc.mode import Mode
-from chipc.stateful_alu_sketch_generator import StatefulALUSketchGenerator
-from chipc.stateless_alu_sketch_generator import StatelessAluSketchGenerator
+from chipc.sketch_stateful_alu_visitor import SketchStatefulAluVisitor
+from chipc.sketch_stateless_alu_visitor import SketchStatelessAluVisitor
+from chipc.utils import get_hole_bit_width
 
 
 class Hole:
@@ -23,11 +23,11 @@ def add_prefix_suffix(text, prefix_string, suffix_string):
 
 
 # Sketch Generator class
-class SketchGenerator:
+class SketchCodeGenerator:
     def __init__(self, sketch_name, num_phv_containers, num_state_groups,
                  num_alus_per_stage, num_pipeline_stages, num_fields_in_prog,
-                 pkt_fields_to_check, jinja2_env, stateful_alu_file,
-                 stateless_alu_file, constant_set,
+                 pkt_fields_to_check, jinja2_env, stateful_alu_filename,
+                 stateless_alu_filename, constant_set,
                  synthesized_allocation):
         self.sketch_name_ = sketch_name
         self.total_hole_bits_ = 0
@@ -45,8 +45,8 @@ class SketchGenerator:
         self.pkt_fields_to_check_ = pkt_fields_to_check
         self.jinja2_env_ = jinja2_env
         self.jinja2_env_.filters['add_prefix_suffix'] = add_prefix_suffix
-        self.stateful_alu_file_ = stateful_alu_file
-        self.stateless_alu_file_ = stateless_alu_file
+        self.stateful_alu_filename_ = stateful_alu_filename
+        self.stateless_alu_filename_ = stateless_alu_filename
         # self.constant_arr_def_ will be the form like
         # int constant_vector[4] = {0,1,2,3};
 
@@ -56,8 +56,7 @@ class SketchGenerator:
             '] constant_vector = ' + \
             constant_set_str + \
             ';\n\n'
-        self.constant_arr_size_ = math.ceil(
-            math.log2(len(constant_set)))
+        self.constant_arr_size_ = get_hole_bit_width(len(constant_set))
         self.num_operands_to_stateful_alu_ = 0
         self.num_state_slots_ = 0
         self.synthesized_allocation_ = synthesized_allocation
@@ -93,56 +92,56 @@ class SketchGenerator:
     # Generate Sketch code for a simple stateless alu (+,-,*,/)
     def generate_stateless_alu(self, alu_name, potential_operands):
         # Grab the stateless alu file name by using
-        input_stream = FileStream(self.stateless_alu_file_)
+        input_stream = FileStream(self.stateless_alu_filename_)
         lexer = aluLexer(input_stream)
         stream = CommonTokenStream(lexer)
         parser = aluParser(stream)
         tree = parser.alu()
 
-        stateless_alu_sketch_generator = \
-            StatelessAluSketchGenerator(
-                self.stateless_alu_file_, self.sketch_name_ + '_' +
-                alu_name, alu_name, potential_operands, self.generate_mux,
+        sketch_stateless_alu_visitor = \
+            SketchStatelessAluVisitor(
+                self.stateless_alu_filename_, self.sketch_name_ + '_' +
+                alu_name, potential_operands, self.generate_mux,
                 self.constant_arr_size_)
-        stateless_alu_sketch_generator.visit(tree)
-        self.add_holes(stateless_alu_sketch_generator.globalholes)
+        sketch_stateless_alu_visitor.visit(tree)
+        self.add_holes(sketch_stateless_alu_visitor.global_holes)
         self.stateless_alu_hole_arguments_ = [
             x for x in sorted(
-                stateless_alu_sketch_generator.stateless_alu_args
+                sketch_stateless_alu_visitor.stateless_alu_args
             )]
-#        self.num_operands_to_stateless_alu_ = (
-#            stateless_alu_sketch_generator.num_packet_fields)
 
         self.num_stateless_muxes_ = \
-            stateless_alu_sketch_generator.num_packet_fields
+            len(sketch_stateless_alu_visitor.packet_fields)
 
-        return (stateless_alu_sketch_generator.helperFunctionStrings +
-                stateless_alu_sketch_generator.mainFunction)
+        return (sketch_stateless_alu_visitor.helper_function_strings +
+                sketch_stateless_alu_visitor.main_function)
 
     # Generate Sketch code for a simple stateful alu (+,-,*,/)
     # Takes one state and one packet operand (or immediate operand) as inputs
     # Updates the state in place and returns the old value of the state
     def generate_stateful_alu(self, alu_name):
-        input_stream = FileStream(self.stateful_alu_file_)
+        input_stream = FileStream(self.stateful_alu_filename_)
         lexer = aluLexer(input_stream)
         stream = CommonTokenStream(lexer)
         parser = aluParser(stream)
         tree = parser.alu()
-        stateful_alu_sketch_generator = StatefulALUSketchGenerator(
-            self.stateful_alu_file_, self.sketch_name_ + '_' + alu_name,
+        sketch_stateful_alu_visitor = SketchStatefulAluVisitor(
+            self.sketch_name_ + '_' + alu_name,
             self.constant_arr_size_)
-        stateful_alu_sketch_generator.visit(tree)
-        self.add_holes(stateful_alu_sketch_generator.global_holes)
+        sketch_stateful_alu_visitor.visit(tree)
+        self.add_holes(sketch_stateful_alu_visitor.global_holes)
         self.stateful_alu_hole_arguments_ = [
-            x for x in sorted(stateful_alu_sketch_generator.alu_args)
+            x for x in sorted(sketch_stateful_alu_visitor.alu_args)
         ]
-        self.num_operands_to_stateful_alu_ = (
-            stateful_alu_sketch_generator.num_packet_fields)
-        self.num_state_slots_ = stateful_alu_sketch_generator.num_state_slots
+        self.num_operands_to_stateful_alu_ = len(
+            sketch_stateful_alu_visitor.packet_fields)
+        self.num_state_slots_ = len(sketch_stateful_alu_visitor.state_vars)
 
-        return (stateful_alu_sketch_generator.helper_function_strings +
-                stateful_alu_sketch_generator.main_function)
+        return (sketch_stateful_alu_visitor.helper_function_strings +
+                sketch_stateful_alu_visitor.main_function)
 
+    # This allocator is only used for synthesized allocation
+    # for stateless_vars
     def generate_pkt_field_allocator(self):
         for j in range(self.num_phv_containers_):
             for k in range(self.num_fields_in_prog_):
@@ -167,7 +166,45 @@ class SketchGenerator:
             assert_predicate += '0) == 1'
             self.add_assert(assert_predicate)
 
-    def generate_state_allocator(self):
+    # This allocator is only used for synthesized allocation
+    # for stateful_vars
+    def generate_state_allocator_synthesized(self):
+        # stateful_var_allocation_group_1_0_2 means
+        # group 1 has been allocate to stateful_alu No.2
+        # in stage 0
+        for i in range(self.num_state_groups_):
+            for j in range(self.num_pipeline_stages_):
+                for k in range(self.num_phv_containers_):
+                    # Add hole_def for stateful_var_allocation_group_
+                    self.add_hole(
+                        self.sketch_name_ + '_' + 'salu_config_' + str(i) +
+                        '_' + str(j) + '_' + str(k), 1)
+
+        # add assert for stateful_var_allocation_group_
+        # any particular group can only be allocated to at most one
+        # stateful_alu
+        for i in range(self.num_state_groups_):
+            assert_predicate = '('
+            for j in range(self.num_pipeline_stages_):
+                for k in range(self.num_phv_containers_):
+                    assert_predicate += self.sketch_name_ + '_' + \
+                        'salu_config_' + str(i) + '_' + str(j) + '_' + \
+                        str(k) + '+'
+            assert_predicate += '0) <= 1'
+            self.add_assert(assert_predicate)
+
+        # any stateful_alu can only be used by at most one stateful_group
+        for j in range(self.num_pipeline_stages_):
+            for k in range(self.num_phv_containers_):
+                assert_predicate = '('
+                for i in range(self.num_state_groups_):
+                    assert_predicate += self.sketch_name_ + '_' + \
+                        'salu_config_' + str(i) + '_' + str(j) + '_' + \
+                        str(k) + '+'
+                assert_predicate += '0) <= 1'
+                self.add_assert(assert_predicate)
+
+    def generate_state_allocator_canonicalized(self):
         for i in range(self.num_pipeline_stages_):
             for l in range(self.num_state_groups_):
                 self.add_hole(
@@ -193,14 +230,14 @@ class SketchGenerator:
     # Sketch code for an n-to-1 mux
     def generate_mux(self, n, mux_name):
         assert (n >= 1)
-        num_bits = math.ceil(math.log(n, 2))
+        num_bits = get_hole_bit_width(n)
         operand_mux_template = self.jinja2_env_.get_template('mux.j2')
         mux_code = operand_mux_template.render(
-            mux_name=self.sketch_name_ + '_' + mux_name,
+            mux_name=mux_name,
             operand_list=['input' + str(i) for i in range(0, n)],
             arg_list=['int input' + str(i) for i in range(0, n)],
             num_operands=n)
-        self.add_hole(self.sketch_name_ + '_' + mux_name + '_ctrl', num_bits)
+        self.add_hole(mux_name + '_ctrl', num_bits)
         return mux_code
 
     # Stateful operand muxes, stateless ones are part of generate_stateless_alu
@@ -210,11 +247,23 @@ class SketchGenerator:
         # support constant/immediate operands.
         assert (self.num_operands_to_stateful_alu_ > 0)
         for i in range(self.num_pipeline_stages_):
-            for l in range(self.num_state_groups_):
-                for k in range(self.num_operands_to_stateful_alu_):
-                    ret += self.generate_mux(
-                        self.num_phv_containers_, 'stateful_operand_mux_' +
-                        str(i) + '_' + str(l) + '_' + str(k)) + '\n'
+            # TODO: merge these two into a function later
+            if self.synthesized_allocation_:
+                for l in range(self.num_phv_containers_):
+                    for k in range(self.num_operands_to_stateful_alu_):
+                        ret += self.generate_mux(
+                            self.num_phv_containers_,
+                            self.sketch_name_ + '_stateful_alu_' + str(i) +
+                            '_' + str(l) + '_' + 'operand_mux_' +
+                            str(k)) + '\n'
+            else:
+                for l in range(self.num_state_groups_):
+                    for k in range(self.num_operands_to_stateful_alu_):
+                        ret += self.generate_mux(
+                            self.num_phv_containers_,
+                            self.sketch_name_ + '_stateful_alu_' + str(i) +
+                            '_' + str(l) + '_' + 'operand_mux_' + str(k)) +\
+                            '\n'
         return ret
 
     # Output muxes to pick between stateful ALUs and stateless ALU
@@ -222,18 +271,28 @@ class SketchGenerator:
         # Note: We are generating a mux that takes as input all virtual
         # stateful ALUs + corresponding stateless ALU The number of virtual
         # stateful ALUs is more or less than the physical stateful ALUs because
-        # it equals the number of state variables in the program_file, but this
-        # doesn't affect correctness because we enforce that the total number
-        # of active virtual stateful ALUs is within the physical limit. It also
-        # doesn't affect the correctness of modeling the output mux because the
-        # virtual output mux setting can be translated into the physical output
-        # mux setting during post processing.
+        # it equals the number of state variables in the original spec, but
+        # this doesn't affect correctness because we enforce that the total
+        # number of active virtual stateful ALUs is within the physical limit.
+        # It also doesn't affect the correctness of modeling the output mux
+        # because the virtual output mux setting can be translated into the
+        # physical output mux setting during post processing.
         ret = ''
         for i in range(self.num_pipeline_stages_):
             for k in range(self.num_phv_containers_):
-                ret += self.generate_mux(
-                    self.num_state_groups_ * self.num_state_slots_ + 1,
-                    'output_mux_phv_' + str(i) + '_' + str(k)) + '\n'
+                # synthesized_allocation we give num_phv_containers virtual
+                # stateful alus per stage
+                if self.synthesized_allocation_:
+                    ret += self.generate_mux(
+                        self.num_phv_containers_ * self.num_state_slots_
+                        + 1,
+                        self.sketch_name_ + '_output_mux_phv_' +
+                        str(i) + '_' + str(k)) + '\n'
+                else:
+                    ret += self.generate_mux(
+                        self.num_state_groups_ * self.num_state_slots_ + 1,
+                        self.sketch_name_ + '_output_mux_phv_' +
+                        str(i) + '_' + str(k)) + '\n'
         return ret
 
     def generate_alus(self):
@@ -246,21 +305,24 @@ class SketchGenerator:
                         'input' + str(k)
                         for k in range(0, self.num_phv_containers_)
                     ]) + '\n'
-            for l in range(self.num_state_groups_):
-                ret += self.generate_stateful_alu('stateful_alu_' + str(i) +
-                                                  '_' + str(l)) + '\n'
+            if self.synthesized_allocation_:
+                for l in range(self.num_phv_containers_):
+                    ret += self.generate_stateful_alu('stateful_alu_' +
+                                                      str(i) +
+                                                      '_' + str(l)) + '\n'
+            else:
+                for l in range(self.num_state_groups_):
+                    ret += self.generate_stateful_alu('stateful_alu_' + str(i)
+                                                      + '_' + str(l)) + '\n'
         return ret
 
-    def generate_sketch(self, program_file, mode, additional_constraints=[],
+    def generate_sketch(self, spec_filename, mode, synthesized_allocation,
+                        additional_constraints=[],
                         hole_assignments=OrderedDict(),
                         additional_testcases=''):
         self.reset_holes_and_asserts()
         assert(mode in [Mode.CODEGEN, Mode.VERIFY])
-        if (self.synthesized_allocation_):
-            template = self.jinja2_env_.get_template(
-                'code_generator_synthesized_allocation.j2')
-        else:
-            template = self.jinja2_env_.get_template('code_generator.j2')
+        template = self.jinja2_env_.get_template('code_generator.j2')
 
         # Create stateless and stateful ALUs, operand muxes for stateful ALUs,
         # and output muxes.
@@ -271,14 +333,17 @@ class SketchGenerator:
 
         # Create allocator to ensure each state var is assigned to exactly
         # stateful ALU and vice versa.
-        self.generate_state_allocator()
-        if (self.synthesized_allocation_):
+        if self.synthesized_allocation_:
             self.generate_pkt_field_allocator()
+            self.generate_state_allocator_synthesized()
+        else:
+            self.generate_state_allocator_canonicalized()
 
         return template.render(
             mode=mode,
+            synthesized_allocation=synthesized_allocation,
             sketch_name=self.sketch_name_,
-            program_file=program_file,
+            spec_filename=spec_filename,
             num_pipeline_stages=self.num_pipeline_stages_,
             num_alus_per_stage=self.num_alus_per_stage_,
             num_phv_containers=self.num_phv_containers_,
@@ -291,7 +356,7 @@ class SketchGenerator:
             num_fields_in_prog=self.num_fields_in_prog_,
             pkt_fields_to_check=self.pkt_fields_to_check_,
             num_state_groups=self.num_state_groups_,
-            spec_as_sketch=Path(program_file).read_text(),
+            spec_as_sketch=Path(spec_filename).read_text(),
             all_assertions=self.asserts_,
             hole_arguments=self.hole_arguments_,
             stateful_alu_hole_arguments=self.stateful_alu_hole_arguments_,
