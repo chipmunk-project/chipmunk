@@ -70,7 +70,6 @@ class GenerateCounterexamplesTest(unittest.TestCase):
         self.assertDictEqual(pkt_fields, {})
         self.assertTrue('state_group_1_state_0' in state_vars)
 
-
 class GetZ3FormulaTest(unittest.TestCase):
     def test_conversion(self):
         # Smoke test for bool-to-int and int-to-bool conversion
