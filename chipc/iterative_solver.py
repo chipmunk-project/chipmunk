@@ -55,7 +55,9 @@ def set_default_values(pkt_fields, state_vars, num_fields_in_prog,
 
 
 def generate_counterexample_asserts(pkt_fields, state_vars, num_fields_in_prog,
-                                    state_group_info, count):
+                                    state_group_info, count,
+                                    pkt_fields_to_check,
+                                    state_group_to_check, group_size):
     counterexample_defs = ''
     counterexample_asserts = ''
 
@@ -73,9 +75,43 @@ def generate_counterexample_asserts(pkt_fields, state_vars, num_fields_in_prog,
         else:
             counterexample_defs += ');\n'
 
-    counterexample_asserts += 'assert (pipeline(' + 'x_' + str(
-        count) + ')' + ' == ' + 'program(' + 'x_' + str(
-            count) + '));\n'
+    if pkt_fields_to_check is None and state_group_to_check is None:
+        counterexample_asserts += 'assert (pipeline(' + 'x_' + str(
+            count) + ')' + ' == ' + 'program(' + 'x_' + str(
+                count) + '));\n'
+    elif pkt_fields_to_check is not None and state_group_to_check is None:
+        for i in range(len(pkt_fields_to_check)):
+            counterexample_asserts += 'assert (pipeline(' + 'x_' + str(
+                count) + ').pkt_' + str(pkt_fields_to_check[i]) + \
+                ' == ' + 'program(' + 'x_' + str(
+                count) + ').pkt_' + str(pkt_fields_to_check[i]) + ');\n'
+    elif pkt_fields_to_check is not None and state_group_to_check is not None:
+        # counterexample for packet fields
+        for i in range(len(pkt_fields_to_check)):
+            counterexample_asserts += 'assert (pipeline(' + 'x_' + str(
+                count) + ').pkt_' + str(pkt_fields_to_check[i]) + \
+                ' == ' + 'program(' + 'x_' + str(
+                count) + ').pkt_' + str(pkt_fields_to_check[i]) + ');\n'
+        # counterexample for stateful groups
+        for i in range(len(state_group_to_check)):
+            for j in range(group_size):
+                counterexample_asserts += 'assert (pipeline(' + 'x_' + str(
+                    count) + ').state_group_' + \
+                    str(state_group_to_check[i]) + \
+                    '_state_' + str(j) + ' == ' + 'program(' + 'x_' + str(
+                    count) + ').state_group_' + \
+                    str(state_group_to_check[i]) + '_state_' + str(j) + ');\n'
+    else:
+        assert pkt_fields_to_check is None and state_group_to_check is not None
+        for i in range(len(state_group_to_check)):
+            for j in range(group_size):
+                counterexample_asserts += 'assert (pipeline(' + 'x_' + str(
+                    count) + ').state_group_' + \
+                    str(state_group_to_check[i]) + \
+                    '_state_' + str(j) + ' == ' + 'program(' + 'x_' + str(
+                    count) + ').state_group_' + str(state_group_to_check[i]) +\
+                    '_state_' + str(j) + ');\n'
+
     return counterexample_defs + counterexample_asserts
 
 
@@ -157,6 +193,9 @@ def main(argv):
         '_' + args.stateless_alu_filename.split('/')[-1].split('.')[0] + \
         '_' + str(args.num_pipeline_stages) + \
         '_' + str(args.num_alus_per_stage)
+
+    # Get how many members in each state group
+    group_size = len(list(state_group_info.items())[0][1])
 
     # Use OrderedSet here for deterministic compilation results. We can also
     # use built-in dict() for Python versions 3.6 and later, as it's inherently
@@ -240,7 +279,7 @@ def main(argv):
 
             additional_testcases += generate_counterexample_asserts(
                 pkt_fields, state_vars, num_fields_in_prog, state_group_info,
-                count)
+                count, args.pkt_fields, args.state_groups, group_size)
 
         count += 1
 
