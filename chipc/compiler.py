@@ -43,7 +43,8 @@ class Compiler:
                  num_alus_per_stage, sketch_name, parallel_sketch,
                  constant_set, synthesized_allocation=False,
                  pkt_fields_to_check=[],
-                 state_groups_to_check=[]):
+                 state_groups_to_check=[],
+                 input_packet=[]):
         self.spec_filename = spec_filename
         self.stateful_alu_filename = stateful_alu_filename
         self.stateless_alu_filename = stateless_alu_filename
@@ -58,10 +59,26 @@ class Compiler:
         self.num_fields_in_prog = get_num_pkt_fields(program_content)
         self.num_state_groups = len(get_state_group_info(program_content))
 
-        assert self.num_fields_in_prog <= num_alus_per_stage, (
-            'Number of fields in program %d is greater than number of '
-            'alus per stage %d. Try increasing number of alus per stage.' % (
-                self.num_fields_in_prog, num_alus_per_stage))
+        if not input_packet:
+            assert self.num_fields_in_prog <= num_alus_per_stage, (
+                'Number of fields in program %d is greater than number of '
+                'alus per stage %d. Try increasing '
+                'number of alus per stage.' % (
+                    self.num_fields_in_prog, num_alus_per_stage))
+        else:
+            assert len(input_packet) <= num_alus_per_stage, (
+                'Number of input fields in program %d is'
+                'greater than number of alus per stage %d. Try increasing '
+                'number of alus per stage.' % (
+                    len(input_packet), num_alus_per_stage))
+            # Guarantee that # of pkt_fields_to_check is less than or equal
+            # to the num_alus_per_stage
+            if pkt_fields_to_check is not None:
+                assert len(pkt_fields_to_check) <= num_alus_per_stage, (
+                    'Number of checked fields in program %d is '
+                    'greater than number of alus per stage %d. '
+                    'Try increasing number of alus per stage.' % (
+                        len(pkt_fields_to_check), num_alus_per_stage))
 
         # Initialize jinja2 environment for templates
         self.jinja2_env = Environment(
@@ -83,6 +100,10 @@ class Compiler:
         elif pkt_fields_to_check and not state_groups_to_check:
             state_groups_to_check = []
 
+        # Differentiate between using default pkt input vs. specify pkt input
+        if not input_packet:
+            input_packet = list(range(self.num_fields_in_prog))
+
         # Create an object for sketch generation
         self.sketch_code_generator = SketchCodeGenerator(
             sketch_name=sketch_name,
@@ -97,7 +118,8 @@ class Compiler:
             stateful_alu_filename=stateful_alu_filename,
             stateless_alu_filename=stateless_alu_filename,
             constant_set=constant_set,
-            synthesized_allocation=synthesized_allocation)
+            synthesized_allocation=synthesized_allocation,
+            input_packet=input_packet)
 
     def update_constants_for_synthesis(self, constant_set):
         # Join the values in constant_set to get constant_array in sketch.
