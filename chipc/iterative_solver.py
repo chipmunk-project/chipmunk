@@ -169,7 +169,8 @@ def main(argv):
         '--input-packet',
         type=int,
         nargs='+',
-        help='Show the actual packet fields used as the input of spec.')
+        help='Specify those packet fields that will \
+              influence the slicing output')
     parser.add_argument(
         '-p',
         '--parallel',
