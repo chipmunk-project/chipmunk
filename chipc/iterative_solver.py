@@ -169,8 +169,14 @@ def main(argv):
         '--input-packet',
         type=int,
         nargs='+',
-        help='Specify those packet fields that will \
-              influence the slicing output')
+        help='This is intended to provide user with choice\
+                to pick up the packet fields that will \
+                influence the packet fields/states we\
+                want to check correctness for to feed into chipmunk.\
+                For example, in example_specs/blue_decrease.sk, \
+                packet field pkt_1 only depends on pkt_0, \
+                so we can specify --input-packet=0 when we \
+                set - -pkt-fields=1.')
     parser.add_argument(
         '-p',
         '--parallel',
