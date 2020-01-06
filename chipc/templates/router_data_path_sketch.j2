@@ -41,7 +41,7 @@
     // Inputs
     {% if stage_number == 0 %}
       // Read each PHV container from corresponding packet field.
-      {% for field_number in input_packet %}
+      {% for field_number in input_packet_fields %}
         {% if synthesized_allocation %}
         // TODO: deal with the case where not all packets are fed as input
         {% for container_number in range(num_phv_containers) %}
@@ -206,7 +206,7 @@
     {% endfor %}
     {% endfor %}
 
-  {% for field_number in pkt_fields_to_check %}
+  {% for field_number in output_packet_fields %}
     // Write pkt_{{field_number}}
     {% if synthesized_allocation %}
     {% for container_number in range(num_phv_containers) %}
@@ -248,14 +248,14 @@
   |StateAndPacket| pipeline_result = pipeline(x);
   |StateAndPacket| program_result = program(x);
 
-  {% for state_group_number in state_groups_to_check %}
+  {% for state_group_number in output_state_groups %}
     {% for slot_number in range(num_state_slots) %}
       assert(pipeline_result.state_group_{{state_group_number}}_state_{{slot_number}}
       == program_result.state_group_{{state_group_number}}_state_{{slot_number}});
     {% endfor %}
   {% endfor %}
 
-  {% for field_number in pkt_fields_to_check %}
+  {% for field_number in output_packet_fields %}
     assert(pipeline_result.pkt_{{field_number}} == program_result.pkt_{{field_number}});
   {% endfor %}
 

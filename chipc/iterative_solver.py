@@ -56,7 +56,7 @@ def set_default_values(pkt_fields, state_vars, num_fields_in_prog,
 
 def generate_counterexample_asserts(pkt_fields, state_vars, num_fields_in_prog,
                                     state_group_info, count,
-                                    pkt_fields_to_check,
+                                    output_packet_fields,
                                     state_group_to_check, group_size):
     counterexample_defs = ''
     counterexample_asserts = ''
@@ -75,23 +75,23 @@ def generate_counterexample_asserts(pkt_fields, state_vars, num_fields_in_prog,
         else:
             counterexample_defs += ');\n'
 
-    if pkt_fields_to_check is None and state_group_to_check is None:
+    if output_packet_fields is None and state_group_to_check is None:
         counterexample_asserts += 'assert (pipeline(' + 'x_' + str(
             count) + ')' + ' == ' + 'program(' + 'x_' + str(
                 count) + '));\n'
-    elif pkt_fields_to_check is not None and state_group_to_check is None:
-        for i in range(len(pkt_fields_to_check)):
+    elif output_packet_fields is not None and state_group_to_check is None:
+        for i in range(len(output_packet_fields)):
             counterexample_asserts += 'assert (pipeline(' + 'x_' + str(
-                count) + ').pkt_' + str(pkt_fields_to_check[i]) + \
+                count) + ').pkt_' + str(output_packet_fields[i]) + \
                 ' == ' + 'program(' + 'x_' + str(
-                count) + ').pkt_' + str(pkt_fields_to_check[i]) + ');\n'
-    elif pkt_fields_to_check is not None and state_group_to_check is not None:
+                count) + ').pkt_' + str(output_packet_fields[i]) + ');\n'
+    elif output_packet_fields is not None and state_group_to_check is not None:
         # counterexample for packet fields
-        for i in range(len(pkt_fields_to_check)):
+        for i in range(len(output_packet_fields)):
             counterexample_asserts += 'assert (pipeline(' + 'x_' + str(
-                count) + ').pkt_' + str(pkt_fields_to_check[i]) + \
+                count) + ').pkt_' + str(output_packet_fields[i]) + \
                 ' == ' + 'program(' + 'x_' + str(
-                count) + ').pkt_' + str(pkt_fields_to_check[i]) + ');\n'
+                count) + ').pkt_' + str(output_packet_fields[i]) + ');\n'
         # counterexample for stateful groups
         for i in range(len(state_group_to_check)):
             for j in range(group_size):
@@ -102,7 +102,8 @@ def generate_counterexample_asserts(pkt_fields, state_vars, num_fields_in_prog,
                     count) + ').state_group_' + \
                     str(state_group_to_check[i]) + '_state_' + str(j) + ');\n'
     else:
-        assert pkt_fields_to_check is None and state_group_to_check is not None
+        assert output_packet_fields is None
+        assert state_group_to_check is not None
         for i in range(len(state_group_to_check)):
             for j in range(group_size):
                 counterexample_asserts += 'assert (pipeline(' + 'x_' + str(

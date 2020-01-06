@@ -26,10 +26,10 @@ def add_prefix_suffix(text, prefix_string, suffix_string):
 class SketchCodeGenerator:
     def __init__(self, sketch_name, num_phv_containers, num_state_groups,
                  num_alus_per_stage, num_pipeline_stages, num_fields_in_prog,
-                 pkt_fields_to_check, state_groups_to_check,
+                 output_packet_fields, output_state_groups,
                  jinja2_env, stateful_alu_filename,
                  stateless_alu_filename, constant_set,
-                 synthesized_allocation, input_packet):
+                 synthesized_allocation, input_packet_fields):
         self.sketch_name_ = sketch_name
         self.total_hole_bits_ = 0
         self.hole_names_ = []
@@ -43,8 +43,8 @@ class SketchCodeGenerator:
         self.num_state_groups_ = num_state_groups
         self.num_alus_per_stage_ = num_alus_per_stage
         self.num_fields_in_prog_ = num_fields_in_prog
-        self.pkt_fields_to_check_ = pkt_fields_to_check
-        self.state_groups_to_check_ = state_groups_to_check
+        self.output_packet_fields_ = output_packet_fields
+        self.output_state_groups_ = output_state_groups
         self.jinja2_env_ = jinja2_env
         self.jinja2_env_.filters['add_prefix_suffix'] = add_prefix_suffix
         self.stateful_alu_filename_ = stateful_alu_filename
@@ -62,7 +62,7 @@ class SketchCodeGenerator:
         self.num_operands_to_stateful_alu_ = 0
         self.num_state_slots_ = 0
         self.synthesized_allocation_ = synthesized_allocation
-        self.input_packet_ = input_packet
+        self.input_packet_fields_ = input_packet_fields
 
     def reset_holes_and_asserts(self):
         self.total_hole_bits_ = 0
@@ -357,8 +357,8 @@ class SketchCodeGenerator:
             output_mux_definitions=output_mux_definitions,
             alu_definitions=alu_definitions,
             num_fields_in_prog=self.num_fields_in_prog_,
-            pkt_fields_to_check=self.pkt_fields_to_check_,
-            state_groups_to_check=self.state_groups_to_check_,
+            output_packet_fields=self.output_packet_fields_,
+            output_state_groups=self.output_state_groups_,
             num_state_groups=self.num_state_groups_,
             spec_as_sketch=Path(spec_filename).read_text(),
             all_assertions=self.asserts_,
@@ -373,4 +373,4 @@ class SketchCodeGenerator:
                 ['int ' + str(hole) + ' = ' + str(value) + ';'
                     for hole, value in hole_assignments.items()]),
             additional_testcases=additional_testcases,
-            input_packet=self.input_packet_)
+            input_packet_fields=self.input_packet_fields_)
