@@ -80,6 +80,20 @@ def generate_counterexample_asserts(pkt_fields, state_vars, num_fields_in_prog,
             count) + ')' + ' == ' + 'program(' + 'x_' + str(
                 count) + '));\n'
     elif output_packet_fields is not None and state_group_to_check is None:
+        # If our spec only cares about specific packet fields,
+        # the counterexample generated should also care about
+        # the same packet fields
+        # For example, we only care about pkt_0 then the counterexample
+        # assert should be assert(pipeline(x_1).pkt_0 == program(x_1).pkt_0)
+
+        # Same case for stateful_groups except we should care about the size
+        # of state group
+        # For example, we only care about the state_group_0 with the size
+        # of this group to be 2, then the counterexample assert should be
+        # assert(pipeline(x_1).state_group_0_state_0 ==
+        # program(x_1).state_group_0_state_0)
+        # assert(pipeline(x_1).state_group_0_state_1 ==
+        # program(x_1).state_group_0_state_1)
         for i in range(len(output_packet_fields)):
             counterexample_asserts += 'assert (pipeline(' + 'x_' + str(
                 count) + ').pkt_' + str(output_packet_fields[i]) + \
