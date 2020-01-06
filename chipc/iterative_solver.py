@@ -211,7 +211,19 @@ def main(argv):
         '_' + str(args.num_alus_per_stage)
 
     # Get how many members in each state group
-    group_size = len(list(state_group_info.items())[0][1])
+    # state_group_info is OrderedDict which stores the num of state group and
+    # the how many stateful vars in each state group
+    # state_group_info[item] specifies the
+    # num of stateful vars in each state group
+    # In our example, each state group has the same size, so we only pick up
+    # one of them to get the group size
+    # For example,
+    # if state_group_info = OrderedDict([('0', OrderedSet(['0', '1']))])
+    # state_group_info[item] = OrderedSet(['0', '1'])
+    # group_size = 2
+    for item in state_group_info:
+        group_size = len(state_group_info[item])
+        break
 
     # Use OrderedSet here for deterministic compilation results. We can also
     # use built-in dict() for Python versions 3.6 and later, as it's inherently
